@@ -1,6 +1,7 @@
 import csv
 import os
 import allure
+from allure_commons.types import AttachmentType
 import pytest
 import json
 from func4test import sendReportOnEmail
@@ -9,9 +10,11 @@ from time import sleep
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from libs.BugReport.BugReport import BugReport
+import libs.GoogleSheets.GoogleSheets as GSH
+from conftest import path
 logs = []
 times = []
+autotest_results = path+"/../autotest-results"
 
 
 @pytest.fixture(scope="session")
@@ -31,17 +34,13 @@ def write_log():
     test_datetime = datetime.now()
     yield
     try:
-        report = BugReport("1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4")
-        report.__MaxBugs__ = int(2 + 60 / 10 * 24)
-        report.initColumns("times")
-        report.initSheets("times")
-        report.getSheets()
+        report = GSH(SSID="1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4", typeOfDoc="Timings")
         m = times.copy()
-        m.insert(0,str(test_datetime))
+        m.insert(0, str(test_datetime))
         report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
     except:
         pass
-    with open("sdo.csv", "a") as f_obj:
+    with open(autotest_results+"sdo.csv", "a") as f_obj:
         fn = ['Role', 'DateTime']
         for i in range(15):
             fn.append(f"time{i+1}")
@@ -50,11 +49,11 @@ def write_log():
         for i in range(len(times)):
             data[f"time{i+1}"] = times[i]
         writer.writerow(data)
-    with open("sdo.log", "a") as f_obj:
+    with open(autotest_results+"sdo.log", "a") as f_obj:
         f_obj.write(str({"DateTime": str(test_datetime), "logs": str(logs)})+"\n")
-    with open("sdo.json", "r") as f_obj:
+    with open(autotest_results+"sdo.json", "r") as f_obj:
         data = json.load(f_obj)
-    with open("sdo.json", 'w') as f_obj:
+    with open(autotest_results+"sdo.json", 'w') as f_obj:
         data[str(test_datetime)] = logs
         json.dump(data, f_obj, indent=4)
 
@@ -172,6 +171,8 @@ def test_login(setup_driver, login, timing, write_log, gather_log, clicker, dt):
         EC.element_to_be_clickable((By.XPATH, "//div[@class]"))
         times.append(datetime.now() - start_task)
     except Exception as e:
+        with allure.step("Screenshot"):
+            allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
         crush_log(driver, e)
         assert False, str(e)
     assert True

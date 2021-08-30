@@ -4,6 +4,8 @@ from time import sleep
 from datetime import datetime
 from os import sys
 from seleniumwire import webdriver
+import allure
+from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
@@ -32,7 +34,6 @@ def setup_driver(request):
                 '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
         d = DesiredCapabilities.CHROME
         d['loggingPrefs'] = {'browser': 'ALL'}
-
         chrome_options.add_argument("--window-size=1920,1080")
         Driver = webdriver.Chrome(path_of_driver, desired_capabilities=d, options=chrome_options)
     except Exception as e:
