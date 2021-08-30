@@ -1,0 +1,22 @@
+{
+  "Cases": {
+    "name": {
+      "CREDENTIALS_FILE": "stable-ring-316114-8acf36454762.json",
+      "SSID": "1bwB7gBIR-PJbKR0b7VvoBqjxTqLcx6-IDgIyW-yaktQ",
+      "SheetTitle": "name",
+      "Count": 100
+    },
+    "phone": {
+      "CREDENTIALS_FILE": "stable-ring-316114-8acf36454762.json",
+      "SSID": "1bwB7gBIR-PJbKR0b7VvoBqjxTqLcx6-IDgIyW-yaktQ",
+      "SheetTitle": "phone",
+      "Count": 100
+    },
+    "email": {
+      "CREDENTIALS_FILE": "stable-ring-316114-8acf36454762.json",
+      "SSID": "1bwB7gBIR-PJbKR0b7VvoBqjxTqLcx6-IDgIyW-yaktQ",
+      "SheetTitle": "email",
+      "Count": 100
+    }
+  }
+}
