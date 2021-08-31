@@ -10,7 +10,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import libs.GoogleSheets.GoogleSheets as GSH
+from libs.GoogleSheets.GoogleSheets import GoogleSheets
 from conftest import path
 logs = []
 times = []
@@ -33,14 +33,14 @@ def login():
 def write_log():
     test_datetime = datetime.now()
     yield
-    try:
-        report = GSH(SSID="1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4", typeOfDoc="Timings")
-        m = times.copy()
-        m.insert(0, str(test_datetime))
-        report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
-    except:
-        pass
-    with open(autotest_results+"sdo.csv", "a") as f_obj:
+    # try:
+    report = GoogleSheets(SSID="1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4", typeOfDoc="Timings")
+    m = times.copy()
+    m.insert(0, str(test_datetime))
+    report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
+    # except:
+    #     pass
+    with open(autotest_results+"/sdo.csv", "a") as f_obj:
         fn = ['Role', 'DateTime']
         for i in range(15):
             fn.append(f"time{i+1}")
@@ -49,11 +49,11 @@ def write_log():
         for i in range(len(times)):
             data[f"time{i+1}"] = times[i]
         writer.writerow(data)
-    with open(autotest_results+"sdo.log", "a") as f_obj:
+    with open(autotest_results+"/sdo.log", "a") as f_obj:
         f_obj.write(str({"DateTime": str(test_datetime), "logs": str(logs)})+"\n")
-    with open(autotest_results+"sdo.json", "r") as f_obj:
+    with open(autotest_results+"/sdo.json", "r") as f_obj:
         data = json.load(f_obj)
-    with open(autotest_results+"sdo.json", 'w') as f_obj:
+    with open(autotest_results+"/sdo.json", 'w') as f_obj:
         data[str(test_datetime)] = logs
         json.dump(data, f_obj, indent=4)
 
