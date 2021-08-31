@@ -33,8 +33,10 @@ def test_formSending(setup_driver, data):
     sleep(2)
     form = Form(xpath=xpath, driver=Driver)
     text_before = Driver.find_element_by_xpath("//body").text
-    Driver.proxy.storage.clear_requests()
-    status = form.Test()
+    if form.isready:
+        status = form.Test()
+    else:
+        pytest.skip()
     if status["code"] // 100 == 1:
         pytest.skip(status["message"])
     elif status["code"] // 100 == 2:

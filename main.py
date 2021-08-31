@@ -13,7 +13,7 @@ def main():
     xpath = "//div[@class='uniform-block-form__items']"
     form = Form(xpath=xpath, driver=driver)
     print(Form.ready)
-    print(form._Test())
+    print(form.Test())
     driver.close()
     driver.quit()
 
