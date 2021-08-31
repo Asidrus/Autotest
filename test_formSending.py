@@ -13,7 +13,7 @@ from func4test import *
 #     "http://46.183.163.61/seminar/rukovoditel-administrativno-hozyajstvennogo-otdela-v-organizacii",
 #     "http://46.183.163.61/seminar/1"
 # ]
-urls = ["https://46.183.163.61/seminar/ehkonomika-i-upravlenie-na-predpriyatii"]
+# urls = ["https://46.183.163.61/seminar/ehkonomika-i-upravlenie-na-predpriyatii"]
 
 
 def pytest_generate_tests(metafunc):

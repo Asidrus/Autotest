@@ -22,9 +22,8 @@ class Form:
         :param xpath: xpath of form is included all input and button tags
         :param kwargs: driver -> selenium.webdriver
         """
-
-        self.__emailDefault__ = "example@gamail.com"
-        self.__phoneDefault__ = "+79999999999"
+        self.__emailDefault__ = "tester_form@gaps.edu.ru"
+        self.__phoneDefault__ = "81234567890"
         self.__nameDefault__ = "Автотест"
         self._email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
                         "name": ["email", "e-mail"]}
@@ -87,6 +86,7 @@ class Form:
         for i in range(10):
             try:
                 if act == "send_keys":
+                    obj.clear()
                     obj.send_keys(data)
                 elif act == "click":
                     obj.click()
@@ -126,6 +126,19 @@ class Form:
                 return self.status(580)
         else:
             return self.status(180)
+
+    def _Test(self, call_button=None):
+        if self.ready:
+            if call_button is not None:
+                self.action(obj=call_button, act="click")
+            self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
+            self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__)
+            if self.email is not None:
+                self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
+            self.action(obj=self.button, act="click")
+            self.Driver.proxy.storage.clear_requests()
+            request = self.findSendingRequest()
+        return request.response.status_code
 
     def findSendingRequest(self):
         keys = ["email="+self.__emailDefault__[:self.__emailDefault__.find("@")]]
