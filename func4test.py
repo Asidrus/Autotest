@@ -10,6 +10,7 @@ import requests
 
 path = os.path.abspath(os.getcwd())
 
+
 def DataToXpath(data):
     atts = ''
     for att in data["attrib"].keys():
@@ -121,31 +122,39 @@ def GenData(urls):
     data = []
     parser = etree.HTMLParser()
     getGrandDad = lambda item: item.xpath("..")[0].xpath("..")[0]
+    count=0
     for url in urls:
-        page = requests.get(url, verify=False)
-        html = page.content.decode("utf-8")
-        tree = etree.parse(StringIO(html), parser=parser)
-        inputs = tree.xpath("(//input)")
-        for input in inputs:
-            if input.get("type") == 'hidden':
-                inputs.remove(input)
-        groups = [[]]
-        for i in range(len(inputs)):
-            if i == 0:
-                groups[0].append(i + 1)
-            elif getGrandDad(inputs[i]) == getGrandDad(inputs[i - 1]):
-                groups[-1].append(i + 1)
-            else:
-                groups.append([i + 1])
-        groups = list(filter(lambda group: len(group) > 1, groups))
-        data = data + [(url, DataToXpath(
-            {"tag": getGrandDad(inputs[group[0]]).tag, "attrib": getGrandDad(inputs[group[0]]).attrib})) for group in
-                       groups]
+        count = count+1
+        print(int(count/len(urls)*10000)/100)
+        try:
+            page = requests.get(url, verify=True)
+            if page.headers["Content-Type"] != "text/html; charset=UTF-8":
+                continue
+            html = page.content.decode("utf-8", errors='ignore')
+            tree = etree.parse(StringIO(html), parser=parser)
+            inputs = tree.xpath("(//input)")
+            for input in inputs:
+                if input.get("type") == 'hidden':
+                    inputs.remove(input)
+            groups = [[]]
+            for i in range(len(inputs)):
+                if i == 0:
+                    groups[0].append(i + 1)
+                elif getGrandDad(inputs[i]) == getGrandDad(inputs[i - 1]):
+                    groups[-1].append(i + 1)
+                else:
+                    groups.append([i + 1])
+            groups = list(filter(lambda group: len(group) > 1, groups))
+            data = data + [{"url": url, "xpath": DataToXpath(
+                {"tag": getGrandDad(inputs[group[0]]).tag, "attrib": getGrandDad(inputs[group[0]]).attrib})} for group in
+                           groups]
+        except Exception as e:
+            print(e)
     return data
 
 
 def urlsParser(site: str, parse=False):
-    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '')+".json"
+    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '') + ".json"
     if not parse:
         if os.path.exists(fname):
             with open(fname, "r") as read_file:
@@ -224,11 +233,17 @@ class Network:
 
 def _urlsParser(site: str, parse=False):
     def putInDict(url, link, dictionary):
-        res = [_link["from"].append(link["url"]) for _link in dictionary if _link["url"] == url]
-        if len(res) == 0:
+        flag = False
+        for _link in dictionary:
+            if _link["url"] == url:
+                flag = True
+                if link["url"] not in _link["from"]:
+                    _link["from"].append(link["url"])
+                break
+        if not flag:
             dictionary.append({"url": url, "from": [link["url"]]})
 
-    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '')+".json"
+    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '') + ".json"
     if not parse:
         if os.path.exists(fname):
             with open(fname, "r") as read_file:
@@ -236,27 +251,24 @@ def _urlsParser(site: str, parse=False):
                 read_file.close()
                 return Data
         else:
-            print(f"Файл {fname}.json не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
+            print(f"Файл {fname} не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
     links = [{"url": site, "from": []}]
     redirect = []
     others = []
     parser = etree.HTMLParser()
     for link in links:
-        print(link)
-        print(link["url"])
         try:
             print(link["url"])
             page = requests.get(link["url"])
             if page.headers["Content-Type"] != "text/html; charset=UTF-8":
                 continue
-            html = page.content.decode("utf-8")
+            html = page.content.decode("utf-8", errors='ignore')
             tree = etree.parse(StringIO(html), parser=parser)
             a_tags = tree.xpath("//a[@href]")
             for a in a_tags:
                 url = a.get("href", "")
                 if url in ("", "/", link["url"], link["url"] + "/") or url.startswith("#"):
                     continue
-
                 if url.startswith("/"):
                     url = site + url
                     putInDict(url, link, links)
@@ -268,5 +280,5 @@ def _urlsParser(site: str, parse=False):
             print(e)
     Data = {"links": links, "redirect": redirect, "others": others}
     with open(fname, "w") as write_file:
-        json.dump(Data, write_file)
+        json.dump(Data, write_file, indent=4)
     return Data
