@@ -5,6 +5,7 @@ from time import sleep
 from seleniumwire import webdriver
 from libs.form import *
 from func4test import *
+import requests
 
 # urls = [
 #     "http://46.183.163.61/seminar/ehkonomika-i-upravlenie-na-predpriyatii",
@@ -17,9 +18,18 @@ from func4test import *
 
 
 def pytest_generate_tests(metafunc):
-    if "url" in metafunc.fixturenames:
-        urls = urlsParser(metafunc.config.getoption("site"), metafunc.config.getoption("foo"))
-        metafunc.parametrize("url", urls)
+    if "data" in metafunc.fixturenames:
+        try:
+            urls = urlsParser(metafunc.config.getoption("site"), metafunc.config.getoption("parse"))['urls']
+            metafunc.parametrize("url", urls)
+        except:
+            pass
+    urls = urlsParser(metafunc.config.getoption("site"), metafunc.config.getoption("parse"))['urls']
+
+
+def gendata(urls):
+    for url in urls:
+        requests.get(url)
 
 
 @allure.feature("Тест форм")

@@ -145,15 +145,15 @@ def GenData(urls):
 
 
 def urlsParser(site: str, parse=False):
-    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '')
+    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '')+".json"
     if not parse:
-        try:
-            with open(f"{fname}.json", "r") as read_file:
+        if os.path.exists(fname):
+            with open(fname, "r") as read_file:
                 Data = json.load(read_file)
                 read_file.close()
                 return Data
-        except:
-            print(f"Файл {site}.json не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
+        else:
+            print(f"Файл {fname}.json не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
     urls = [site]
     redirect = []
     others = []
@@ -178,14 +178,11 @@ def urlsParser(site: str, parse=False):
                     link = site + link
                     if link not in urls:
                         urls.append(link)
-                        # print(link)
                 elif link.startswith("http"):
                     if link not in redirect:
-                        # print(link)
                         redirect.append(link)
                 else:
                     if link not in others:
-                        # print(link)
                         others.append(link)
         except Exception as e:
             print(e)
@@ -223,3 +220,53 @@ class Network:
                     return request
             else:
                 return None
+
+
+def _urlsParser(site: str, parse=False):
+    def putInDict(url, link, dictionary):
+        res = [_link["from"].append(link["url"]) for _link in dictionary if _link["url"] == url]
+        if len(res) == 0:
+            dictionary.append({"url": url, "from": [link["url"]]})
+
+    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '')+".json"
+    if not parse:
+        if os.path.exists(fname):
+            with open(fname, "r") as read_file:
+                Data = json.load(read_file)
+                read_file.close()
+                return Data
+        else:
+            print(f"Файл {fname}.json не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
+    links = [{"url": site, "from": []}]
+    redirect = []
+    others = []
+    parser = etree.HTMLParser()
+    for link in links:
+        print(link)
+        print(link["url"])
+        try:
+            print(link["url"])
+            page = requests.get(link["url"])
+            if page.headers["Content-Type"] != "text/html; charset=UTF-8":
+                continue
+            html = page.content.decode("utf-8")
+            tree = etree.parse(StringIO(html), parser=parser)
+            a_tags = tree.xpath("//a[@href]")
+            for a in a_tags:
+                url = a.get("href", "")
+                if url in ("", "/", link["url"], link["url"] + "/") or url.startswith("#"):
+                    continue
+
+                if url.startswith("/"):
+                    url = site + url
+                    putInDict(url, link, links)
+                elif url.startswith("http"):
+                    putInDict(url, link, redirect)
+                else:
+                    putInDict(url, link, others)
+        except Exception as e:
+            print(e)
+    Data = {"links": links, "redirect": redirect, "others": others}
+    with open(fname, "w") as write_file:
+        json.dump(Data, write_file)
+    return Data
