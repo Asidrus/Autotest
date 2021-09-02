@@ -153,54 +153,6 @@ def GenData(urls):
     return data
 
 
-def urlsParser(site: str, parse=False):
-    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '') + ".json"
-    if not parse:
-        if os.path.exists(fname):
-            with open(fname, "r") as read_file:
-                Data = json.load(read_file)
-                read_file.close()
-                return Data
-        else:
-            print(f"Файл {fname}.json не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
-    urls = [site]
-    redirect = []
-    others = []
-    parser = etree.HTMLParser()
-    for url in urls:
-        try:
-            print(url)
-            page = requests.get(url)
-            # Скпинуть ссылку если не html
-            if page.headers["Content-Type"] != "text/html; charset=UTF-8":
-                continue
-            html = page.content.decode("utf-8")
-            tree = etree.parse(StringIO(html), parser=parser)
-            a_tags = tree.xpath("//a[@href]")
-            for a in a_tags:
-                link = a.get("href", "")
-                # скипаем ссылки на себя
-                if link in ("", "/", url, url + "/") or link.startswith("#"):
-                    continue
-
-                if link.startswith("/"):
-                    link = site + link
-                    if link not in urls:
-                        urls.append(link)
-                elif link.startswith("http"):
-                    if link not in redirect:
-                        redirect.append(link)
-                else:
-                    if link not in others:
-                        others.append(link)
-        except Exception as e:
-            print(e)
-    Data = {"urls": urls, "redirect": redirect, "others": others}
-    with open(f"{fname}.json", "w") as write_file:
-        json.dump(Data, write_file)
-    return Data
-
-
 def getLinkFromPage(url):
     parser = etree.HTMLParser()
     page = requests.get(url)
@@ -231,7 +183,7 @@ class Network:
                 return None
 
 
-def _urlsParser(site: str, parse=False):
+def urlsParser(site: str, parse=False):
     def putInDict(url, link, dictionary):
         flag = False
         for _link in dictionary:

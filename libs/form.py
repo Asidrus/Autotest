@@ -68,17 +68,20 @@ class Form:
             self.isready = False
 
     def action(self, obj, act: str, data=None):
+        def do(obj, act, data):
+            if act == "send_keys":
+                obj.clear()
+                obj.send_keys(data)
+            elif act == "click":
+                obj.click()
         self.Driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
         for i in range(10):
             try:
-                if act == "send_keys":
-                    obj.clear()
-                    obj.send_keys(data)
-                elif act == "click":
-                    obj.click()
-                break
+                do(obj,act,data)
+                return True
             except:
                 sleep(0.1)
+        do(obj, act, data)
 
     def Test(self, call_button=None):
         if self.isready:
@@ -92,7 +95,7 @@ class Form:
             self.Driver.proxy.storage.clear_requests()
             request = self.findSendingRequest()
             if request is not None:
-                return request.response.status_code
+                return request
         return None
 
     def findSendingRequest(self):

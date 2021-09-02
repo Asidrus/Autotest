@@ -33,13 +33,17 @@ def login():
 def write_log():
     test_datetime = datetime.now()
     yield
-    # try:
-    report = GoogleSheets(SSID="1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4", typeOfDoc="Timings")
-    m = times.copy()
-    m.insert(0, str(test_datetime))
-    report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
-    # except:
-    #     pass
+    try:
+        months = {
+            8: "1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4",
+            9: "1zXsJTkKzEnli-TAIuKL27cV1_54y4BjwOYCNKKYCrSM"
+        }
+        report = GoogleSheets(SSID=months[test_datetime.date().month], typeOfDoc="Timings")
+        m = times.copy()
+        m.insert(0, str(test_datetime))
+        report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
+    except Exception as e:
+        print(e)
     with open(autotest_results+"/sdo.csv", "a") as f_obj:
         fn = ['Role', 'DateTime']
         for i in range(15):

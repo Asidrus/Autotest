@@ -1,42 +1,67 @@
 from seleniumwire import webdriver
 from libs.form import Form
 from time import sleep
-
-
-def main():
-    driver = webdriver.Chrome("./resources/chromedriver")
-    driver.get("https://pentaschool.ru/")
-    sleep(10)
-    driver.add_cookie({"name": "metric_off", "value": "1"})
-    url = "https://pentaschool.ru/program/program-graficheskij-dizajn-v-reklame-s-nulya?"
-    driver.get(url)
-    xpath = "//div[@class='uniform-block-form__items']"
-    form = Form(xpath=xpath, driver=driver)
-    print(Form.ready)
-    print(form.Test())
-    driver.close()
-    driver.quit()
-
+import allure
 
 def _test():
     from func4test import _urlsParser, GenData
-    data = _urlsParser("https://pentaschool.ru", parse=False)
-    urls = [link["url"] for link in data["links"]]
-    gendata = GenData(urls)
-    # data = [{"url": "", "xpath": ""}, {"url": "", "xpath": ""}]
+    import json
+    # data = _urlsParser("https://pentaschool.ru", parse=False)
+    # urls = [link["url"] for link in data["links"]]
+    # gendata = GenData(urls)
+    # with open(f"forms.json", "w") as write_file:
+    #     json.dump({"data": gendata}, write_file, indent=4)
+
+    with open("forms.json", "r") as read_file:
+        Data = json.load(read_file)
+        read_file.close()
     data = []
-    for item in gendata:
+    for item in Data["data"]:
         if data == 0:
             data.append(item)
         else:
             count = 0
-            if len([True for dat in data if dat["xpath"]==item["xpath"]])==0:
+            if len([True for dat in data if dat["xpath"] == item["xpath"]]) == 0:
                 data.append(item)
-        print(data)
     result = [(item["url"], item["xpath"]) for item in data]
     print(result)
+    print(len(result))
+
+
+# def wrapper(func, error=None, screenshot=None, **kwargs):
+#     try:
+#         func(**kwargs)
+#     except Exception as e:
+#         if screenshot:
+#             allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
+#         if error is None:
+#             print(e)
+#         else:
+#             print(error)
+
+
+def wrapper(error=None, screenshot=None, **kwargs):
+    try:
+        func(**kwargs)
+    except Exception as e:
+        # if screenshot:
+        #     allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
+        if error is None:
+            raise e
+        else:
+            raise Exception(error)
+
+
+def step(func):
+    return wrapper
+
+@step
+def div(b, c):
+    a = b / c
+    print(a)
 
 
 if __name__ == "__main__":
-    # main()
-    _test()
+    div(10,1)
+    # step(div)(b=10, c=10)
+    # _test()
