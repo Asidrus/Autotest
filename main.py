@@ -40,9 +40,9 @@ def _test():
 #             print(error)
 
 
-def wrapper(error=None, screenshot=None, **kwargs):
+def wrapper(*args, error=None, screenshot=None, **kwargs):
     try:
-        func(**kwargs)
+        func(*args, **kwargs)
     except Exception as e:
         # if screenshot:
         #     allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
@@ -53,6 +53,16 @@ def wrapper(error=None, screenshot=None, **kwargs):
 
 
 def step(func):
+    def wrapper(*args, error=None, screenshot=None, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            # if screenshot:
+            #     allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
+            if error is None:
+                raise e
+            else:
+                raise Exception(error)
     return wrapper
 
 @step
@@ -62,6 +72,6 @@ def div(b, c):
 
 
 if __name__ == "__main__":
-    div(10,1)
-    # step(div)(b=10, c=10)
+    # div(10,0, error="деление")
+    step(div)(10, 10)
     # _test()

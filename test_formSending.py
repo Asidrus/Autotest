@@ -25,27 +25,24 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("url, xpath", result)
 
 
-def wrapper(error=None, screenshot=None, driver=None, **kwargs):
-    try:
-        func(**kwargs)
-    except Exception as e:
-        if screenshot:
-            allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
-        if error is None:
-            raise e
-        else:
-            raise Exception(error)
-
-
 def step(func):
+    def wrapper(*args, _error=None, _screenshot=None, _driver=None, _step=None, **kwargs):
+        with allure.step(_step):
+            try:
+                func(*args, **kwargs)
+            except Exception as e:
+                if _screenshot:
+                    allure.attach(_driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
+                if _error is None:
+                    raise e
+                else:
+                    raise Exception(_error)
     return wrapper
 
 
 @step
 def check_cookie(driver, url, cookie_dict):
     if driver.get_cookie(name=cookie_dict["name"]) is None:
-        # driver.get(url=url[0:url.find(".ru") + 3])
-        # driver.add_cookie(cookie_dict=cookie_dict)
         step(driver.get)(url=url[0:url.find(".ru") + 3])
         step(driver.add_cookie)(cookie_dict=cookie_dict)
 
@@ -55,8 +52,7 @@ def check_cookie(driver, url, cookie_dict):
 @allure.severity("Critical")
 def test_formSending(setup_driver, url, xpath):
     driver = setup_driver
-    check_cookie(driver=driver, url=url, cookie_dict={"name": "metric_off", "value": "1"})
-    sleep(20)
+    check_cookie(driver, url, {"name": "metric_off", "value": "1"}, _step="Добавление cookie")
     with allure.step("Перейти на url"):
         try:
             driver.get(url)
