@@ -15,7 +15,7 @@ class Form:
     # If form if ready for test
     isready = True
 
-    def __init__(self, *args, xpath=None, **kwargs):
+    def __init__(self, *args, xpath=None, driver=None, **kwargs):
         """
 
         :param args: list of input tags if xpath == None
@@ -29,14 +29,15 @@ class Form:
                         "name": ["email", "e-mail"]}
         self._phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
         self._name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
-        self.Driver = kwargs["driver"]
-        self.getAttribute = lambda item: self.Driver.execute_script('var items = {}; for (index = 0; index < '
+        self.confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним"]
+        self.driver = driver
+        self.getAttribute = lambda item: self.driver.execute_script('var items = {}; for (index = 0; index < '
                                                                     'arguments[0].attributes.length; ++index) { '
                                                                     'items[arguments[0].attributes[index].name] = '
                                                                     'arguments[0].attributes[index].value }; return '
                                                                     'items;', item)
         if xpath is not None:
-            self.granddad = self.Driver.find_element_by_xpath(xpath)
+            self.granddad = self.driver.find_element_by_xpath(xpath)
             args = self.granddad.find_elements_by_xpath(".//input")
 
         for arg in args:
@@ -74,7 +75,7 @@ class Form:
                 obj.send_keys(data)
             elif act == "click":
                 obj.click()
-        self.Driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
+        self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
         for i in range(10):
             try:
                 do(obj,act,data)
@@ -85,6 +86,7 @@ class Form:
 
     def Test(self, call_button=None):
         if self.isready:
+            text_before = self.driver.find_element_by_xpath("//body").text
             if call_button is not None:
                 self.action(obj=call_button, act="click")
             self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
@@ -92,16 +94,18 @@ class Form:
             if self.email is not None:
                 self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
             self.action(obj=self.button, act="click")
-            self.Driver.proxy.storage.clear_requests()
+            self.driver.proxy.storage.clear_requests()
             request = self.findSendingRequest()
-            if request is not None:
-                return request
-        return None
+            text_after = self.driver.find_element_by_xpath("//body").text
+            txt_before, txt_after = compareLists(str2list(text_before), str2list(text_after))
+            confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
+            return request, confirmation
+        return None, None
 
     def findSendingRequest(self):
         keys = ["email="+self.__emailDefault__[:self.__emailDefault__.find("@")]]
         sleep(5)
-        for request in self.Driver.requests:
+        for request in self.driver.requests:
             if any([key in request.body.decode("utf-8", errors='ignore') for key in keys]) or any(
                     [key in request.querystring for key in keys]):
                 return request

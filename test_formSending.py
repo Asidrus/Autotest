@@ -29,14 +29,17 @@ def step(func):
     def wrapper(*args, _error=None, _screenshot=None, _driver=None, _step=None, **kwargs):
         with allure.step(_step):
             try:
-                func(*args, **kwargs)
+                res = func(*args, **kwargs)
+                return res
             except Exception as e:
                 if _screenshot:
-                    allure.attach(_driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
+                    allure.attach(_driver.get_screenshot_as_png(), name="Screenshot",
+                                  attachment_type=AttachmentType.PNG)
                 if _error is None:
                     raise e
                 else:
                     raise Exception(_error)
+
     return wrapper
 
 
@@ -53,28 +56,13 @@ def check_cookie(driver, url, cookie_dict):
 def test_formSending(setup_driver, url, xpath):
     driver = setup_driver
     check_cookie(driver, url, {"name": "metric_off", "value": "1"}, _step="Добавление cookie")
-    with allure.step("Перейти на url"):
-        try:
-            driver.get(url)
-        except Exception as e:
-            allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
-            assert e
+    step(driver.get)(url, _step=f"Переход на страницу {url=}")
     sleep(2)
-    with allure.step("Инициализация формы"):
-        form = Form(xpath=xpath, driver=driver)
-    text_before = driver.find_element_by_xpath("//body").text
-    if form.isready:
-        request = None
-        with allure.step("Отправка формы"):
-            try:
-                request = form.Test()
-            except Exception as e:
-                allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
-                raise e
-        text_after = driver.find_element_by_xpath("//body").text
-        txt_before, txt_after = compareLists(str2list(text_before), str2list(text_after))
-        confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним"]
-        confirmation = any([conf in txt.lower() for txt in txt_after for conf in confirm])
+    form = step(Form)(xpath=xpath, driver=driver, _step="Инициализация формы")
+    if not form.isready:
+        pytest.skip(f"Form is not define as FeedBackForm on {url=} with {xpath=}")
+    request, confirmation = step(form.Test)(_driver=driver, _screenshot=True, _step="Отправка заявки")
+    with allure.step("Анализ результата"):
         if request is None and confirmation:
             with allure.step("Screenshot"):
                 allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
@@ -98,5 +86,3 @@ def test_formSending(setup_driver, url, xpath):
                         allure.attach(driver.get_screenshot_as_png(), name="Screenshot",
                                       attachment_type=AttachmentType.PNG)
                     assert False, str(request.response.body.decode("UTF-8") + str(request.response))
-    else:
-        pytest.skip(f"Form is not define as FeedBackForm on {url=} with {xpath=}")
