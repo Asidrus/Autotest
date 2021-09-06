@@ -6,48 +6,39 @@ from seleniumwire import webdriver
 from libs.form import *
 from func4test import *
 import requests
+from conftest import *
+import os
+from datetime import datetime, timedelta
+
+path = os.path.abspath(os.getcwd())
 
 
 def pytest_generate_tests(metafunc):
-    urls = urlsParser(metafunc.config.getoption("site"), metafunc.config.getoption("parse"))['links']
-    with open("forms.json", "r") as read_file:
-        Data = json.load(read_file)
-        read_file.close()
+    site = metafunc.config.getoption("site")
+    domain = site.replace("https://", "").replace(".ru", "")
+    fname = path + "/resources/"+f"{domain}_form.json"
+
+    if os.path.exists(fname) and (
+            (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
+        with open(fname, "r") as read_file:
+            Data = json.load(read_file)
+            read_file.close()
+    else:
+        data = urlsParser("https://pentaschool.ru", parse=False)
+        urls = [link["url"] for link in data["links"]]
+        Data = {"data": GenData(urls)}
+        with open(fname, "w") as write_file:
+            json.dump(Data, write_file, indent=4)
+
     data = []
     for item in Data["data"]:
         if data == 0:
             data.append(item)
         else:
-            count = 0
             if len([True for dat in data if dat["xpath"] == item["xpath"]]) == 0:
                 data.append(item)
     result = [(item["url"], item["xpath"]) for item in data]
     metafunc.parametrize("url, xpath", result)
-
-
-def step(func):
-    def wrapper(*args, _error=None, _screenshot=None, _driver=None, _step=None, **kwargs):
-        with allure.step(_step):
-            try:
-                res = func(*args, **kwargs)
-                return res
-            except Exception as e:
-                if _screenshot:
-                    allure.attach(_driver.get_screenshot_as_png(), name="Screenshot",
-                                  attachment_type=AttachmentType.PNG)
-                if _error is None:
-                    raise e
-                else:
-                    raise Exception(_error)
-
-    return wrapper
-
-
-@step
-def check_cookie(driver, url, cookie_dict):
-    if driver.get_cookie(name=cookie_dict["name"]) is None:
-        step(driver.get)(url=url[0:url.find(".ru") + 3])
-        step(driver.add_cookie)(cookie_dict=cookie_dict)
 
 
 @allure.feature("Тест форм")

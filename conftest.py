@@ -48,6 +48,31 @@ def setup_driver(request):
         raise e
 
 
+def step(func):
+    def wrapper(*args, _error=None, _screenshot=None, _driver=None, _step=None, **kwargs):
+        with allure.step(_step):
+            try:
+                res = func(*args, **kwargs)
+                return res
+            except Exception as e:
+                if _screenshot:
+                    allure.attach(_driver.get_screenshot_as_png(), name="Screenshot",
+                                  attachment_type=AttachmentType.PNG)
+                if _error is None:
+                    raise e
+                else:
+                    raise Exception(_error)
+    return wrapper
+
+
+@step
+def check_cookie(driver, url, cookie_dict):
+    if driver.get_cookie(name=cookie_dict["name"]) is None:
+        step(driver.get)(url=url[0:url.find(".ru") + 3])
+        step(driver.add_cookie)(cookie_dict=cookie_dict)
+
+
+
 @pytest.fixture(scope="function")
 def timing():
     startTime = datetime.now()

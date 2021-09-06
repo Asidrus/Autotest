@@ -7,6 +7,7 @@ import smtplib
 from lxml import etree
 from io import StringIO
 import requests
+from datetime import datetime, timedelta
 
 path = os.path.abspath(os.getcwd())
 
@@ -122,10 +123,10 @@ def GenData(urls):
     data = []
     parser = etree.HTMLParser()
     getGrandDad = lambda item: item.xpath("..")[0].xpath("..")[0]
-    count=0
+    count = 0
     for url in urls:
-        count = count+1
-        print(int(count/len(urls)*10000)/100)
+        count = count + 1
+        print(int(count / len(urls) * 10000) / 100)
         try:
             page = requests.get(url, verify=True)
             if page.headers["Content-Type"] != "text/html; charset=UTF-8":
@@ -146,7 +147,8 @@ def GenData(urls):
                     groups.append([i + 1])
             groups = list(filter(lambda group: len(group) > 1, groups))
             data = data + [{"url": url, "xpath": DataToXpath(
-                {"tag": getGrandDad(inputs[group[0]]).tag, "attrib": getGrandDad(inputs[group[0]]).attrib})} for group in
+                {"tag": getGrandDad(inputs[group[0]]).tag, "attrib": getGrandDad(inputs[group[0]]).attrib})} for group
+                           in
                            groups]
         except Exception as e:
             print(e)
@@ -195,15 +197,15 @@ def urlsParser(site: str, parse=False):
         if not flag:
             dictionary.append({"url": url, "from": [link["url"]]})
 
-    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '') + ".json"
-    if not parse:
-        if os.path.exists(fname):
-            with open(fname, "r") as read_file:
-                Data = json.load(read_file)
-                read_file.close()
-                return Data
-        else:
-            print(f"Файл {fname} не найден, начинаем парсинг ссылок, наливайте кофе... это надолго")
+    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '') + "_links.json"
+    if (not parse) and os.path.exists(fname) and (
+            (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
+        with open(fname, "r") as read_file:
+            Data = json.load(read_file)
+            read_file.close()
+            return Data
+    else:
+        print(f"Файл {fname} не найден или страрый, начинаем парсинг ссылок, наливайте кофе... это надолго")
     links = [{"url": site, "from": []}]
     redirect = []
     others = []
