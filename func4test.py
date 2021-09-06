@@ -129,7 +129,7 @@ def GenData(urls):
         print(int(count / len(urls) * 10000) / 100)
         try:
             page = requests.get(url, verify=True)
-            if page.headers["Content-Type"] != "text/html; charset=UTF-8":
+            if "text/html" not in page.headers["Content-Type"]:
                 continue
             html = page.content.decode("utf-8", errors='ignore')
             tree = etree.parse(StringIO(html), parser=parser)
@@ -211,27 +211,27 @@ def urlsParser(site: str, parse=False):
     others = []
     parser = etree.HTMLParser()
     for link in links:
-        try:
-            print(link["url"])
-            page = requests.get(link["url"])
-            if page.headers["Content-Type"] != "text/html; charset=UTF-8":
+        # try:
+        print(link["url"])
+        page = requests.get(link["url"])
+        if page.headers["Content-Type"] not in ("text/html; charset=UTF-8", "text/html; charset=windows-1251"):
+            continue
+        html = page.content.decode("utf-8", errors='ignore')
+        tree = etree.parse(StringIO(html), parser=parser)
+        a_tags = tree.xpath("//a[@href]")
+        for a in a_tags:
+            url = a.get("href", "")
+            if url in ("", "/", link["url"], link["url"] + "/") or url.startswith("#"):
                 continue
-            html = page.content.decode("utf-8", errors='ignore')
-            tree = etree.parse(StringIO(html), parser=parser)
-            a_tags = tree.xpath("//a[@href]")
-            for a in a_tags:
-                url = a.get("href", "")
-                if url in ("", "/", link["url"], link["url"] + "/") or url.startswith("#"):
-                    continue
-                if url.startswith("/"):
-                    url = site + url
-                    putInDict(url, link, links)
-                elif url.startswith("http"):
-                    putInDict(url, link, redirect)
-                else:
-                    putInDict(url, link, others)
-        except Exception as e:
-            print(e)
+            if url.startswith("/"):
+                url = site + url
+                putInDict(url, link, links)
+            elif url.startswith("http"):
+                putInDict(url, link, redirect)
+            else:
+                putInDict(url, link, others)
+    # except Exception as e:
+    #     print(e)
     Data = {"links": links, "redirect": redirect, "others": others}
     with open(fname, "w") as write_file:
         json.dump(Data, write_file, indent=4)

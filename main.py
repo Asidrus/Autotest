@@ -11,7 +11,7 @@ path = os.path.abspath(os.getcwd())
 
 
 def main():
-    site = "https://pentaschool.ru"
+    site = "https://adpo.edu.ru"
     domain = site.replace("https://", "").replace(".ru", "")
     fname = path + "/resources/" + f"{domain}_form.json"
 
@@ -21,7 +21,7 @@ def main():
             Data = json.load(read_file)
             read_file.close()
     else:
-        data = urlsParser("https://pentaschool.ru", parse=True)
+        data = urlsParser(site, parse=False)
         urls = [link["url"] for link in data["links"]]
         Data = {"data": GenData(urls)}
         with open(fname, "w") as write_file:
@@ -39,4 +39,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    site = "https://adpo.edu.ru"
+    data = urlsParser(site, parse=True)

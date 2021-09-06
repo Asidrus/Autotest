@@ -24,7 +24,7 @@ def pytest_generate_tests(metafunc):
             Data = json.load(read_file)
             read_file.close()
     else:
-        data = urlsParser("https://pentaschool.ru", parse=False)
+        data = urlsParser(site, parse=False)
         urls = [link["url"] for link in data["links"]]
         Data = {"data": GenData(urls)}
         with open(fname, "w") as write_file:
