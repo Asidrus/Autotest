@@ -10,32 +10,9 @@ import json
 path = os.path.abspath(os.getcwd())
 
 
-def main():
-    site = "https://adpo.edu.ru"
-    domain = site.replace("https://", "").replace(".ru", "")
-    fname = path + "/resources/" + f"{domain}_form.json"
+def test_ADPO():
 
-    if os.path.exists(fname) and (
-            (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
-        with open(fname, "r") as read_file:
-            Data = json.load(read_file)
-            read_file.close()
-    else:
-        data = urlsParser(site, parse=False)
-        urls = [link["url"] for link in data["links"]]
-        Data = {"data": GenData(urls)}
-        with open(fname, "w") as write_file:
-            json.dump(Data, write_file, indent=4)
 
-    data = []
-    for item in Data["data"]:
-        if data == 0:
-            data.append(item)
-        else:
-            if len([True for dat in data if dat["xpath"] == item["xpath"]]) == 0:
-                data.append(item)
-    result = [(item["url"], item["xpath"]) for item in data]
-    print(result)
 
 
 if __name__ == "__main__":

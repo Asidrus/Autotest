@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 path = os.path.abspath(os.getcwd())
 
-
+# /home/kali/autotest/tests/resources/adpo.edu_form.json
 def pytest_generate_tests(metafunc):
     site = metafunc.config.getoption("site")
     domain = site.replace("https://", "").replace(".ru", "")
