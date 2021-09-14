@@ -26,10 +26,28 @@ async def getpage(func, *args, **kwargs):
 
 class aioparser:
 
-    async def getpage(self, url):
+    parser = None
+
+    links = []
+    redirect = []
+    others = []
+
+    def takeLink(self):
+        yield from self.links
+
+    async def _parse(self, site):
+        self.links.append({"url": site, "from": []})
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                return response
+            for link in self.takeLink():
+                print(link["url"])
+                async with session.get(link["url"]) as response:
+                    if "text/html" not in response.headers["Content-Type"]:
+                        continue
+                    text = await response.text()
+                    html = await response.text("utf-8", errors="ignore")
+                    tree = etree.parse(StringIO(html), parser=self.parser)
+
+
 
     async def parse(self, site):
         links = [{"url": site, "from": []}]
