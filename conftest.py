@@ -9,9 +9,7 @@ from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
-
-path = os.path.abspath(os.getcwd())
-path_of_driver = path + "/resources/chromedriver" if sys.platform == "linux" else path + "/resources/chromedriver.exe"
+from config import chromedriver
 
 
 def pytest_addoption(parser):
@@ -35,7 +33,7 @@ def setup_driver(request):
         d = DesiredCapabilities.CHROME
         d['loggingPrefs'] = {'browser': 'ALL'}
         chrome_options.add_argument("--window-size=1920,1080")
-        Driver = webdriver.Chrome(path_of_driver, desired_capabilities=d, options=chrome_options)
+        Driver = webdriver.Chrome(chromedriver, desired_capabilities=d, options=chrome_options)
     except Exception as e:
         raise e
     yield Driver

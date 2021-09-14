@@ -1,20 +1,16 @@
 import csv
-import os
 import allure
 from allure_commons.types import AttachmentType
 import pytest
 import json
-from func4test import sendReportOnEmail
-from datetime import datetime, timedelta
-from time import sleep
+from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from libs.GoogleSheets.GoogleSheets import GoogleSheets
-from conftest import path
+from config import autotest_results, google_token
 logs = []
 times = []
-autotest_results = path+"/../autotest-results"
 
 
 @pytest.fixture(scope="session")
@@ -38,7 +34,7 @@ def write_log():
             8: "1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4",
             9: "1zXsJTkKzEnli-TAIuKL27cV1_54y4BjwOYCNKKYCrSM"
         }
-        report = GoogleSheets(SSID=months[test_datetime.date().month], typeOfDoc="Timings")
+        report = GoogleSheets(SSID=months[test_datetime.date().month], typeOfDoc="Timings", CREDENTIALS_FILE=google_token)
         m = times.copy()
         m.insert(0, str(test_datetime))
         report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])

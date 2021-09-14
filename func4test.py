@@ -1,13 +1,10 @@
 import json
 import os
 from libs.case import *
-from time import sleep
-from seleniumwire import webdriver
 import smtplib
 from lxml import etree
 from io import StringIO
 import requests
-from datetime import datetime, timedelta
 
 path = os.path.abspath(os.getcwd())
 
@@ -153,86 +150,3 @@ def GenData(urls):
         except Exception as e:
             print(e)
     return data
-
-
-def getLinkFromPage(url):
-    parser = etree.HTMLParser()
-    page = requests.get(url)
-    html = page.content.decode("utf-8")
-    tree = etree.parse(StringIO(html), parser=parser)
-    a_tags = tree.xpath("//a[@href]")
-    links = [link.get("href", "") for link in a_tags]
-    return links
-
-
-class Network:
-
-    def __init__(self):
-        pass
-
-    def findRequest(self, **kwargs):
-        requests = list()
-        for request in kwargs["requests"]:
-            if request.response:
-                query = ""
-                if type(request.querystring) == bytes:
-                    query = request.querystring.decode("UTF-8")
-                else:
-                    query = request.querystring
-                if "tester" in query:
-                    return request
-            else:
-                return None
-
-
-def urlsParser(site: str, parse=False):
-    def putInDict(url, link, dictionary):
-        flag = False
-        for _link in dictionary:
-            if _link["url"] == url:
-                flag = True
-                if link["url"] not in _link["from"]:
-                    _link["from"].append(link["url"])
-                break
-        if not flag:
-            dictionary.append({"url": url, "from": [link["url"]]})
-
-    fname = path + "/resources/" + site.replace('https://', '').replace('.ru', '') + "_links.json"
-    if (not parse) and os.path.exists(fname) and (
-            (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
-        with open(fname, "r") as read_file:
-            Data = json.load(read_file)
-            read_file.close()
-            return Data
-    else:
-        print(f"Файл {fname} не найден или страрый, начинаем парсинг ссылок, наливайте кофе... это надолго")
-    links = [{"url": site, "from": []}]
-    redirect = []
-    others = []
-    parser = etree.HTMLParser()
-    for link in links:
-        # try:
-        print(link["url"])
-        page = requests.get(link["url"])
-        if page.headers["Content-Type"] not in ("text/html; charset=UTF-8", "text/html; charset=windows-1251"):
-            continue
-        html = page.content.decode("utf-8", errors='ignore')
-        tree = etree.parse(StringIO(html), parser=parser)
-        a_tags = tree.xpath("//a[@href]")
-        for a in a_tags:
-            url = a.get("href", "")
-            if url in ("", "/", link["url"], link["url"] + "/") or url.startswith("#"):
-                continue
-            if url.startswith("/"):
-                url = site + url
-                putInDict(url, link, links)
-            elif url.startswith("http"):
-                putInDict(url, link, redirect)
-            else:
-                putInDict(url, link, others)
-    # except Exception as e:
-    #     print(e)
-    Data = {"links": links, "redirect": redirect, "others": others}
-    with open(fname, "w") as write_file:
-        json.dump(Data, write_file, indent=4)
-    return Data
