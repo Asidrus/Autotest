@@ -1,20 +1,13 @@
-from datetime import datetime
-import aiohttp
+from config import *
 import asyncio
-from lxml import etree
-from io import StringIO
-import requests
-from libs.aioparser import aioparser
 
 
-
-def _test():
-    parser = aioparser()
-    parser.getAllUrls(site="https://pentaschool.ru", parse=True)
-
+async def main(msg):
+    reader, writer = await asyncio.open_connection(
+        '127.0.0.1', 1234)
+    writer.write(msg.encode())
+    writer.close()
+    await writer.wait_closed()
 
 if __name__ == "__main__":
-    start = datetime.now()
-    _test()
-    print(datetime.now()-start)
-
+    asyncio.run(main(msg))

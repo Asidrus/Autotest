@@ -1,15 +1,15 @@
+import asyncio
+
 import pytest
-import os
 from time import sleep
 from datetime import datetime
-from os import sys
 from seleniumwire import webdriver
 import allure
 from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
-from config import chromedriver
+from config import *
 
 
 def pytest_addoption(parser):
@@ -46,20 +46,43 @@ def setup_driver(request):
         raise e
 
 
+async def send_telegram_broadcast(msg):
+    reader, writer = await asyncio.open_connection(
+        '127.0.0.1', 1234)
+    writer.write((msg+"#END").encode())
+    writer.close()
+    await writer.wait_closed()
+
+
+def alarm(msg):
+    asyncio.run(send_telegram_broadcast(msg))
+
+
 def step(func):
-    def wrapper(*args, _error=None, _screenshot=None, _driver=None, _step=None, **kwargs):
+    def wrapper(*args,
+                _error=None,
+                _driver=None,
+                _screenshot=None,
+                _step=None,
+                _browser_log=None,
+                _ignore=None,
+                **kwargs):
         with allure.step(_step):
             try:
                 res = func(*args, **kwargs)
                 return res
             except Exception as e:
-                if _screenshot:
+                if _screenshot and (_driver is not None):
                     allure.attach(_driver.get_screenshot_as_png(), name="Screenshot",
                                   attachment_type=AttachmentType.PNG)
-                if _error is None:
-                    raise e
-                else:
+                if _browser_log and (_driver is not None):
+                    logger.warning({"url": _driver.current_url, "messages": _driver.get_log('browser')})
+                logger.critical(str(e))
+                if _error is not None:
+                    e = Exception(_error)
+                if _ignore is not True:
                     raise Exception(_error)
+
     return wrapper
 
 
@@ -68,7 +91,6 @@ def check_cookie(driver, url, cookie_dict):
     if driver.get_cookie(name=cookie_dict["name"]) is None:
         step(driver.get)(url=url[0:url.find(".ru") + 3])
         step(driver.add_cookie)(cookie_dict=cookie_dict)
-
 
 
 @pytest.fixture(scope="function")
@@ -91,4 +113,5 @@ def clicker():
             except:
                 sleep(0.05)
         button.click()
+
     return _clicker

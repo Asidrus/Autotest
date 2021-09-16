@@ -70,7 +70,7 @@ class aioparser:
                     a_tags = tree.xpath("//a[@href]")
                     for a in a_tags:
                         url = a.get("href", "")
-                        if url in ("", "/", link["url"], link["url"] + "/") or url.startswith("#") or ("?" in url):
+                        if url in ("", "/", link["url"], link["url"] + "/") or ("#" in url) or ("?" in url):
                             continue
                         if url.startswith("/"):
                             url = site + url

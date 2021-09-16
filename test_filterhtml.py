@@ -5,6 +5,7 @@ import allure
 import requests
 from xml import etree
 
+
 def pytest_generate_tests(metafunc):
     if "url" in metafunc.fixturenames:
         # urls = urlsParser(metafunc.config.getoption("site"), metafunc.config.getoption("foo"))

@@ -2,27 +2,16 @@ import csv
 import allure
 from allure_commons.types import AttachmentType
 import pytest
-import json
 from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from libs.GoogleSheets.GoogleSheets import GoogleSheets
-from config import autotest_results, google_token
-logs = []
+from config import *
+from conftest import step
+from time import sleep
+
 times = []
-
-
-@pytest.fixture(scope="session")
-def login():
-    def _login(driver, _login, _password):
-        name = driver.find_element_by_xpath("//input[@name='username']")
-        password = driver.find_element_by_xpath("//input[@name='password']")
-        button = driver.find_element_by_xpath("//button[@type='submit']")
-        name.send_keys(_login)
-        password.send_keys(_password)
-        button.click()
-    return _login
 
 
 @pytest.fixture(scope="session")
@@ -34,47 +23,47 @@ def write_log():
             8: "1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4",
             9: "1zXsJTkKzEnli-TAIuKL27cV1_54y4BjwOYCNKKYCrSM"
         }
-        report = GoogleSheets(SSID=months[test_datetime.date().month], typeOfDoc="Timings", CREDENTIALS_FILE=google_token)
+        report = GoogleSheets(SSID=months[test_datetime.date().month], typeOfDoc="Timings",
+                              CREDENTIALS_FILE=google_token)
         m = times.copy()
         m.insert(0, str(test_datetime))
         report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
     except Exception as e:
         print(e)
-    with open(autotest_results+"/sdo.csv", "a") as f_obj:
+    with open(autotest_results + "/sdo.csv", "a") as f_obj:
         fn = ['Role', 'DateTime']
         for i in range(15):
-            fn.append(f"time{i+1}")
+            fn.append(f"time{i + 1}")
         writer = csv.DictWriter(f_obj, fieldnames=fn, delimiter=',')
         data = {'Role': 'student', 'DateTime': test_datetime}
         for i in range(len(times)):
-            data[f"time{i+1}"] = times[i]
+            data[f"time{i + 1}"] = times[i]
         writer.writerow(data)
-    with open(autotest_results+"/sdo.log", "a") as f_obj:
-        f_obj.write(str({"DateTime": str(test_datetime), "logs": str(logs)})+"\n")
-    with open(autotest_results+"/sdo.json", "r") as f_obj:
-        data = json.load(f_obj)
-    with open(autotest_results+"/sdo.json", 'w') as f_obj:
-        data[str(test_datetime)] = logs
-        json.dump(data, f_obj, indent=4)
 
 
-@pytest.fixture(scope="session")
-def gather_log():
-    def _add_log(driver):
+def login(driver, _login, _password):
+    name = driver.find_element_by_xpath("//input[@name='username']")
+    password = driver.find_element_by_xpath("//input[@name='password']")
+    button = driver.find_element_by_xpath("//button[@type='submit']")
+    name.send_keys(_login)
+    password.send_keys(_password)
+    button.click()
+
+
+def do_step(step, driver, start_task):
+    button = WebDriverWait(driver, 100).until(
+        EC.element_to_be_clickable((By.XPATH, step['xpath'])))
+    logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
+    for i in range(400):
         try:
-            logs.append({"url": driver.current_url, "messages": driver.get_log('browser')})
+            button.click()
+            break
         except:
-            pass
-
-    def _crush_log(driver, e):
-        logs.append({"url": driver.current_url, "messages": str(e)})
-        _add_log(driver)
-        # try:
-        #     sendReportOnEmail("it@gaps.edu.ru", "Autotest SDO", str(times) + str(logs))
-        # except:
-        #     pass
-
-    return _add_log, _crush_log
+            sleep(0.05)
+    times.append(datetime.now() - start_task)
+    if step["back"]:
+        driver.back()
+    return datetime.now()
 
 
 @allure.feature("Тест sdo")
@@ -82,8 +71,8 @@ def gather_log():
 @allure.severity("Critical")
 @pytest.mark.timeout(300)
 @pytest.mark.parametrize("dt", [str(datetime.now())])
-def test_login(setup_driver, login, timing, write_log, gather_log, clicker, dt):
-    add_log, crush_log = gather_log
+def test_login(setup_driver, timing, write_log, clicker, dt):
+    gather = lambda: logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
     driver = setup_driver
     mainUrl = "https://sdo.niidpo.ru/login/index.php"
     steps = [
@@ -125,18 +114,12 @@ def test_login(setup_driver, login, timing, write_log, gather_log, clicker, dt):
         },
     ]
 
-    try:
-        driver.get(mainUrl)
-        logs.append({"url": driver.current_url, "messages": driver.get_log('browser')})
-    except Exception as e:
-        crush_log(driver, f"Test broken. Can't get page: {mainUrl}")
-        assert False, str(e)
-    try:
-        login(driver, "an.karenovna@yandex.ru", "an.karenovna")
-        add_log(driver)
-    except Exception as e:
-        crush_log(driver, f"Test broken. Can't get page: {mainUrl}")
-        assert False, str(e)
+    step(driver.get)(mainUrl, _step=f"Переход на страницу url={mainUrl}",
+                     _driver=driver, _screenshot=True, _browser_log=True)
+    gather()
+    step(login)(driver, "an.karenovna@yandex.ru", "an.karenovna",
+                _step=f"Вход в личный кабинет",
+                _driver=driver, _screenshot=True, _browser_log=True)
     reqs = []
     for request in driver.requests:
         try:
@@ -144,35 +127,19 @@ def test_login(setup_driver, login, timing, write_log, gather_log, clicker, dt):
                 reqs.append(request)
         except:
             pass
-    try:
-        times.append(reqs[1].date - reqs[0].date)
-    except Exception as e:
-        logs.append({"url": driver.current_url, "messages": f"Time 1 is not define, cause: {e}"})
-        times.append(None)
-    try:
-        times.append(reqs[2].date - reqs[1].date)
-    except:
-        logs.append({"url": driver.current_url, "messages": f"Time 2 is not define, cause: {e}"})
-        times.append(None)
+    step(times.append)(reqs[1].date - reqs[0].date, _error=f"Time 1 is not define, cause", _ignore=True)
+    step(times.append)(reqs[1].date - reqs[0].date, _error=f"Time 2 is not define, cause", _ignore=True)
     try:
         start_task = reqs[2].date
     except:
         start_task = datetime.now()
-    try:
-        for step in steps:
-            button = WebDriverWait(driver, 100).until(
-                EC.element_to_be_clickable((By.XPATH, step['xpath'])))
-            add_log(driver)
-            clicker(driver, button)
-            times.append(datetime.now()-start_task)
-            if step["back"]:
-                driver.back()
-            start_task = datetime.now()
-        EC.element_to_be_clickable((By.XPATH, "//div[@class]"))
-        times.append(datetime.now() - start_task)
-    except Exception as e:
-        with allure.step("Screenshot"):
-            allure.attach(driver.get_screenshot_as_png(), name="Screenshot", attachment_type=AttachmentType.PNG)
-        crush_log(driver, e)
-        assert False, str(e)
+
+    for part in steps:
+        start_task = step(do_step)(part, driver, start_task,
+                                   _driver=driver, _screenshot=True,
+                                   _step="Шаг по клику на" + str(part["xpath"]),
+                                   _browser_log=True)
+    WebDriverWait(driver, 100).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@class='attention-aggree']")))
+    times.append(datetime.now() - start_task)
     assert True

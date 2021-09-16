@@ -1,22 +1,18 @@
 import allure
 from allure_commons.types import AttachmentType
-import pytest
-from time import sleep
-from seleniumwire import webdriver
 from libs.form import *
 from func4test import *
-import requests
 from conftest import *
 import os
 from datetime import datetime, timedelta
+from config import resources_path
+from libs.aioparser import aioparser
 
-path = os.path.abspath(os.getcwd())
 
-# /home/kali/autotest/tests/resources/adpo.edu_form.json
 def pytest_generate_tests(metafunc):
     site = metafunc.config.getoption("site")
     domain = site.replace("https://", "").replace(".ru", "")
-    fname = path + "/resources/"+f"{domain}_form.json"
+    fname = resources_path+f"/{domain}_form.json"
 
     if os.path.exists(fname) and (
             (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
@@ -24,8 +20,9 @@ def pytest_generate_tests(metafunc):
             Data = json.load(read_file)
             read_file.close()
     else:
-        data = urlsParser(site, parse=False)
-        urls = [link["url"] for link in data["links"]]
+        parser = aioparser()
+        parser.getAllUrls(site)
+        urls = [link["url"] for link in parser.links]
         Data = {"data": GenData(urls)}
         with open(fname, "w") as write_file:
             json.dump(Data, write_file, indent=4)
