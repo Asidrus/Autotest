@@ -1,5 +1,6 @@
 import asyncio
 
+import asyncpg as asyncpg
 import pytest
 from time import sleep
 from datetime import datetime
@@ -49,7 +50,7 @@ def setup_driver(request):
 async def send_telegram_broadcast(msg):
     reader, writer = await asyncio.open_connection(
         '127.0.0.1', 1234)
-    writer.write((msg+"#END").encode())
+    writer.write((msg + "#END").encode())
     writer.close()
     await writer.wait_closed()
 
@@ -115,3 +116,14 @@ def clicker():
         button.click()
 
     return _clicker
+
+
+@pytest.fixture(scope="session")
+@pytest.mark.asyncio
+async def db():
+    conn = await asyncpg.connect(user=self.user,
+                                 password=self.password,
+                                 database=self.database,
+                                 host=self.host)
+    yield conn
+    conn.close()
