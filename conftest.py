@@ -118,12 +118,12 @@ def clicker():
     return _clicker
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 @pytest.mark.asyncio
 async def db():
-    conn = await asyncpg.connect(user=self.user,
-                                 password=self.password,
-                                 database=self.database,
-                                 host=self.host)
-    yield conn
-    conn.close()
+    connection = await asyncpg.connect(user=db_login,
+                                       password=db_password,
+                                       database="speedtest",
+                                       host="localhost")
+    yield connection
+    await connection.close()
