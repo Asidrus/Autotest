@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import contextmanager
 
 import asyncpg as asyncpg
 import pytest
@@ -59,6 +60,11 @@ def alarm(msg):
     asyncio.run(send_telegram_broadcast(msg))
 
 
+def gatherBrowserLogs(driver):
+    driver.proxy.storage.clear_requests()
+    logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
+
+
 def step(func):
     def wrapper(*args,
                 _error=None,
@@ -87,21 +93,34 @@ def step(func):
     return wrapper
 
 
+@contextmanager
+def allure_step(step_name=None,
+                driver=None,
+                screenshot=None,
+                browser_log=None,
+                ignore=None,
+                error=None,
+                alarm=None):
+    with allure.step(step_name):
+        try:
+            yield
+        except Exception as e:
+            if screenshot and (driver is not None):
+                allure.attach(driver.get_screenshot_as_png(), name=step_name, attachment_type=AttachmentType.PNG)
+            if browser_log and (driver is not None):
+                logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
+            if error is not None:
+                e = Exception(error)
+            logger.critical(str(e))
+            if ignore is not True:
+                raise Exception(error)
+
+
 @step
 def check_cookie(driver, url, cookie_dict):
     if driver.get_cookie(name=cookie_dict["name"]) is None:
         step(driver.get)(url=url[0:url.find(".ru") + 3])
         step(driver.add_cookie)(cookie_dict=cookie_dict)
-
-
-@pytest.fixture(scope="function")
-def timing():
-    startTime = datetime.now()
-
-    def deltaTime():
-        return datetime.now() - startTime
-
-    return deltaTime
 
 
 @pytest.fixture(scope="session")

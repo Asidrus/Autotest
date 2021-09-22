@@ -22,9 +22,10 @@ def main2():
     plt.savefig("../temp/pic1.png")
     # plt.show()
 
+
 from datetime import time
 if __name__ == "__main__":
     # asyncio.run(main("hi"))
     # main2()
     time(second=1)
-    time.
+    # time.

@@ -4,11 +4,16 @@ import pytest
 import aiohttp
 # import requests
 
+test_name = "Статус код всех ссылок"
+domain = ""
+severity = "Blocker"
+
 codes = {1: True, 2: True, 3: True, 4: False, 5: False}
 
 
 def pytest_generate_tests(metafunc):
     parser = aioparser()
+    domain = metafunc.config.getoption("site").lower().replace("https://", "")
     parser.getAllUrls(metafunc.config.getoption("site"), metafunc.config.getoption("parse"))
     metafunc.parametrize("link", parser.links)
     # metafunc.parametrize("link", [{"url":"https://pentaschool.ru", "from": []},
@@ -24,11 +29,11 @@ def pytest_generate_tests(metafunc):
 #     assert codes[response.status_code // 100], f"{response.status_code}, from={link['from']}"
 
 
-@allure.feature("Тест ссылок")
-@allure.story("Статус страниц")
-@allure.severity("Critical")
+@allure.feature(domain)
+@allure.story(test_name)
+@allure.severity(severity)
 @pytest.mark.asyncio
-async def test_pageStatus(link, timing):
+async def test_pageStatus(link):
     async with aiohttp.ClientSession() as session:
         async with session.get(link["url"]) as response:
-            assert codes[response.status_code // 100], f"{response.status_code}, from={link['from']}"
+            assert codes[response.status // 100], f"{response.status}, from={link['from']}"

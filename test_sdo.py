@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from libs.GoogleSheets.GoogleSheets import GoogleSheets
 from config import *
-from conftest import step
+from conftest import step, allure_step, gatherBrowserLogs, alarm
 from time import sleep
 
 times = []
@@ -18,24 +18,28 @@ times = []
 def write_log():
     test_datetime = datetime.now()
     yield
+    sendInGoogleSheet(test_datetime, times)
+    writeIntoFile(test_datetime, times)
+
+
+def sendInGoogleSheet(test_datetime, times):
     try:
-        months = {
-            8: "1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4",
-            9: "1zXsJTkKzEnli-TAIuKL27cV1_54y4BjwOYCNKKYCrSM"
-        }
-        report = GoogleSheets(SSID=months[test_datetime.date().month], typeOfDoc="Timings",
+        report = GoogleSheets(SSID=listener_months_SSID[test_datetime.date().month], typeOfDoc="Timings",
                               CREDENTIALS_FILE=google_token)
         m = times.copy()
         m.insert(0, str(test_datetime))
         report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
     except Exception as e:
-        print(e)
+        logger.critical(str(e))
+
+
+def writeIntoFile(test_datetime, times):
     with open(autotest_results + "/sdo.csv", "a") as f_obj:
         fn = ['Role', 'DateTime']
         for i in range(15):
             fn.append(f"time{i + 1}")
         writer = csv.DictWriter(f_obj, fieldnames=fn, delimiter=',')
-        data = {'Role': 'student', 'DateTime': test_datetime}
+        data = {'DateTime': test_datetime}
         for i in range(len(times)):
             data[f"time{i + 1}"] = times[i]
         writer.writerow(data)
@@ -51,8 +55,7 @@ def login(driver, _login, _password):
 
 
 def do_step(step, driver, start_task):
-    button = WebDriverWait(driver, 100).until(
-        EC.element_to_be_clickable((By.XPATH, step['xpath'])))
+    button = WebDriverWait(driver, 100).until(EC.element_to_be_clickable((By.XPATH, step['xpath'])))
     logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
     for i in range(400):
         try:
@@ -71,8 +74,7 @@ def do_step(step, driver, start_task):
 @allure.severity("Critical")
 @pytest.mark.timeout(300)
 @pytest.mark.parametrize("dt", [str(datetime.now())])
-def test_login(setup_driver, timing, write_log, clicker, dt):
-    gather = lambda: logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
+def test_sdo(setup_driver, write_log, clicker, dt):
     driver = setup_driver
     mainUrl = "https://sdo.niidpo.ru/login/index.php"
     steps = [
@@ -113,13 +115,13 @@ def test_login(setup_driver, timing, write_log, clicker, dt):
             'back': False
         },
     ]
-
-    step(driver.get)(mainUrl, _step=f"Переход на страницу url={mainUrl}",
-                     _driver=driver, _screenshot=True, _browser_log=True)
-    gather()
-    step(login)(driver, "an.karenovna@yandex.ru", "an.karenovna",
-                _step=f"Вход в личный кабинет",
-                _driver=driver, _screenshot=True, _browser_log=True)
+    with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True):
+        driver.get(mainUrl)
+        gatherBrowserLogs(driver)
+        alarm("TEST ___ Critical: SDO упал!")
+    with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True):
+        login(driver, listener_login, listener_password)
+        gatherBrowserLogs(driver)
     reqs = []
     for request in driver.requests:
         try:
@@ -127,19 +129,20 @@ def test_login(setup_driver, timing, write_log, clicker, dt):
                 reqs.append(request)
         except:
             pass
-    step(times.append)(reqs[1].date - reqs[0].date, _error=f"Time 1 is not define, cause", _ignore=True)
-    step(times.append)(reqs[1].date - reqs[0].date, _error=f"Time 2 is not define, cause", _ignore=True)
+    with allure_step(f"Поиск запроса после клика", driver=driver, screenshot=True,
+                     browser_log=True, error=f"Time 1 is not define", ignore=True):
+        times.append(reqs[1].date - reqs[0].date)
+    with allure_step(f"Поиск запроса редиректа", driver=driver, screenshot=True,
+                     browser_log=True, error=f"Time 2 is not define", ignore=True):
+        times.append(reqs[2].date - reqs[1].date)
     try:
         start_task = reqs[2].date
     except:
         start_task = datetime.now()
-
     for part in steps:
-        start_task = step(do_step)(part, driver, start_task,
-                                   _driver=driver, _screenshot=True,
-                                   _step="Шаг по клику на" + str(part["xpath"]),
-                                   _browser_log=True)
-    WebDriverWait(driver, 100).until(
-        EC.element_to_be_clickable((By.XPATH, "//div[@class='attention-aggree']")))
+        with allure_step("Шаг по клику на" + str(part["xpath"]), driver=driver, screenshot=True, browser_log=True):
+            do_step(part, driver, start_task)
+            gatherBrowserLogs(driver)
+    WebDriverWait(driver, 100).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='attention-aggree']")))
     times.append(datetime.now() - start_task)
     assert True

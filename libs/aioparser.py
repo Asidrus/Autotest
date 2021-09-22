@@ -28,8 +28,8 @@ class aioparser:
     redirect = []
     others = []
 
-    def getAllUrls(self, site, path=".", parse=False):
-        fname = resources_path + "/" +site.replace('https://', '').replace('.ru', '') + "_links.json"
+    def getAllUrls(self, site, parse=False):
+        fname = resources_path + "/" + site.replace('https://', '').replace('.ru', '') + "_links.json"
         if (not parse) and os.path.exists(fname) and (
                 (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
             self.readfile(fname)
