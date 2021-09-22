@@ -11,6 +11,10 @@ from config import *
 from conftest import step, allure_step, gatherBrowserLogs, alarm
 from time import sleep
 
+suite_name = "Мониторинг сайтов"
+test_name = "Сбор времени от sdo.niidpo.ru"
+severity = "Сritical"
+
 times = []
 
 
@@ -69,9 +73,9 @@ def do_step(step, driver, start_task):
     return datetime.now()
 
 
-@allure.feature("Тест sdo")
-@allure.story("Log in")
-@allure.severity("Critical")
+@allure.feature(suite_name)
+@allure.story(test_name)
+@allure.severity(severity)
 @pytest.mark.timeout(300)
 @pytest.mark.parametrize("dt", [str(datetime.now())])
 def test_sdo(setup_driver, write_log, clicker, dt):
@@ -115,11 +119,12 @@ def test_sdo(setup_driver, write_log, clicker, dt):
             'back': False
         },
     ]
-    with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True):
+    with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True,
+                     _alarm=f"{severity}:{suite_name}:{test_name}: Проблема с загрузкой {mainUrl}"):
         driver.get(mainUrl)
         gatherBrowserLogs(driver)
-        alarm("TEST ___ Critical: SDO упал!")
-    with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True):
+    with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True,
+                     _alarm=f"{severity}:{suite_name}:{test_name}:"):
         login(driver, listener_login, listener_password)
         gatherBrowserLogs(driver)
     reqs = []

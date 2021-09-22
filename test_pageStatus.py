@@ -2,6 +2,7 @@ import allure
 from libs.aioparser import aioparser
 import pytest
 import aiohttp
+
 # import requests
 
 test_name = "Статус код всех ссылок"

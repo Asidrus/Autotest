@@ -99,8 +99,7 @@ def allure_step(step_name=None,
                 screenshot=None,
                 browser_log=None,
                 ignore=None,
-                error=None,
-                alarm=None):
+                _alarm=None):
     with allure.step(step_name):
         try:
             yield
@@ -109,11 +108,11 @@ def allure_step(step_name=None,
                 allure.attach(driver.get_screenshot_as_png(), name=step_name, attachment_type=AttachmentType.PNG)
             if browser_log and (driver is not None):
                 logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
-            if error is not None:
-                e = Exception(error)
             logger.critical(str(e))
+            if _alarm is not None:
+                alarm(_alarm+f"\nШаг{step_name} провален"+f"\nОшибка {str(e)}")
             if ignore is not True:
-                raise Exception(error)
+                raise Exception(e)
 
 
 @step
