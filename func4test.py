@@ -150,3 +150,24 @@ def GenData(urls):
         except Exception as e:
             print(e)
     return data
+
+
+# async def main2(links):
+#     async with aiohttp.ClientSession() as session:
+#         i = 0
+#         for link in links:
+#             async with session.get(link["url"]) as response:
+#                 print(i/len(links)*100.0)
+#                 i = i+1
+#                 try:
+#                     parser = etree.HTMLParser()
+#                     content = await response.content.read()
+#                     text = content.decode("windows-1251", errors='ignore')
+#                     tree = etree.parse(StringIO(text), parser=parser)
+#                     txt = etree.tostring(tree, method="text", encoding='windows-1251').decode("windows-1251")
+#                     if any([number in txt.lower() for number in ("0010006", "0008663")]):
+#                         res.append(link["url"]+"\n")
+#                 except:
+#                     pass
+#
+#     return res

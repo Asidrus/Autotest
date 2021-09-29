@@ -115,7 +115,6 @@ def allure_step(step_name=None,
                 raise Exception(e)
 
 
-@step
 def check_cookie(driver, url, cookie_dict):
     if driver.get_cookie(name=cookie_dict["name"]) is None:
         step(driver.get)(url=url[0:url.find(".ru") + 3])

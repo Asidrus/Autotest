@@ -23,7 +23,7 @@ class Form:
         :param kwargs: driver -> selenium.webdriver
         """
         self.__emailDefault__ = "tester_form@gaps.edu.ru"
-        self.__phoneDefault__ = "81234567890"
+        self.__phoneDefault__ = "71234567890"
         self.__nameDefault__ = "Автотест"
         self._email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
                         "name": ["email", "e-mail"]}
