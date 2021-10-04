@@ -120,11 +120,11 @@ def test_sdo(setup_driver, write_log, clicker, dt):
         },
     ]
     with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True,
-                     _alarm=f"{severity}:{suite_name}:{test_name}: Проблема с загрузкой {mainUrl}"):
+                     _alarm=f"{severity}: {suite_name}: {test_name}: Проблема с загрузкой {mainUrl}"):
         driver.get(mainUrl)
         gatherBrowserLogs(driver)
     with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True,
-                     _alarm=f"{severity}:{suite_name}:{test_name}:"):
+                     _alarm=f"{severity}: {suite_name}: {test_name}:"):
         login(driver, listener_login, listener_password)
         gatherBrowserLogs(driver)
         raise Exception("ломаю код")
