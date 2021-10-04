@@ -109,7 +109,13 @@ async def main5(urls):
                 tree = etree.parse(StringIO(text), parser=parser)
                 try:
                     el = tree.xpath("//sup[contains(text(),*)]")
-                    style = el[-1].getparent().getparent().get("style")
+                    parent = el[-1].getparent().getparent()
+                    try:
+                        if parent.get("class") == "note-star-block":
+                            continue
+                    except:
+                        pass
+                    style = parent.get("style")
                     color = style[style.find("background:")+12:]
                     color = color[:color.find(";")]
                     print(color)
@@ -129,7 +135,7 @@ async def main5(urls):
 if __name__ == "__main__":
     # main4(sys.argv[1])
     aiop = aioparser()
-    aiop.getAllUrls("https://niidpo.ru")
+    aiop.getAllUrls("edu.bakalavr-magistr.ru")
     urls = [link["url"] for link in aiop.links if "seminar" in link["url"]]
     asyncio.run(main5(urls))
 

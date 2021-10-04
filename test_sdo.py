@@ -135,10 +135,10 @@ def test_sdo(setup_driver, write_log, clicker, dt):
         except:
             pass
     with allure_step(f"Поиск запроса после клика", driver=driver, screenshot=True,
-                     browser_log=True, error=f"Time 1 is not define", ignore=True):
+                     browser_log=True, ignore=True):
         times.append(reqs[1].date - reqs[0].date)
     with allure_step(f"Поиск запроса редиректа", driver=driver, screenshot=True,
-                     browser_log=True, error=f"Time 2 is not define", ignore=True):
+                     browser_log=True, ignore=True):
         times.append(reqs[2].date - reqs[1].date)
     try:
         start_task = reqs[2].date

@@ -84,7 +84,7 @@ def step(func):
                                   attachment_type=AttachmentType.PNG)
                 if _browser_log and (_driver is not None):
                     logger.warning({"url": _driver.current_url, "messages": _driver.get_log('browser')})
-                logger.critical(str(e))
+                logger.critical(f"{_step}|"+str(e))
                 if _error is not None:
                     e = Exception(_error)
                 if _ignore is not True:
@@ -108,7 +108,7 @@ def allure_step(step_name=None,
                 allure.attach(driver.get_screenshot_as_png(), name=step_name, attachment_type=AttachmentType.PNG)
             if browser_log and (driver is not None):
                 logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
-            logger.critical(str(e))
+            logger.critical(f"{step_name}|"+str(e))
             if _alarm is not None:
                 alarm(_alarm+f"\nШаг{step_name} провален"+f"\nОшибка {str(e)}")
             if ignore is not True:
