@@ -110,7 +110,10 @@ def allure_step(step_name=None,
                 logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
             logger.critical(f"{step_name}|"+str(e))
             if _alarm is not None:
-                alarm(_alarm+f"\nШаг {step_name} провален"+f"\nОшибка {str(e)}")
+                try:
+                    alarm(_alarm+f"\nШаг {step_name} провален"+f"\nОшибка {str(e)}")
+                except Exception as er:
+                    e = f"{e}, {str(er)}"
             if ignore is not True:
                 raise Exception(e)
 

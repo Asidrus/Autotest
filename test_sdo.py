@@ -127,7 +127,6 @@ def test_sdo(setup_driver, write_log, clicker, dt):
                      _alarm=f"{severity}: {suite_name}: {test_name}:"):
         login(driver, listener_login, listener_password)
         gatherBrowserLogs(driver)
-        raise Exception("ломаю код")
     reqs = []
     for request in driver.requests:
         try:
