@@ -50,7 +50,7 @@ def setup_driver(request):
 
 async def send_telegram_broadcast(msg):
     reader, writer = await asyncio.open_connection(
-        '127.0.0.1', 1234)
+        'localhost', 1234)
     writer.write((msg + "#END").encode())
     writer.close()
     await writer.wait_closed()
