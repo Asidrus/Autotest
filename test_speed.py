@@ -43,7 +43,7 @@ async def test_getSpeed(db, data):
             async with session.get(url) as response:
                 T = codes[response.status // 100]
                 if not T:
-                    alarm(f"{severity}:{suite_name}:{test_name}: {url=} имеет статус код [{response.status} {response.reason}]")
+                    alarm(f"{severity}: {suite_name}: {test_name}: {url=} имеет статус код [{response.status} {response.reason}]")
                     await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', TRUE, {url_id});")
                 else:
                     await db.fetch(

@@ -77,8 +77,8 @@ def do_step(step, driver, start_task):
 @allure.story(test_name)
 @allure.severity(severity)
 @pytest.mark.timeout(300)
-@pytest.mark.parametrize("dt", [str(datetime.now())])
-def test_sdo(setup_driver, write_log, clicker, dt):
+# @pytest.mark.parametrize("dt", [str(datetime.now())])
+def test_sdo(setup_driver, write_log, clicker):
     driver = setup_driver
     mainUrl = "https://sdo.niidpo.ru/login/index.php"
     steps = [

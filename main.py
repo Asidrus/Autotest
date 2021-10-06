@@ -133,9 +133,9 @@ async def main5(urls):
         w.writelines([(er + "\n") for er in errors])
 
 if __name__ == "__main__":
-    # main4(sys.argv[1])
-    aiop = aioparser()
-    aiop.getAllUrls("edu.bakalavr-magistr.ru")
-    urls = [link["url"] for link in aiop.links if "seminar" in link["url"]]
-    asyncio.run(main5(urls))
+    main2()
+    # aiop = aioparser()
+    # aiop.getAllUrls("edu.bakalavr-magistr.ru")
+    # urls = [link["url"] for link in aiop.links if "seminar" in link["url"]]
+    # asyncio.run(main5(urls))
 
