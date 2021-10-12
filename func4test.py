@@ -119,7 +119,7 @@ def genCasesForFormValidation(fname):
 def GenData(urls):
     data = []
     parser = etree.HTMLParser()
-    getGrandDad = lambda item: item.xpath("..")[0].xpath("..")[0]
+    getGrandDad = lambda item: item.xpath("..")[0].xpath("..")[0].xpath("..")[0]
     count = 0
     for url in urls:
         count = count + 1

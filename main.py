@@ -44,12 +44,12 @@ async def main(links, pattern):
 def main2():
     parser = aioparser()
     parser.getAllUrls("https://mgaps.ru")
-    pattern = ["707", "гуманитарн", "гапс", "академ", "мисао"]
+    pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
     res = asyncio.run(main(parser.links, pattern))
     import json
-    with open("temp.json", "w") as w:
-        json.dump(res, w, indent=4)
-    with open("temp.cache", "w") as w:
+    with open("mgaps.json", "w", encoding="utf-8") as w:
+        json.dump(res, w, indent=4, ensure_ascii=False)
+    with open("mgaps.txt", "w") as w:
         data = []
         for key in res:
             for url in res[key]:

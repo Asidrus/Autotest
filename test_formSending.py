@@ -9,33 +9,33 @@ from config import resources_path
 from libs.aioparser import aioparser
 
 
-# def pytest_generate_tests(metafunc):
-#     site = metafunc.config.getoption("site")
-#     domain = site.replace("https://", "").replace(".ru", "")
-#     fname = resources_path+f"/{domain}_form.json"
-#
-#     if os.path.exists(fname) and (
-#             (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
-#         with open(fname, "r") as read_file:
-#             Data = json.load(read_file)
-#             read_file.close()
-#     else:
-#         parser = aioparser()
-#         parser.getAllUrls(site)
-#         urls = [link["url"] for link in parser.links]
-#         Data = {"data": GenData(urls)}
-#         with open(fname, "w") as write_file:
-#             json.dump(Data, write_file, indent=4)
-#
-#     data = []
-#     for item in Data["data"]:
-#         if data == 0:
-#             data.append(item)
-#         else:
-#             if len([True for dat in data if dat["xpath"] == item["xpath"]]) == 0:
-#                 data.append(item)
-#     result = [(item["url"], item["xpath"]) for item in data]
-#     metafunc.parametrize("url, xpath", result)
+def pytest_generate_tests(metafunc):
+    site = metafunc.config.getoption("site")
+    domain = site.replace("https://", "").replace(".ru", "")
+    fname = resources_path+f"/{domain}_form.json"
+
+    if os.path.exists(fname) and (
+            (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
+        with open(fname, "r") as read_file:
+            Data = json.load(read_file)
+            read_file.close()
+    else:
+        parser = aioparser()
+        parser.getAllUrls(site)
+        urls = [link["url"] for link in parser.links]
+        Data = {"data": GenData(urls)}
+        with open(fname, "w") as write_file:
+            json.dump(Data, write_file, indent=4)
+
+    data = []
+    for item in Data["data"]:
+        if data == 0:
+            data.append(item)
+        else:
+            if len([True for dat in data if dat["xpath"] == item["xpath"]]) == 0:
+                data.append(item)
+    result = [(item["url"], item["xpath"]) for item in data]
+    metafunc.parametrize("url, xpath", result)
 #
 #
 # @allure.feature("Тест форм")
@@ -78,6 +78,7 @@ from libs.aioparser import aioparser
 
 #url="https://niidpo.ru/seminar/4837", xpath="//form[@id='order_form']"
 #url="https://pentaschool.ru/program/program-graficheskij-dizajn-v-reklame-s-nulya", xpath="//div[@class='uniform-block-form__items']"
+
 def test_form_Sending(setup_driver, url="https://psy.edu.ru/program/geshtalt-konsultirovanie-v-psihologicheskoj-praktike", xpath="//div[@class='still-quest_elems']"):
     driver = setup_driver
     with allure_step("Добавление cookie"):
