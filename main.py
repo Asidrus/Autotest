@@ -3,8 +3,8 @@ from io import StringIO
 
 import aiohttp
 from lxml import etree
-
-from config import *
+import os
+from config import autotest_results
 import asyncio
 from matplotlib import pyplot as plt
 import random
@@ -15,52 +15,9 @@ from func4test import GenData
 from libs.aioparser import aioparser
 
 
-async def main(links, pattern):
-    res = {}
-    for p in pattern:
-        res[p] = []
-    async with aiohttp.ClientSession() as session:
-        i = 0
-        for link in links:
-            async with session.get(link["url"]) as response:
-                print(i / len(links) * 100.0)
-                i = i + 1
-                try:
-                    parser = etree.HTMLParser()
-                    content = await response.content.read()
-                    text = content.decode("windows-1251", errors='ignore')
-                    tree = etree.parse(StringIO(text), parser=parser)
-                    txt = etree.tostring(tree, method="text", encoding='windows-1251').decode("windows-1251")
-                    for p in pattern:
-                        if p in txt.lower():
-                            res[p].append(link["url"])
-                            print({p: link["url"]})
-                    # if any([p in txt.lower() for p in pattern]):
-                    #     res.append(link["url"]+"\n")
-                except:
-                    print("error")
-    return res
-
-def main2():
-    parser = aioparser()
-    parser.getAllUrls("https://mgaps.ru")
-    pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
-    res = asyncio.run(main(parser.links, pattern))
-    import json
-    with open("mgaps.json", "w", encoding="utf-8") as w:
-        json.dump(res, w, indent=4, ensure_ascii=False)
-    with open("mgaps.txt", "w") as w:
-        data = []
-        for key in res:
-            for url in res[key]:
-                if url not in data:
-                    data.append(url+"\n")
-        w.writelines(data)
-
-
 def main3(site):
     domain = site.replace("https://", "").replace(".ru", "")
-    fname = resources_path + f"/{domain}_form.json"
+    fname = autotest_results + f"/{domain}_form.json"
     if os.path.exists(fname) and (
             (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
         with open(fname, "r") as read_file:
@@ -77,7 +34,7 @@ def main3(site):
 
 def main4(site):
     domain = site.replace("https://", "").replace(".ru", "")
-    fname = resources_path + f"/{domain}_form.json"
+    fname = autotest_results + f"/{domain}_form.json"
 
     with open(fname, 'r') as r:
         data = json.load(r)
@@ -132,10 +89,19 @@ async def main5(urls):
     with open("resources/errors.tmp", "w") as w:
         w.writelines([(er + "\n") for er in errors])
 
+
+def _filter(site):
+    domain = site.replace("https://", "")
+    with open(autotest_results+f"/{domain}_result.json", "r") as r:
+        data = json.load(r)
+    for d in data:
+        if d == "4000 или 3 мес":
+            continue
+        data[d] = list(filter(lambda url: not any([(el in url) for el in ["/seminar", "/anons"]]), data[d]))
+    with open(autotest_results+f"/{domain}_result.json", "w", encoding="utf-8") as w:
+        json.dump(data, w, ensure_ascii=False, indent=4)
+
+
 if __name__ == "__main__":
-    main2()
-    # aiop = aioparser()
-    # aiop.getAllUrls("edu.bakalavr-magistr.ru")
-    # urls = [link["url"] for link in aiop.links if "seminar" in link["url"]]
-    # asyncio.run(main5(urls))
+    _filter("https://niidpo.ru")
 
