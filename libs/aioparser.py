@@ -20,6 +20,9 @@ def putInDict(url, link, dictionary):
         dictionary.append({"url": url, "from": [link["url"]]})
 
 
+headers = {"User-Agent": 'Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166'}
+
+
 class aioparser:
 
     parser = etree.HTMLParser()
@@ -27,9 +30,13 @@ class aioparser:
     links = []
     redirect = []
     others = []
+    adaptive = False
+    fname_appendix = ""
 
-    def getAllUrls(self, site, parse=False):
-        fname = resources_path + "/" + site.replace('https://', '').replace('.ru', '') + "_links.json"
+    def getAllUrls(self, site, parse=False, adaptive=False):
+        self.adaptive = adaptive
+        self.fname_appendix = "_adaptive" if adaptive == True else ""
+        fname = resources_path + "/" + site.replace('https://', '').replace('.ru', '') + self.fname_appendix + "_links.json"
         if (not parse) and os.path.exists(fname) and (
                 (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
             self.readfile(fname)

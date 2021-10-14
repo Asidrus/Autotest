@@ -21,8 +21,8 @@ def sendReportOnEmail(to: str, title, msg):
     # login = "tester3@gaps.edu.ru"
     # password = None
     # server = "smtp.yandex.ru"
-    login = "asidruswork@gmail.com"
-    password = "33Ns3LZP"
+    login = ""
+    password = ""
     server = "smtp.gmail.com"
     if True:
         smtp = smtplib.SMTP_SSL(server, 465)
