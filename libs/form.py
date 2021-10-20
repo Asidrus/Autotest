@@ -108,9 +108,10 @@ class Form:
             self.driver.backend.storage.clear_requests()
             self.action(obj=self.button, act="click")
             request = self.findSendingRequest()
-            while True is None:
-                sleep(2)
-            sleep(1)
+            sleep(8)
+            # while True is None:
+            #     sleep(2)
+            # sleep(1)
             text_after = self.driver.find_element_by_xpath("//body").text
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
