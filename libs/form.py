@@ -105,10 +105,12 @@ class Form:
             self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
             if self.email is not None:
                 self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
-            # del self.driver.requests
+            self.driver.backend.storage.clear_requests()
             self.action(obj=self.button, act="click")
             request = self.findSendingRequest()
-            sleep(2)
+            while True is None:
+                sleep(2)
+            sleep(1)
             text_after = self.driver.find_element_by_xpath("//body").text
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
@@ -141,17 +143,3 @@ class Form:
                     except:
                         continue
         return None
-
-    def checkResponse(self, body: str) -> bool:
-        rt = ''.join(re.findall(r'[0-9]*', body))
-        if (len(rt) != 0):
-            if (re.search(r'1234567890', rt).group(0) == '1234567890'):
-                return True
-        # elif any([(conf in body.lower()) for conf in self.confirm]):
-        #     return True
-        # elif re.search(r'true', body.lower()).group(0) == 'true':
-        #     return True
-        # elif body == "1":
-        #     return True
-        # else:
-        #     return False

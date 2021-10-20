@@ -52,7 +52,6 @@ def pytest_generate_tests(metafunc):
 
 
 def test_form_Sending(setup_driver, url, datatest):
-# def test_form_Sending(setup_driver, url="https://edu.i-spo.ru/seminar/ehkonomika-i-upravlenie-na-predpriyatii", datatest="order_form"):
     driver = setup_driver
     getAttribute = lambda item: driver.execute_script('var items = {}; for (index = 0; index < '
                                                       'arguments[0].attributes.length; ++index) { '
