@@ -1,6 +1,6 @@
 from time import sleep
 from func4test import *
-
+import re
 
 class Form:
     """
@@ -12,6 +12,7 @@ class Form:
     phone = None
     email = None
     button = None
+    callButton = None
     # If form if ready for test
     isready = True
 
@@ -65,6 +66,11 @@ class Form:
                         self.button = item
             except:
                 print("кнопка не обнаружена")
+        try:
+            data_test = self.getAttribute(self.granddad)["data-test"]
+            self.callButton = self.driver.find_element_by_xpath(f"//button[@data-test='{data_test}']")
+        except Exception as e:
+            pass
         if any(map(lambda i: i is None, (self.name, self.phone, self.button))):
             self.isready = False
 
@@ -86,28 +92,57 @@ class Form:
 
     def Test(self, call_button=None):
         if self.isready:
+            if self.callButton is not None:
+                self.callButton.click()
             text_before = self.driver.find_element_by_xpath("//body").text
             if call_button is not None:
                 self.action(obj=call_button, act="click")
             self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
-            self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__)
+            self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
             if self.email is not None:
                 self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
+            del self.driver.requests
             self.action(obj=self.button, act="click")
-            self.driver.proxy.storage.clear_requests()
             request = self.findSendingRequest()
+            sleep(2)
             text_after = self.driver.find_element_by_xpath("//body").text
-            txt_before, txt_after = compareLists(str2list(text_before), str2list(text_after))
+            _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
-            return request, confirmation
-        return None, None
+            # from urllib.parse import unquote
+            for req in self.driver.requests:
+                if req.url == 'https://edu.i-spo.ru/form/send_order':
+                    # print(req.body.decode("utf-8"))
+                    print(req.responce.body.decode("utf-8"))
+                # r1 = any([conf in request[0].response.body.decode("utf-8", errors='ignore') for conf in self.confirm])
+            return (True and confirmation), confirmation, True
+        return None
 
     def findSendingRequest(self):
-        keys = ["email="+self.__emailDefault__[:self.__emailDefault__.find("@")]]
-        sleep(5)
+        arr = []
         for request in self.driver.requests:
-            if any([key in request.body.decode("utf-8", errors='ignore') for key in keys]) or any(
-                    [key in request.querystring for key in keys]):
-                return request
-            else:
-                return None
+            if request.response:
+                if((request.response.status_code==200 or  request.response.status_code==404 or request.response.status_code==500) and request.response.headers['Content-Type']=='text/html; charset=UTF-8'):
+                    rt = ''.join(re.findall(r'[0-9]*', request.body.decode("utf-8")))
+                    if(len(rt)!=0):
+                        if(re.search(r'1234567890', rt).group(0) == '1234567890'):
+                            arr.append(request)
+                    else:
+                        continue
+        if(arr):
+            return arr
+        else:
+            return None
+
+    def checkResponse(self, body: str) -> bool:
+        rt = ''.join(re.findall(r'[0-9]*', body))
+        if (len(rt) != 0):
+            if (re.search(r'1234567890', rt).group(0) == '1234567890'):
+                return True
+        # elif any([(conf in body.lower()) for conf in self.confirm]):
+        #     return True
+        # elif re.search(r'true', body.lower()).group(0) == 'true':
+        #     return True
+        # elif body == "1":
+        #     return True
+        # else:
+        #     return False

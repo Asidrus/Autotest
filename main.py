@@ -11,7 +11,7 @@ import random
 from datetime import datetime, timedelta
 from seleniumwire import webdriver
 
-from func4test import GenData
+from func4test import GenData, DataToXpath
 from libs.aioparser import aioparser
 
 
@@ -102,6 +102,33 @@ def _filter(site):
         json.dump(data, w, ensure_ascii=False, indent=4)
 
 
-if __name__ == "__main__":
-    _filter("https://niidpo.ru")
+async def __genData(urls):
+    parser = etree.HTMLParser()
+    data = []
+    async with aiohttp.ClientSession() as session:
+        for url in urls:
+            async with session.get(url) as response:
+                if "text/html" not in response.headers["Content-Type"]:
+                    continue
+                html = await response.text("utf-8", errors="ignore")
+                tree = etree.parse(StringIO(html), parser=parser)
+                forms = tree.xpath("//form[@data-test]")
+                for el in forms:
+                    if not any([(el.attrib["data-test"] == d["xpath"]["attrib"]["data-test"]) for d in data]):
+                        data.append({"url": url, "xpath": {"tag": "form", "attrib": el.attrib}})
+                    # xpath = DataToXpath({"tag": "form", "attrib": el.attrib})
+                    # data.append({"url": url, "xpath": xpath})
+                    # if not any([(d["xpath"] == xpath) for d in data]):
+                    #     data.append()
+    for d in data:
+        d["xpath"] = DataToXpath(d["xpath"])
+    return data
 
+
+if __name__ == "__main__":
+    # _filter("https://niidpo.ru")
+    parser = aioparser()
+    parser.getAllUrls(site="https://edu.i-spo.ru")
+    data = asyncio.run(__genData([link["url"] for link in parser.links]))
+    for d in data:
+        print(d)
