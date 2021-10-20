@@ -1,5 +1,6 @@
 import json
 from io import StringIO
+from time import time, sleep
 
 import aiohttp
 from lxml import etree
@@ -125,10 +126,32 @@ async def __genData(urls):
     return data
 
 
+def RunUntil(func):
+    def wrapper(*args, timeout=10, delta=0.25, **kwargs):
+        start = time()
+        while time() - start < timeout:
+            try:
+                func(*args, **kwargs)
+                break
+            except:
+                sleep(delta)
+        raise TimeoutError("Время поиска вышло")
+    return wrapper
+
+
+@RunUntil
+def func():
+    n = random.randint(0, 5)
+    print(n)
+    if n != 3:
+        raise Exception()
+
+
 if __name__ == "__main__":
-    # _filter("https://niidpo.ru")
-    parser = aioparser()
-    parser.getAllUrls(site="https://edu.i-spo.ru")
-    data = asyncio.run(__genData([link["url"] for link in parser.links]))
-    for d in data:
-        print(d)
+    # # _filter("https://niidpo.ru")
+    # parser = aioparser()
+    # parser.getAllUrls(site="https://edu.i-spo.ru")
+    # data = asyncio.run(__genData([link["url"] for link in parser.links]))
+    # for d in data:
+    #     print(d)
+    func()

@@ -1,4 +1,5 @@
-from time import sleep
+from contextlib import contextmanager
+from time import sleep, time
 from func4test import *
 import re
 import zlib
@@ -107,26 +108,24 @@ class Form:
                 self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
             self.driver.backend.storage.clear_requests()
             self.action(obj=self.button, act="click")
-            request = self.findSendingRequest()
-            sleep(8)
-            # while True is None:
-            #     sleep(2)
-            # sleep(1)
+            for i in range(10):
+                request = self.findSendingRequest()
+                if request:
+                    break
+                sleep(1)
+            if request is None:
+                raise Exception("Заявка не отправлена! Запрос не найден")
             text_after = self.driver.find_element_by_xpath("//body").text
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
-            if request is not None:
-                body = request.response.body
-            else:
-                body = None
             try:
                 content_encoding = request.response.headers["content-encoding"]
             except:
                 content_encoding = None
             if content_encoding is not None:
-                text = zlib.decompress(body, 16+zlib.MAX_WBITS).decode()
+                text = zlib.decompress(request.response.body, 16+zlib.MAX_WBITS).decode()
             else:
-                text = unquote(body.decode())
+                text = unquote(request.response.body.decode())
             answer = any([conf in text for conf in self.confirm])
             return (confirmation and answer), confirmation, answer
         return None
@@ -137,10 +136,9 @@ class Form:
                 if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
                     try:
                         rt = ''.join(re.findall(r'[0-9]*', request.body.decode("utf-8")))
-                        if rt != '':
-                            if re.search(r'1234567890', rt).group(0) == '1234567890':
-                                print(zlib.decompress(request.response.body, 16 + zlib.MAX_WBITS).decode())
-                                return request
+                        if (rt != '') and (re.search(r'1234567890', rt).group(0) == '1234567890'):
+                            # print(zlib.decompress(request.response.body, 16 + zlib.MAX_WBITS).decode())
+                            return request
                     except:
                         continue
         return None
