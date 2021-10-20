@@ -1,6 +1,9 @@
 from time import sleep
 from func4test import *
 import re
+import zlib
+from urllib.parse import unquote
+
 
 class Form:
     """
@@ -30,7 +33,7 @@ class Form:
                         "name": ["email", "e-mail"]}
         self._phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
         self._name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
-        self.confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним"]
+        self.confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
         self.driver = driver
         self.getAttribute = lambda item: self.driver.execute_script('var items = {}; for (index = 0; index < '
                                                                     'arguments[0].attributes.length; ++index) { '
@@ -81,10 +84,11 @@ class Form:
                 obj.send_keys(data)
             elif act == "click":
                 obj.click()
+
         self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
         for i in range(10):
             try:
-                do(obj,act,data)
+                do(obj, act, data)
                 return True
             except:
                 sleep(0.1)
@@ -101,37 +105,42 @@ class Form:
             self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
             if self.email is not None:
                 self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
-            del self.driver.requests
+            # del self.driver.requests
             self.action(obj=self.button, act="click")
             request = self.findSendingRequest()
             sleep(2)
             text_after = self.driver.find_element_by_xpath("//body").text
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
-            # from urllib.parse import unquote
-            for req in self.driver.requests:
-                if req.url == 'https://edu.i-spo.ru/form/send_order':
-                    # print(req.body.decode("utf-8"))
-                    print(req.responce.body.decode("utf-8"))
-                # r1 = any([conf in request[0].response.body.decode("utf-8", errors='ignore') for conf in self.confirm])
-            return (True and confirmation), confirmation, True
+            if request is not None:
+                body = request.response.body
+            else:
+                body = None
+            try:
+                content_encoding = request.response.headers["content-encoding"]
+            except:
+                content_encoding = None
+            if content_encoding is not None:
+                text = zlib.decompress(body, 16+zlib.MAX_WBITS).decode()
+            else:
+                text = unquote(body.decode())
+            answer = any([conf in text for conf in self.confirm])
+            return (confirmation and answer), confirmation, answer
         return None
 
     def findSendingRequest(self):
-        arr = []
         for request in self.driver.requests:
             if request.response:
-                if((request.response.status_code==200 or  request.response.status_code==404 or request.response.status_code==500) and request.response.headers['Content-Type']=='text/html; charset=UTF-8'):
-                    rt = ''.join(re.findall(r'[0-9]*', request.body.decode("utf-8")))
-                    if(len(rt)!=0):
-                        if(re.search(r'1234567890', rt).group(0) == '1234567890'):
-                            arr.append(request)
-                    else:
+                if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
+                    try:
+                        rt = ''.join(re.findall(r'[0-9]*', request.body.decode("utf-8")))
+                        if rt != '':
+                            if re.search(r'1234567890', rt).group(0) == '1234567890':
+                                print(zlib.decompress(request.response.body, 16 + zlib.MAX_WBITS).decode())
+                                return request
+                    except:
                         continue
-        if(arr):
-            return arr
-        else:
-            return None
+        return None
 
     def checkResponse(self, body: str) -> bool:
         rt = ''.join(re.findall(r'[0-9]*', body))
