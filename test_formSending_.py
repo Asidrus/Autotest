@@ -70,7 +70,14 @@ def test_form_Sending(setup_driver, url, datatest):
     with allure_step("Инициализация формы"):
         form = Form(xpath=xpath, driver=driver)
     if not form.isready:
-        pytest.skip(f"Form is not define as FeedBackForm on {url=} with {xpath=}")
-    with allure_step("Отправка заявки", driver, True, True, _alarm=False):
-        result, r1, r2 = form.Test()
-    assert result, f"{r1=}, {r2=}"
+        raise Exception(f"Невозможно инициализировать форму {form.name=},{form.phone=}")
+    with allure_step("Отправка заявки", driver, True, True, _alarm=True):
+        answer, confirmation = form.Test()
+    if answer and confirmation:
+        assert True
+    elif not (answer or confirmation):
+        assert (answer and confirmation), f"Форма не отправлена"
+    elif not answer:
+        assert False, "Не найдено подтверждение в ответе от сервера"
+    elif not confirmation:
+        assert False, "Не найднено сообщение об успешной отправки"

@@ -85,7 +85,6 @@ class Form:
                 obj.send_keys(data)
             elif act == "click":
                 obj.click()
-
         self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
         for i in range(10):
             try:
@@ -95,40 +94,34 @@ class Form:
                 sleep(0.1)
         do(obj, act, data)
 
-    def Test(self, call_button=None):
-        if self.isready:
-            if self.callButton is not None:
-                self.callButton.click()
-            text_before = self.driver.find_element_by_xpath("//body").text
-            if call_button is not None:
-                self.action(obj=call_button, act="click")
-            self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
-            self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
-            if self.email is not None:
-                self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
-            self.driver.backend.storage.clear_requests()
-            self.action(obj=self.button, act="click")
-            for i in range(10):
-                request = self.findSendingRequest()
-                if request:
-                    break
-                sleep(1)
-            if request is None:
-                raise Exception("Заявка не отправлена! Запрос не найден")
-            text_after = self.driver.find_element_by_xpath("//body").text
-            _, txt_after = compareLists(str2list(text_before), str2list(text_after))
-            confirmation = any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
-            try:
-                content_encoding = request.response.headers["content-encoding"]
-            except:
-                content_encoding = None
-            if content_encoding is not None:
-                text = zlib.decompress(request.response.body, 16+zlib.MAX_WBITS).decode()
-            else:
-                text = unquote(request.response.body.decode())
-            answer = any([conf in text for conf in self.confirm])
-            return (confirmation and answer), confirmation, answer
-        return None
+    def Test(self):
+        return self.Evaluation()
+
+    def Evaluation(self):
+        if self.callButton is not None:
+            self.callPopup()
+        text_before = self.driver.find_element_by_xpath("//body").text
+        self.driver.backend.storage.clear_requests()
+        try:
+            self.fillForm()
+        except Exception as e:
+            raise Exception(f"Не получилось заполнить форму: {e}")
+        answer = self.answerEvaluation()
+        confirmation = self.confirmationEvaluation(text_before)
+        return answer, confirmation
+
+    def callPopup(self):
+        try:
+            self.callButton.click()
+        except Exception as e:
+            raise Exception(f"Не удалось открыть поп-ап: {e}")
+
+    def fillForm(self):
+        self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
+        self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
+        if self.email is not None:
+            self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
+        self.action(obj=self.button, act="click")
 
     def findSendingRequest(self):
         for request in self.driver.requests:
@@ -142,3 +135,27 @@ class Form:
                     except:
                         continue
         return None
+
+    def waitRequest(self, timeout=10, delta=0.25):
+        start = time()
+        while time() - start < timeout:
+            request = self.findSendingRequest()
+            if request:
+                return request
+                break
+            sleep(delta)
+        raise TimeoutError("Запрос не найден")
+
+    def answerEvaluation(self):
+        request = self.waitRequest()
+        try:
+            content_encoding = request.response.headers["content-encoding"]
+            text = zlib.decompress(request.response.body, 16 + zlib.MAX_WBITS).decode()
+        except:
+            text = unquote(request.response.body.decode())
+        return any([conf in text for conf in self.confirm])
+
+    def confirmationEvaluation(self, text_before):
+        text_after = self.driver.find_element_by_xpath("//body").text
+        _, txt_after = compareLists(str2list(text_before), str2list(text_after))
+        return any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
