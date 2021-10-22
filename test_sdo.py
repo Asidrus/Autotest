@@ -75,22 +75,21 @@ def do_step(step, driver, start_task):
     return datetime.now()
 
 
-def waitResponse(request, timeout=10, delta=0.25):
-    start = time()
-    while time() - start < timeout:
-        try:
-            response = request.response
-            return response
-        except:
-            sleep(delta)
-    raise TimeoutError("Время ожидания ответа от сервера превышено")
+# def waitResponse(request, timeout=10, delta=0.25):
+#     start = time()
+#     while time() - start < timeout:
+#         try:
+#             response = request.response
+#             return response
+#         except:
+#             sleep(delta)
+#     raise TimeoutError("Время ожидания ответа от сервера превышено")
 
 
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)
 @pytest.mark.timeout(300)
-# @pytest.mark.parametrize("dt", [str(datetime.now())])
 def test_sdo(setup_driver, write_log, clicker):
     driver = setup_driver
     mainUrl = "https://sdo.niidpo.ru/login/index.php"
@@ -135,9 +134,10 @@ def test_sdo(setup_driver, write_log, clicker):
     with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True,
                      _alarm=f"{severity}: {suite_name}: {test_name}: Проблема с загрузкой {mainUrl}"):
         driver.get(mainUrl)
-        # gatherBrowserLogs(driver)
-        # if not checkStatus[waitResponse(driver.requests[0]).status_code]:
-        #     raise Exception(f"Ответ от сервера:{driver.requests[0].response.status_code}")
+        if not checkStatus[driver.requests[0].response.status_code]:
+            raise Exception(f"Ответ от сервера:{driver.requests[0].response.status_code}")
+        gatherBrowserLogs(driver)
+
     with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True,
                      _alarm=f"{severity}: {suite_name}: {test_name}:"):
         login(driver, listener_login, listener_password)

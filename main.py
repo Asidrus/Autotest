@@ -126,25 +126,14 @@ async def __genData(urls):
     return data
 
 
-def RunUntil(func):
-    def wrapper(*args, timeout=10, delta=0.25, **kwargs):
-        start = time()
-        while time() - start < timeout:
-            try:
-                func(*args, **kwargs)
-                break
-            except:
-                sleep(delta)
-        raise TimeoutError("Время поиска вышло")
-    return wrapper
-
-
-@RunUntil
-def func():
-    n = random.randint(0, 5)
-    print(n)
-    if n != 3:
-        raise Exception()
+def fun():
+    from seleniumwire import webdriver
+    driver = webdriver.Chrome("./resources/chromedriver")
+    # driver.get("https://sdo.niidpo.ru")
+    driver.get("https://sdo.niidpo.ru/login/index.php")
+    print(driver.requests[0].response.status_code)
+    driver.close()
+    driver.quit()
 
 
 if __name__ == "__main__":
@@ -154,4 +143,4 @@ if __name__ == "__main__":
     # data = asyncio.run(__genData([link["url"] for link in parser.links]))
     # for d in data:
     #     print(d)
-    func()
+    fun()
