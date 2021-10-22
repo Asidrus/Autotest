@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from libs.GoogleSheets.GoogleSheets import GoogleSheets
 from config import *
 from conftest import step, allure_step, gatherBrowserLogs, alarm
-from time import sleep
+from time import sleep, time
 
 suite_name = "Мониторинг сайтов"
 test_name = "Сбор времени от sdo.niidpo.ru"
@@ -18,7 +18,6 @@ severity = "Сritical"
 times = []
 
 checkStatus = {1: True, 2: True, 3: True, 4: False, 5: False}
-
 
 
 @pytest.fixture(scope="session")
@@ -76,6 +75,17 @@ def do_step(step, driver, start_task):
     return datetime.now()
 
 
+def waitResponse(request, timeout=10, delta=0.25):
+    start = time()
+    while time() - start < timeout:
+        try:
+            response = request.response
+            return response
+        except:
+            sleep(delta)
+    raise TimeoutError("Время ожидания ответа от сервера превышено")
+
+
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)
@@ -126,7 +136,7 @@ def test_sdo(setup_driver, write_log, clicker):
                      _alarm=f"{severity}: {suite_name}: {test_name}: Проблема с загрузкой {mainUrl}"):
         driver.get(mainUrl)
         gatherBrowserLogs(driver)
-        if not checkStatus[driver.requests[0].response.status_code]:
+        if not checkStatus[waitResponse(driver.requests[0]).status_code]:
             raise Exception(f"Ответ от сервера:{driver.requests[0].response.status_code}")
     with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True,
                      _alarm=f"{severity}: {suite_name}: {test_name}:"):
