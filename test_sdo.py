@@ -134,7 +134,7 @@ def test_sdo(setup_driver, write_log, clicker):
     with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True,
                      _alarm=f"{severity}: {suite_name}: {test_name}: Проблема с загрузкой {mainUrl}"):
         driver.get(mainUrl)
-        if not checkStatus[driver.requests[0].response.status_code]:
+        if not checkStatus[driver.requests[0].response.status_code//100]:
             raise Exception(f"Ответ от сервера:{driver.requests[0].response.status_code}")
         gatherBrowserLogs(driver)
 
