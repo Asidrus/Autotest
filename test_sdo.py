@@ -135,9 +135,9 @@ def test_sdo(setup_driver, write_log, clicker):
     with allure_step(f"Переход на страницу url={mainUrl}", driver=driver, screenshot=True, browser_log=True,
                      _alarm=f"{severity}: {suite_name}: {test_name}: Проблема с загрузкой {mainUrl}"):
         driver.get(mainUrl)
-        gatherBrowserLogs(driver)
-        if not checkStatus[waitResponse(driver.requests[0]).status_code]:
-            raise Exception(f"Ответ от сервера:{driver.requests[0].response.status_code}")
+        # gatherBrowserLogs(driver)
+        # if not checkStatus[waitResponse(driver.requests[0]).status_code]:
+        #     raise Exception(f"Ответ от сервера:{driver.requests[0].response.status_code}")
     with allure_step(f"Вход в личный кабинет", driver=driver, screenshot=True, browser_log=True,
                      _alarm=f"{severity}: {suite_name}: {test_name}:"):
         login(driver, listener_login, listener_password)
