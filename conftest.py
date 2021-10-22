@@ -61,7 +61,7 @@ def alarm(msg):
 
 
 def gatherBrowserLogs(driver):
-    driver.proxy.storage.clear_requests()
+    driver.backend.storage.clear_requests()
     logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
 
 
