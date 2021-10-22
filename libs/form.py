@@ -4,7 +4,8 @@ from func4test import *
 import re
 import zlib
 from urllib.parse import unquote
-
+import allure
+from allure_commons.types import AttachmentType
 
 class Form:
     """
@@ -124,17 +125,18 @@ class Form:
         self.action(obj=self.button, act="click")
 
     def findSendingRequest(self):
-        for request in self.driver.requests:
-            if request.response:
-                if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
-                    try:
-                        rt = ''.join(re.findall(r'[0-9]*', request.body.decode("utf-8")))
-                        if (rt != '') and (re.search(r'1234567890', rt).group(0) == '1234567890'):
-                            # print(zlib.decompress(request.response.body, 16 + zlib.MAX_WBITS).decode())
-                            return request
-                    except:
-                        continue
-        return None
+        with allure_step(f"Поиск отправленного запроса"):
+            for request in self.driver.requests:
+                if request.response:
+                    if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
+                        try:
+                            rt = ''.join(re.findall(r'[0-9]*', request.body.decode("utf-8")))
+                            if (rt != '') and (re.search(r'1234567890', rt).group(0) == '1234567890'):
+                                # print(zlib.decompress(request.response.body, 16 + zlib.MAX_WBITS).decode())
+                                return request
+                        except:
+                            continue
+            return None
 
     def waitRequest(self, timeout=10, delta=0.25):
         start = time()
@@ -156,6 +158,7 @@ class Form:
         return any([conf in text for conf in self.confirm])
 
     def confirmationEvaluation(self, text_before):
-        text_after = self.driver.find_element_by_xpath("//body").text
-        _, txt_after = compareLists(str2list(text_before), str2list(text_after))
-        return any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
+        with allure_step(f"Обработка результата"):
+            text_after = self.driver.find_element_by_xpath("//body").text
+            _, txt_after = compareLists(str2list(text_before), str2list(text_after))
+            return any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
