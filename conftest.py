@@ -22,20 +22,50 @@ def pytest_addoption(parser):
     parser.addoption("--parse", action='store_true', help="Parse site on urls")
 
 
+# @pytest.fixture(scope="session")
+# def setup_driver(request):
+#     try:
+#         chrome_options = Options()
+#         if request.config.getoption("--invisible"):
+#             display = Display(visible=0, size=(1920, 1080))
+#             display.start()
+#         if request.config.getoption("--adaptive"):
+#             chrome_options.add_argument(
+#                 '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
+#         d = DesiredCapabilities.CHROME
+#         d['loggingPrefs'] = {'browser': 'ALL'}
+#         chrome_options.add_argument("--window-size=1920,1080")
+#         Driver = webdriver.Chrome(chromedriver, desired_capabilities=d, options=chrome_options)
+#     except Exception as e:
+#         raise e
+#     yield Driver
+#     try:
+#         Driver.close()
+#         Driver.quit()
+#         if request.config.getoption("--invisible"):
+#             display.stop()
+#     except Exception as e:
+#         raise e
+
+
 @pytest.fixture(scope="session")
 def setup_driver(request):
     try:
-        chrome_options = Options()
+        options = Options()
         if request.config.getoption("--invisible"):
             display = Display(visible=0, size=(1920, 1080))
             display.start()
         if request.config.getoption("--adaptive"):
-            chrome_options.add_argument(
+            options.add_argument(
                 '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
         d = DesiredCapabilities.CHROME
         d['loggingPrefs'] = {'browser': 'ALL'}
-        chrome_options.add_argument("--window-size=1920,1080")
-        Driver = webdriver.Chrome(chromedriver, desired_capabilities=d, options=chrome_options)
+        options.add_argument("--window-size=1920,1080")
+        if debug:
+            Driver = webdriver.Chrome(chromedriver, desired_capabilities=d, options=options)
+        else:
+            Driver = webdriver.Remote(command_executor=f"http://{selenoid_IP}:{selenoid_port}/wd/hub",
+                                      desired_capabilities=DesiredCapabilities.CHROME, options=options)
     except Exception as e:
         raise e
     yield Driver
@@ -84,7 +114,7 @@ def step(func):
                                   attachment_type=AttachmentType.PNG)
                 if _browser_log and (_driver is not None):
                     logger.warning({"url": _driver.current_url, "messages": _driver.get_log('browser')})
-                logger.critical(f"{_step}|"+str(e))
+                logger.critical(f"{_step}|" + str(e))
                 if _error is not None:
                     e = Exception(_error)
                 if _ignore is not True:
@@ -108,10 +138,10 @@ def allure_step(step_name=None,
                 allure.attach(driver.get_screenshot_as_png(), name=step_name, attachment_type=AttachmentType.PNG)
             if browser_log and (driver is not None):
                 logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
-            logger.critical(f"{step_name}|"+str(e))
+            logger.critical(f"{step_name}|" + str(e))
             if _alarm is not None:
                 try:
-                    alarm(_alarm+f"\nШаг {step_name} провален"+f"\nОшибка {str(e)}")
+                    alarm(_alarm + f"\nШаг {step_name} провален" + f"\nОшибка {str(e)}")
                 except Exception as er:
                     e = f"{e}, {str(er)}"
             if ignore is not True:
