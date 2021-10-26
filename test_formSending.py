@@ -80,4 +80,4 @@ def test_form_Sending(setup_driver, url, datatest):
     elif not answer:
         assert False, "Не найдено подтверждение в ответе от сервера"
     elif not confirmation:
-        assert False, "Не найднено сообщение об успешной отправки"
+        assert False, "Не найднено сообщение об успешной отправке"

@@ -125,7 +125,7 @@ class Form:
         self.action(obj=self.button, act="click")
 
     def findSendingRequest(self):
-        with allure_step(f"Поиск отправленного запроса"):
+        with allure_step("Поиск отправленного запроса"):
             for request in self.driver.requests:
                 if request.response:
                     if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
@@ -158,7 +158,7 @@ class Form:
         return any([conf in text for conf in self.confirm])
 
     def confirmationEvaluation(self, text_before):
-        with allure_step(f"Обработка результата"):
+        with allure_step("Обработка результата"):
             text_after = self.driver.find_element_by_xpath("//body").text
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             return any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
