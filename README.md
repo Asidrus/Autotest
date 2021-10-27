@@ -24,6 +24,7 @@
 <i>conda export --name autotest > req.yml</i><br></li>
 <li>Импортировать окружение из файла:<br>
 <i>conda env create --file req.yml</i><br></li></ul>
+
 ---
 run.sh - запуск теста в докере, например<br>
 sudo docker run -it autotest bash /tests/run.sh pytest --param1 --param2 test_formSending.py
