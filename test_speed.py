@@ -1,9 +1,8 @@
 from config import *
-from conftest import alarm
+from conftest import alarm, db_connection
 import allure
 import pytest
 import asyncio
-import asyncpg
 import aiohttp
 from datetime import datetime
 
@@ -13,20 +12,18 @@ severity = "Сritical"
 
 codes = {1: True, 2: True, 3: True, 4: False, 5: False}
 
+db_name = "speedtest"
+db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
 
-async def getData():
-    connection = await asyncpg.connect(user=db_login,
-                                       password=db_password,
-                                       database="speedtest",
-                                       host="localhost")
+
+@db_connection(**db_data)
+async def getData(connection):
     urls = await connection.fetch("SELECT * FROM URLS;")
-    await connection.close()
     return urls
 
 
 def pytest_generate_tests(metafunc):
     urls = asyncio.run(getData())
-    # metafunc.parametrize("url", (url["url"] for url in urls))
     metafunc.parametrize("data", urls)
 
 
@@ -34,6 +31,7 @@ def pytest_generate_tests(metafunc):
 @allure.story(test_name)
 @allure.severity(severity)
 @pytest.mark.asyncio
+@pytest.mark.parametrize('db', [db_data], indirect=True)
 async def test_getSpeed(db, data):
     url = data["url"]
     url_id = data["url_id"]
