@@ -1,3 +1,6 @@
+git clone
+git checkout --track -b loc_name_branch origin/remote_branch_name - клонирование удаленной ветки в локальный репозиторий, где loc_name_branch - имя локальной ветки, а remote_branch_name - имя ветки в удаленном репозитории
+
 git pull
 git checkout kote
 git merge master
