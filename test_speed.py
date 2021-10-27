@@ -10,10 +10,10 @@ suite_name = "Мониторинг сайтов"
 test_name = "Сбор времени ответа от сайтов"
 severity = "Сritical"
 
-codes = {1: True, 2: True, 3: True, 4: False, 5: False}
-
 db_name = "speedtest"
 db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
+
+codes = {1: True, 2: True, 3: True, 4: False, 5: False}
 
 
 @db_connection(**db_data)
