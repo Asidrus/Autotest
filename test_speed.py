@@ -45,7 +45,7 @@ async def test_getSpeed(db, data):
     with allure_step(f"Обработка результата {url=}", _alarm=__alarm):
         if not result:
             await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', TRUE, {url_id});")
-            assert True
+            assert False, status_code
         else:
             await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', False, {url_id});")
-            assert False, status_code
+            assert True

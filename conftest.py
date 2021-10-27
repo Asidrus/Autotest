@@ -143,8 +143,6 @@ def clicker():
 
     return _clicker
 
-# db_connection(getData)()
-
 
 def db_connection(**kwargs):
     """

@@ -56,7 +56,6 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("url, datatest", result)
 
 
-
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)

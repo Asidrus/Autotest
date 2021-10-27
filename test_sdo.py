@@ -142,6 +142,7 @@ def test_sdo(setup_driver, write_log, clicker):
                      _alarm=f"{severity}: {suite_name}: {test_name}:"):
         login(driver, listener_login, listener_password)
         gatherBrowserLogs(driver)
+    ### ----
     reqs = []
     for request in driver.requests:
         try:
@@ -149,6 +150,8 @@ def test_sdo(setup_driver, write_log, clicker):
                 reqs.append(request)
         except:
             pass
+
+    ### ----
     with allure_step(f"Поиск запроса после клика", driver=driver, screenshot=True,
                      browser_log=True, ignore=True):
         times.append(reqs[1].date - reqs[0].date)
@@ -166,3 +169,11 @@ def test_sdo(setup_driver, write_log, clicker):
     WebDriverWait(driver, 100).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='attention-aggree']")))
     times.append(datetime.now() - start_task)
     assert True
+
+
+def process_browser_log_entry(entry):
+    response = json.loads(entry['message'])['message']
+    return response
+
+events = [process_browser_log_entry(entry) for entry in logs]
+events = [event for event in events if 'Network.response' in event['method']]
