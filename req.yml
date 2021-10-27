@@ -72,7 +72,6 @@ dependencies:
   - readline=8.1=h27cfd23_0
   - requests=2.26.0=pyhd8ed1ab_0
   - rsa=4.7.2=pyh44b312d_0
-  - selenium=3.141.0=py38h27cfd23_1000
   - setuptools=52.0.0=py38h06a4308_0
   - simplejson=3.17.3=py38h497a2fe_0
   - six=1.16.0=pyhd3eb1b0_0
@@ -91,6 +90,7 @@ dependencies:
   - zstd=1.4.9=ha95c52a_0
   - pip:
     - allure-pytest==2.9.43
+    - async-generator==1.10
     - blinker==1.4
     - brotli==1.0.9
     - charset-normalizer==2.0.4
@@ -104,8 +104,13 @@ dependencies:
     - lxml==4.6.3
     - matplotlib==3.4.3
     - numpy==1.21.2
+    - outcome==1.1.0
     - python-dateutil==2.8.2
-    - selenium-wire==4.5.3
+    - selenium==4.0.0
+    - sniffio==1.2.0
+    - sortedcontainers==2.4.0
+    - trio==0.19.0
+    - trio-websocket==0.9.2
     - wsproto==1.0.0
     - zstandard==0.15.2
 prefix: /home/kali/anaconda3/envs/autotest

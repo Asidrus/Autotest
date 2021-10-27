@@ -6,6 +6,7 @@ from time import sleep
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 import allure
 from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display

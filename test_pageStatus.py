@@ -3,8 +3,6 @@ from libs.aioparser import aioparser
 import pytest
 import aiohttp
 
-# import requests
-
 test_name = "Статус код всех ссылок"
 domain = ""
 severity = "Blocker"
@@ -17,17 +15,6 @@ def pytest_generate_tests(metafunc):
     domain = metafunc.config.getoption("site").lower().replace("https://", "")
     parser.getAllUrls(metafunc.config.getoption("site"), metafunc.config.getoption("parse"))
     metafunc.parametrize("link", parser.links)
-    # metafunc.parametrize("link", [{"url":"https://pentaschool.ru", "from": []},
-    #                               {"url":"https://psy.edu.ru", "from": []}])
-
-
-# @allure.feature("Тест ссылок")
-# @allure.story("Статус страниц")
-# @allure.severity("Critical")
-# def test_pageStatus(link, timing):
-#     response = requests.get(link["url"])
-#     codes = {1: True, 2: True, 3: False, 4: False, 5: False}
-#     assert codes[response.status_code // 100], f"{response.status_code}, from={link['from']}"
 
 
 @allure.feature(domain)

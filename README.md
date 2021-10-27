@@ -21,7 +21,7 @@
 <b>Conda</b><br>
 <ul>
 <li>Создать файл окружения:<br>
-<i>conda export --name autotest > req.yml</i><br></li>
+<i>conda env export --name autotest > req.yml</i><br></li>
 <li>Импортировать окружение из файла:<br>
 <i>conda env create --file req.yml</i><br></li></ul>
 
