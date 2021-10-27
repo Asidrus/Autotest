@@ -17,6 +17,32 @@ def DataToXpath(data):
     return f"//{data['tag']}{atts}"
 
 
+def str2list(text):
+    txt = []
+    while True:
+        ind = text.find("\n")
+        if ind >= 0:
+            if ind != 0:
+                txt.append(text[:ind])
+            text = text[ind + 1:]
+        else:
+            txt.append(text)
+            break
+    return txt
+
+
+def compareLists(list1, list2):
+    l1 = list1.copy()
+    l2 = list2.copy()
+    for l in list1:
+        if l in l2:
+            l2.remove(l)
+    for l in list2:
+        if l in l1:
+            l1.remove(l)
+    return l1, l2
+
+
 def sendReportOnEmail(to: str, title, msg):
     # login = "tester3@gaps.edu.ru"
     # password = None
@@ -67,32 +93,6 @@ class ErrorParser:
         else:
             Errors.append(self.IsCorrect)
         return Errors
-
-
-def str2list(text):
-    txt = []
-    while True:
-        ind = text.find("\n")
-        if ind >= 0:
-            if ind != 0:
-                txt.append(text[:ind])
-            text = text[ind + 1:]
-        else:
-            txt.append(text)
-            break
-    return txt
-
-
-def compareLists(list1, list2):
-    l1 = list1.copy()
-    l2 = list2.copy()
-    for l in list1:
-        if l in l2:
-            l2.remove(l)
-    for l in list2:
-        if l in l1:
-            l1.remove(l)
-    return l1, l2
 
 
 def genCasesForFormValidation(fname):
@@ -150,24 +150,3 @@ def GenData(urls):
         except Exception as e:
             print(e)
     return data
-
-
-# async def main2(links):
-#     async with aiohttp.ClientSession() as session:
-#         i = 0
-#         for link in links:
-#             async with session.get(link["url"]) as response:
-#                 print(i/len(links)*100.0)
-#                 i = i+1
-#                 try:
-#                     parser = etree.HTMLParser()
-#                     content = await response.content.read()
-#                     text = content.decode("windows-1251", errors='ignore')
-#                     tree = etree.parse(StringIO(text), parser=parser)
-#                     txt = etree.tostring(tree, method="text", encoding='windows-1251').decode("windows-1251")
-#                     if any([number in txt.lower() for number in ("0010006", "0008663")]):
-#                         res.append(link["url"]+"\n")
-#                 except:
-#                     pass
-#
-#     return res

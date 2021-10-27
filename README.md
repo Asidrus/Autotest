@@ -1,13 +1,29 @@
-git pull
-git checkout kote
-git merge master
+<b>Git</b>
+1. Получить обновления с master's ветки:</br>
+<i>git pull</i></br>
+<i>git checkout kote</i></br>
+<i>git merge master</i></br>
 
-git add 
-git commit -m "kote"
-git push origin kote
-git checkout master
-git pull
-git merge kote
-git push origin master
 
-git chechout kote
+2. Добавление нового кода
+<i>git add </i></br>
+<i>git commit -m "kote"</i></br>
+<i>git push origin kote</i></br>
+
+
+3. Слияние с master's веткой
+<i>git checkout master</i></br>
+<i>git pull</i></br>
+<i>git merge kote</i></br>
+<i>git push origin master</i></br>
+<i>git chechout kote</i></br>
+---
+<b>Conda</b><br>
+Создать файл окружения:</br>
+<i>conda export --name autotest > req.yml</i></br>
+Импортировать окружение из файла:</br>
+<i>conda env create --file req.yml</i></br>
+---
+run.sh - запуск теста в докере, например<br>
+sudo docker run -it autotest bash /tests/run.sh pytest --param1 --param2 test_formSending.py
+---
