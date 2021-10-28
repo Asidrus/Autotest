@@ -55,8 +55,8 @@ def login(driver, _login, _password):
     name = driver.find_element_by_xpath("//input[@name='username']")
     password = driver.find_element_by_xpath("//input[@name='password']")
     button = driver.find_element_by_xpath("//button[@type='submit']")
-    name.send_keys(_login)
-    password.send_keys(_password)
+    name.send_keys(listener_login)
+    password.send_keys(listener_password)
     button.click()
 
 
