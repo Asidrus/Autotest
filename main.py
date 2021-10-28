@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from libs.form import DataToXpath, Form
 
 def main():
-    driver = webdriver.Chrome("./resources/chromedriver")
+    driver = webdriver.Chrome("./chromedriver/chromedriver")
     try:
         driver.get("https://edu.i-spo.ru")
         form = driver.find_element(By.XPATH, "//form[@data-test='pop_form']")

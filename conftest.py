@@ -2,7 +2,6 @@ import asyncio
 from contextlib import contextmanager
 import asyncpg as asyncpg
 import pytest
-from time import sleep
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -10,7 +9,7 @@ from selenium.webdriver.common.by import By
 import allure
 from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display
-from config.config import *
+from conf.config import *
 
 
 def pytest_addoption(parser):
@@ -164,5 +163,5 @@ async def db(request):
    
     await connection.close()
     
-    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
+
 

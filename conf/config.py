@@ -1,18 +1,43 @@
-from selenium import webdriver
-from time import sleep
+import os
+import sys
+import logging
+from datetime import datetime
 
+# paths
+project_path = os.path.abspath(os.getcwd())
+project_path.replace('connect', '')
+libs_path = project_path+"/libs"
+resources_path =  project_path+"/resources"
+google_token = project_path+"/stable-ring-316114-8acf36454762.json"
+# chromedriver = project_path+"/chromedriver/chromedriver"
+# chromedriver = "/chromedriver/chromedriver.exe"
 
-class WebdriverChrome:
+autotest_results = project_path+"/autotest-results"
+allure_results = project_path+"/allure-results"
+# telegram socket
+IP = "127.0.0.1"
+PORT = 1234
+# gather the logs
+today = datetime.now().date()
+fname = autotest_results + "/logs" + "/" + str(today) + ".log"
+if not os.path.exists(fname):
+    with open(fname, "w"): pass
+logging.basicConfig(filename=fname,
+                    format='%(asctime)s|%(levelname)s|%(message)s',
+                    level=logging.WARNING,
+                    datefmt='%d/%m/%Y %H:%M:%S')
+logger = logging
+# DB
+db_login = ""
+db_password = ""
+# sdo.Niidpo.ru
 
-    def __init__(self):
-        self.driver = webdriver.Chrome("/home/evgenii/python/conf/chromedriver")
-        self.website = "https://pentaschool.ru/program/program-graficheskij-dizajn-v-reklame-s-nulya"
-        self.text_err = "//div[@class='form_errors']"
-        self.driver.get(self.website)
-        self.input_FCs = self.driver.find_element_by_xpath("//input[@class='els-form gtm_diplom_form']")
-        self.btn = self.driver.find_element_by_xpath("//button[@class='but-cons amber-but']")
+listener_login = ""
+listener_password = ""
 
-
-    def closeDriver(self):
-        self.driver.close()
-        self.driver.quit()
+listener_months_SSID = {
+    8: "1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4",
+    9: "1zXsJTkKzEnli-TAIuKL27cV1_54y4BjwOYCNKKYCrSM",
+    10: "1cxBX10S5_NKYk7qpjBjtjBwatb7boosR9qAjeMX86dw",
+    11: "1JU7xbBQVN8Fisg4A678okvBn_Z4J6_3pq_VW3HNkwTc"
+}

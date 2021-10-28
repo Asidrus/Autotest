@@ -5,7 +5,7 @@ import json
 from io import StringIO
 from lxml import etree
 from datetime import datetime, timedelta
-from config import resources_path
+from conf.config import resources_path
 
 
 def putInDict(url, link, dictionary):
