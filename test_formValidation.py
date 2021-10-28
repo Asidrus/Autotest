@@ -3,8 +3,8 @@ from allure_commons.types import AttachmentType
 import pytest
 import os
 import json
-from func4test import genCasesForFormValidation
-from func4test import compareLists,str2list
+from libs.func4test import genCasesForFormValidation
+from libs.func4test import compareLists,str2list
 from libs.form import Form
 from libs.form import ErrorParser
 

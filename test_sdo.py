@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from libs.GoogleSheets.GoogleSheets import GoogleSheets
 from config import *
-from conftest import step, allure_step, gatherBrowserLogs, alarm
+from conftest import allure_step, gatherBrowserLogs
 from time import sleep, time
 
 suite_name = "Мониторинг сайтов"

@@ -1,0 +1,9 @@
+{'data': '               ', 'valid': False, 'result': True}
+{'data': 'Аксёничев Пётр Семёнович', 'valid': True, 'result': False}
+{'data': '                                     Чаплин Спенсер Чарлз  ', 'valid': False, 'result': True}
+{'data': 'Ким Ир Сен               ', 'valid': False, 'result': True}
+{'data': ' Киселева Ольга Евгеньевна Киселева Ольга Евгеньевна Киселева Ольга Евгеньевна Киселева Ольга Евгеньевна Киселева Ольга Евгеньевна Киселева Ольга Евгеньевна Киселева Ольга Евгеньевна ', 'valid': False, 'result': True}
+{'data': 'ВладимирКрасноеСолнышко', 'valid': False, 'result': True}
+{'data': 'ж', 'valid': False, 'result': True}
+{'data': 'Вввв Вв вввВ', 'valid': False, 'result': True}
+{'data': 'Цезарь-Шереметьева Аркадина Евгеньевна', 'valid': True, 'result': False}

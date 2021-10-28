@@ -1,11 +1,14 @@
 from contextlib import contextmanager
 from time import sleep, time
-from func4test import *
+
+from conftest import allure_step
+from libs.func4test import *
 import re
 import zlib
 from urllib.parse import unquote
 import allure
 from allure_commons.types import AttachmentType
+
 
 class Form:
     """
@@ -43,8 +46,8 @@ class Form:
                                                                     'arguments[0].attributes[index].value }; return '
                                                                     'items;', item)
         if xpath is not None:
-            self.granddad = self.driver.find_element_by_xpath(xpath)
-            args = self.granddad.find_elements_by_xpath(".//input")
+            self.granddad = self.driver.find_element("xpath", xpath)
+            args = self.granddad.find_elements("xpath", f"({xpath})//input")
 
         for arg in args:
             for key in self._name_.keys():
@@ -60,12 +63,12 @@ class Form:
                     self.email = arg
                     break
         if self.granddad is None:
-            self.granddad = args[0].find_element_by_xpath("..").find_element_by_xpath("..").find_element_by_xpath("..")
+            self.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath", "..")
         try:
-            self.button = self.granddad.find_element_by_xpath(".//button")
+            self.button = self.granddad.find_element("xpath", ".//button")
         except:
             try:
-                items = self.granddad.find_elements_by_tag_name("input")
+                items = self.granddad.find_element("xpath", "input")
                 for item in items:
                     if "отправить" in item.get_attribute("value").lower():
                         self.button = item
@@ -73,7 +76,7 @@ class Form:
                 print("кнопка не обнаружена")
         try:
             data_test = self.getAttribute(self.granddad)["data-test"]
-            self.callButton = self.driver.find_element_by_xpath(f"//button[@data-test='{data_test}']")
+            self.callButton = self.driver.find_element("xpath", f"//button[@data-test='{data_test}']")
         except Exception as e:
             pass
         if any(map(lambda i: i is None, (self.name, self.phone, self.button))):
@@ -87,6 +90,7 @@ class Form:
             elif act == "click":
                 obj.click()
         self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
+        sleep(1)
         for i in range(10):
             try:
                 do(obj, act, data)
@@ -101,15 +105,17 @@ class Form:
     def Evaluation(self):
         if self.callButton is not None:
             self.callPopup()
-        text_before = self.driver.find_element_by_xpath("//body").text
-        self.driver.backend.storage.clear_requests()
+        text_before = self.driver.find_element("xpath", "//body").text
+        # self.driver.backend.storage.clear_requests()
         try:
             self.fillForm()
         except Exception as e:
             raise Exception(f"Не получилось заполнить форму: {e}")
-        answer = self.answerEvaluation()
-        confirmation = self.confirmationEvaluation(text_before)
-        return answer, confirmation
+        # answer = self.answerEvaluation()
+        # confirmation = self.confirmationEvaluation(text_before)
+        confirmation = self.waitEvaluation(text_before)
+        # return answer, confirmation
+        return confirmation
 
     def callPopup(self):
         try:
@@ -119,13 +125,16 @@ class Form:
 
     def fillForm(self):
         self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
+        # self.name.send_keys(self.__nameDefault__)
         self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
+        # self.phone.send_keys(self.__phoneDefault__[1:])
+        sleep(1)
         if self.email is not None:
             self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
         self.action(obj=self.button, act="click")
 
     def findSendingRequest(self):
-        with allure_step("Поиск отправленного запроса"):
+        with allure_step(f"Поиск отправленного запроса"):
             for request in self.driver.requests:
                 if request.response:
                     if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
@@ -137,6 +146,16 @@ class Form:
                         except:
                             continue
             return None
+
+    def waitEvaluation(self, text_before, timeout=10, delta=0.25):
+        start = time()
+        while time() - start < timeout:
+            request = self.confirmationEvaluation(text_before)
+            if request:
+                return request
+                break
+            sleep(delta)
+        raise TimeoutError("Запрос не найден")
 
     def waitRequest(self, timeout=10, delta=0.25):
         start = time()
@@ -158,7 +177,7 @@ class Form:
         return any([conf in text for conf in self.confirm])
 
     def confirmationEvaluation(self, text_before):
-        with allure_step("Обработка результата"):
-            text_after = self.driver.find_element_by_xpath("//body").text
+        with allure_step(f"Обработка результата"):
+            text_after = self.driver.find_element("xpath", "//body").text
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             return any([conf in txt.lower() for txt in txt_after for conf in self.confirm])

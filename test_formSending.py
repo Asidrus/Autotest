@@ -1,7 +1,6 @@
 import allure
 from allure_commons.types import AttachmentType
 from libs.form import *
-from func4test import *
 from conftest import *
 import os
 from datetime import datetime, timedelta
@@ -10,6 +9,12 @@ from libs.aioparser import aioparser
 
 import aiohttp
 from lxml import etree
+
+
+suite_name = "Проверка отправки заявок с ФОС"
+test_name = "Проверка отправки заявок с ФОС"
+severity = "Сritical"
+__alarm = f"{severity}: {suite_name}: {test_name}:"
 
 
 async def seekForms(urls):
@@ -51,7 +56,11 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("url, datatest", result)
 
 
-def test_form_Sending(setup_driver, url, datatest):
+
+@allure.feature(suite_name)
+@allure.story(test_name)
+@allure.severity(severity)
+def test_formSending(setup_driver, url, datatest):
     driver = setup_driver
     getAttribute = lambda item: driver.execute_script('var items = {}; for (index = 0; index < '
                                                       'arguments[0].attributes.length; ++index) { '
@@ -64,20 +73,26 @@ def test_form_Sending(setup_driver, url, datatest):
     with allure_step(f"Переход на страницу {url=}"):
         if driver.current_url != url:
             driver.get(url)
-    sleep(2)
-    el = driver.find_element_by_xpath(f"(//form[@data-test='{datatest}'])[1]")
+    el = driver.find_element("xpath", f"(//form[@data-test='{datatest}'])[1]")
     xpath = DataToXpath({"tag": "form", "attrib": getAttribute(el)})
     with allure_step("Инициализация формы"):
         form = Form(xpath=xpath, driver=driver)
     if not form.isready:
         raise Exception(f"Невозможно инициализировать форму {form.name=},{form.phone=}")
     with allure_step("Отправка заявки", driver, True, True, _alarm=True):
-        answer, confirmation = form.Test()
-    if answer and confirmation:
-        assert True
-    elif not (answer or confirmation):
-        assert (answer and confirmation), f"Форма не отправлена"
-    elif not answer:
-        assert False, "Не найдено подтверждение в ответе от сервера"
-    elif not confirmation:
-        assert False, "Не найднено сообщение об успешной отправке"
+        # answer, confirmation = form.Test()
+        confirmation = form.Test()
+    with allure_step(f"Проверка результата {url=}, {datatest=}", _alarm=__alarm):
+        if confirmation:
+            assert True
+        else:
+            assert False, "Не найднено сообщение об успешной отправки"
+
+    # if answer and confirmation:
+    #     assert True
+    # elif not (answer or confirmation):
+    #     assert (answer and confirmation), f"Форма не отправлена"
+    # elif not answer:
+    #     assert False, "Не найдено подтверждение в ответе от сервера"
+    # elif not confirmation:
+    #     assert False, "Не найднено сообщение об успешной отправки"

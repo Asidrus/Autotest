@@ -1,52 +1,51 @@
 from config import *
-from conftest import alarm
+from conftest import alarm, db_connection, allure_step
 import allure
 import pytest
 import asyncio
-import asyncpg
 import aiohttp
 from datetime import datetime
 
 suite_name = "Мониторинг сайтов"
 test_name = "Сбор времени ответа от сайтов"
 severity = "Сritical"
+__alarm = f"{severity}: {suite_name}: {test_name}:"
+db_name = "speedtest"
+db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
 
 codes = {1: True, 2: True, 3: True, 4: False, 5: False}
 
 
-async def getData():
-    connection = await asyncpg.connect(user=db_login,
-                                       password=db_password,
-                                       database="speedtest",
-                                       host="localhost")
+@db_connection(**db_data)
+async def getData(connection):
     urls = await connection.fetch("SELECT * FROM URLS;")
-    await connection.close()
     return urls
 
 
 def pytest_generate_tests(metafunc):
-    urls = asyncio.run(getData())
-    # metafunc.parametrize("url", (url["url"] for url in urls))
-    metafunc.parametrize("data", urls)
+    with allure_step("Сбор urls из БД"):
+        urls = asyncio.run(getData())
+        metafunc.parametrize("data", urls)
 
 
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)
 @pytest.mark.asyncio
+@pytest.mark.parametrize('db', [db_data], indirect=True)
 async def test_getSpeed(db, data):
     url = data["url"]
     url_id = data["url_id"]
-    start_time = datetime.now()
-    try:
+    with allure_step(f"Получение данных {url=}", _alarm=__alarm):
+        start_time = datetime.now()
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                T = codes[response.status // 100]
-                if not T:
-                    alarm(f"{severity}: {suite_name}: {test_name}: {url=} имеет статус код [{response.status} {response.reason}]")
-                    await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', TRUE, {url_id});")
-                else:
-                    await db.fetch(
-                        f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', False, {url_id});")
-    except:
-        await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', TRUE, {url_id});")
+                status_code = response.status
+    result = codes[status_code // 100]
+    with allure_step(f"Обработка результата {url=}", _alarm=__alarm):
+        if not result:
+            await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', TRUE, {url_id});")
+            assert True
+        else:
+            await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', False, {url_id});")
+            assert False, status_code
