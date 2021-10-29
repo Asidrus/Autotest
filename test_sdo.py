@@ -27,8 +27,9 @@ checkStatus = {1: True, 2: True, 3: True, 4: False, 5: False}
 def write_log():
     test_datetime = datetime.now()
     yield
-    sendInGoogleSheet(test_datetime, times)
     writeIntoFile(test_datetime, times)
+    sendInGoogleSheet(test_datetime, times)
+
 
 
 def sendInGoogleSheet(test_datetime, times):
@@ -40,6 +41,7 @@ def sendInGoogleSheet(test_datetime, times):
         report.addData(sheet=report.__Sheets__[test_datetime.date().day - 1], data=[m[0:12]])
     except Exception as e:
         logger.critical(str(e))
+        raise e
 
 
 def writeIntoFile(test_datetime, times):
