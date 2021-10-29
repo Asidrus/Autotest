@@ -31,7 +31,7 @@ def setup_driver(request):
         options.add_argument("--window-size=1920,1080")
         # options.add_argument("--disable-dev-shm-usage")
         options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-        options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
+        # options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
         if request.config.getoption("--adaptive"):
             options.add_argument(
                 '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
@@ -142,8 +142,6 @@ def clicker():
         button.click()
 
     return _clicker
-
-# db_connection(getData)()
 
 
 def db_connection(**kwargs):

@@ -1,35 +1,32 @@
+import datetime
+import time
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from libs.form import DataToXpath, Form
+from config import listener_login, listener_password
+import json
+
+
+def process_browser_log_entry(entry):
+    response = json.loads(entry['message'])['message']
+    return response
+
 
 def main():
-    driver = webdriver.Chrome("./resources/chromedriver")
-    try:
-        driver.get("https://edu.i-spo.ru")
-        form = driver.find_element(By.XPATH, "//form[@data-test='pop_form']")
-
-        getAttribute = lambda item: driver.execute_script('var items = {}; for (index = 0; index < '
-                                                          'arguments[0].attributes.length; ++index) { '
-                                                          'items[arguments[0].attributes[index].name] = '
-                                                          'arguments[0].attributes[index].value }; return '
-                                                          'items;', item)
-        xpath = DataToXpath({"tag": "form", "attrib": getAttribute(form)})
-        print(xpath)
-        form = Form(xpath=xpath, driver=driver)
-        form.Test()
-
-        # driver.find_element("xpath", "//button[@id='callback_btn']").click()
-        # name = driver.find_element("xpath", "//input[@id='name_inline_556']")
-        # name.send_keys("name")
-        # phone = driver.find_element("xpath", "//input[@id='order_tel_556']")
-        # phone.send_keys("1234567890")
-        # import time
-        # time.sleep(20)
-    except Exception as e:
-        raise e
-    finally:
-        driver.close()
+    for i in range(30):
+        options = webdriver.ChromeOptions()
+        options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+        # options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
+        driver = webdriver.Chrome("./resources/chromedriver", options=options)
+        driver.get("https://psy.edu.ru")
+        driver.add_cookie(cookie_dict={"name": "task_PSY_43", "value": "test"})
+        driver.add_cookie(cookie_dict={"name": "psycho_site", "value": "test"})
+        driver.add_cookie(cookie_dict={"name": "psycho_site_dev", "value": "test"})
+        driver.get("https://psy.edu.ru/blog/chego-boyatsya-psihologi-3-istorii-o-slozhnyh-sessiyah")
         driver.quit()
+        # driver.close()
+
 
 if __name__ == "__main__":
     main()

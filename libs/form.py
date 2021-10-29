@@ -86,7 +86,9 @@ class Form:
         def do(obj, act, data):
             if act == "send_keys":
                 obj.clear()
-                obj.send_keys(data)
+                for sym in data:
+                    sleep(0.05)
+                    obj.send_keys(sym)
             elif act == "click":
                 obj.click()
         self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
@@ -128,7 +130,6 @@ class Form:
         # self.name.send_keys(self.__nameDefault__)
         self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
         # self.phone.send_keys(self.__phoneDefault__[1:])
-        sleep(1)
         if self.email is not None:
             self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
         self.action(obj=self.button, act="click")
