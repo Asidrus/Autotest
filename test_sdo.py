@@ -176,7 +176,8 @@ def test_sdo(setup_driver, write_log, clicker):
     getTime = lambda req: datetime.fromtimestamp(req["params"]["response"]["responseTime"] / 1000)
     times.append(getTime(reqs[1])-getTime(reqs[0]))
     start_task = datetime.now()
-    times.append(start_task - getTime(reqs[1]))
+    times.append(getTime(reqs[1]) - start_task)
+    # times.append(start_task - getTime(reqs[1]))
     # logs = driver.get_log('performance')
     # events = [process_browser_log_entry(entry) for entry in logs]
     # events = [event for event in events if 'Network.response' in event['method']]

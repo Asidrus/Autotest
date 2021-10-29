@@ -86,7 +86,9 @@ class Form:
         def do(obj, act, data):
             if act == "send_keys":
                 obj.clear()
-                obj.send_keys(data)
+                for sym in data:
+                    sleep(0.05)
+                    obj.send_keys(sym)
             elif act == "click":
                 obj.click()
         self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
