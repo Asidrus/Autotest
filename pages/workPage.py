@@ -1,34 +1,38 @@
-from connect.baseApp import WorkDriver
 from time import sleep
 import pytest
+from connect.baseApp import WorkDriver
 
-class WorkPage(WorkDriver):
 
-    def writingTextInField(self, xpath, text):
-        input = self.findElement(xpath) 
+class Pages(WorkDriver):
+
+    def writingTextInField(self, input, text):
         input.clear()
-        input.send_keys(text)
-        return input
- 
-    def clickButton(self, xpath):
-        return self.findElement(xpath).click()
+        for symbol in text:
+            self.sleepPage(.05)
+            input.send_keys(symbol)
 
-    def stopPage(time):
-        return sleep(time)
+    def clickButton(self, granddad, xpath):
+        try:
+            button = self.searchElemAtGranddad(granddad, xpath).click()
+        except:
+            try:
+                items =  self.searchElemForTagAtGranddad(granddad, "input")
+                for item in items:
+                    if "отправить" in self.getAttrForElem(item, "value").lower():
+                        button = item
+                        button.click()
+            except:
+                print("кнопка не обнаружена")
 
 
-    def addCookie(self, url):
-        return self.check_cookie(url, {"name": "metric_off", "value": "1"})
-
-    def sleepPage(time):
+    def sleepPage(self, time):
         return sleep(time)
 
     def outTextElem(self, xpath):
         return self.findElement(xpath).text
-   
-    @pytest.fixture(scope="session")
+    
     def clicker():
-        def _clicker(button):
+        def _clicker(button): 
             for i in range(200):
                 try:
                     button.click()

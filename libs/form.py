@@ -6,16 +6,10 @@ from libs.func4test import *
 import re
 import zlib
 from urllib.parse import unquote
-import allure
-from allure_commons.types import AttachmentType
-from connect.baseApp import WorkDriver
-from pages.workPage import WorkPage
+from pages.workPage import Pages
 
-class Form(WorkDriver):
-    """
-    Class for testing feedback forms
-    """
-    # HTML objects
+class Form:
+
     granddad = None
     name = None
     phone = None
@@ -25,85 +19,69 @@ class Form(WorkDriver):
     # If form if ready for test
     isready = True
 
-    def __init__(self, *args, xpath=None, **kwargs):
-        """
+    __emailDefault__ = "tester_form@gaps.edu.ru"
+    __phoneDefault__ = "71234567890"
+    __nameDefault__ = "Автотест"
 
-        :param args: list of input tags if xpath == None
-        :param xpath: xpath of form is included all input and button tags
-        :param kwargs: driver -> selenium.webdriver
-        """
-        self.__emailDefault__ = "tester_form@gaps.edu.ru"
-        self.__phoneDefault__ = "71234567890"
-        self.__nameDefault__ = "Автотест"
-
-        self._email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
+    _email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
                         "name": ["email", "e-mail"]}
-        self._phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
-        self._name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
-        self.confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
+    _phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
+    _name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
+    confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
     
+  
+class PageForm(Pages):
+
+    def findform(self, *args, xpath=None, **kwargs):
+        self.form = Form()
         if xpath is not None:
-            self.granddad = self.findElement(xpath)
-            args = self.searchElemAtGranddad(self.granddad,  f"({xpath})//input")
+            self.form.granddad = self.findElement(xpath)
+            args =  self.searchElemAtGranddad(self.form.granddad, ".//input")
+
+        self.form.name =  self.assigningAnArgumentField(args, self.form._name_)
+        self.form.phone =  self.assigningAnArgumentField(args, self.form._phone_)
+        self.form.email = self.assigningAnArgumentField(args, self.form._email_)
+        self.form.button = ".//button"
+
+        if self.form.granddad is None:
+            self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath", "..")
       
-        for arg in args:
-            for key in self._name_.keys():
-                if str.lower(arg.get_attribute(key)) in self._name_[key]:
-                    self.name = arg
-                    break
-            for key in self._phone_.keys():
-                if str.lower(arg.get_attribute(key)) in self._phone_[key]:
-                    self.phone = arg
-                    break
-            for key in self._email_.keys():
-                if str.lower(arg.get_attribute(key)) in self._email_[key]:
-                    self.email = arg
-                    break
-        if self.granddad is None:
-            self.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath", "..")
         try:
-            self.button = self.searchElemAtGranddad(self.granddad, ".//button")
-        except:
-            try:
-                items =  self.searchElemAtGranddad(self.granddad, "input")
-                for item in items:
-                    if "отправить" in item.get_attribute("value").lower():
-                        self.button = item
-            except:
-                print("кнопка не обнаружена")
-        try:
-            data_test = self.getAttrElem(self.granddad)["data-test"]
-            self.callButton = f"//button[@data-test='{data_test}']"
+            data_test = self.getAttr(self.form.granddad)["data-test"]
+            self.form.callButton = f"//button[@data-test='{data_test}']"
         except Exception as e:
             pass
-        if any(map(lambda i: i is None, (self.name, self.phone, self.button))):
-            self.isready = False
+        if any(map(lambda i: i is None, (self.form.name, self.form.phone, self.form.button))):
+            self.form.isready = False
+
+    def assigningAnArgumentField(self, args, dict):
+        for arg in args:
+            for key in dict.keys():
+                if str.lower(self.getAttrForElem(arg, key)) in dict[key]:
+                    return arg
 
     def action(self, obj, act: str, data=None):
         def do(obj, act, data):
             if act == "send_keys":
-                WorkPage.writingTextInField(xpath=obj, text=data)
+                self.writingTextInField(obj, text=data)
             elif act == "click":
-                WorkPage.clickButton(obj)
-
-        self.getDriver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
-        WorkPage.sleepPage(1)
-        
-        for i in range(10):
+                self.clickButton(self.form.granddad, obj)
+        # self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")      
+        for _ in range(10):
             try:
                 do(obj, act, data)
                 return True
             except:
-                WorkPage(0.1)
+                self.sleepPage(0.1)
         do(obj, act, data)
 
     def Test(self):
         return self.Evaluation()
 
     def Evaluation(self):
-        if self.callButton is not None:
+        if self.form.callButton is not None:
             self.callPopup()
-        text_before = WorkPage.outTextElem("//body")
+        text_before = self.outTextElem("//body")
         # self.driver.backend.storage.clear_requests()
         try:
             self.fillForm()
@@ -117,19 +95,27 @@ class Form(WorkDriver):
 
     def callPopup(self):
         try:
-            WorkPage.clickButton(self.callButton)
+            self.buttonCallPopup = self.findElement(self.form.callButton)
+        except:
+            self.buttonCallPopup = None
+        try:
+            if self.buttonCallPopup:
+                self.buttonCallPopup.click()
         except Exception as e:
             raise Exception(f"Не удалось открыть поп-ап: {e}")
 
     def fillForm(self):
-        self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
+        try:
+            self.action(obj=self.form.name, act="send_keys", data=self.form.__nameDefault__)
+        except Exception as e:
+            raise e
         # self.name.send_keys(self.__nameDefault__)
-        self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
+        self.action(obj=self.form.phone, act="send_keys", data=self.form.__phoneDefault__[1:])
         # self.phone.send_keys(self.__phoneDefault__[1:])
-        WorkPage.sleepPage(1)
-        if self.email is not None:
-            self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
-        self.action(obj=self.button, act="click")
+        self.sleepPage(1)
+        if self.form.email is not None:
+            self.action(obj=self.form.email, act="send_keys", data=self.form.__emailDefault__)
+        self.action(obj=self.form.button, act="click")
 
     def findSendingRequest(self):
         with allure_step(f"Поиск отправленного запроса"):
@@ -152,7 +138,7 @@ class Form(WorkDriver):
             if request:
                 return request
                 break
-            WorkPage.sleepPage(delta)
+            self.sleepPage(delta)
         raise TimeoutError("Запрос не найден")
 
     def waitRequest(self, timeout=10, delta=0.25):
@@ -162,7 +148,7 @@ class Form(WorkDriver):
             if request:
                 return request
                 break
-            WorkPage.sleepPage(delta)
+            self.sleepPage(delta)
         raise TimeoutError("Запрос не найден")
 
     def answerEvaluation(self):
@@ -176,6 +162,6 @@ class Form(WorkDriver):
 
     def confirmationEvaluation(self, text_before):
         with allure_step(f"Обработка результата"):
-            text_after = WorkPage.outTextElem("//body")
+            text_after = self.outTextElem("//body")
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
-            return any([conf in txt.lower() for txt in txt_after for conf in self.confirm])
+            return any([conf in txt.lower() for txt in txt_after for conf in self.form.confirm])

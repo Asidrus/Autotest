@@ -1,3 +1,4 @@
+from time import sleep
 import allure
 from allure_commons.types import AttachmentType
 from libs.form import *
@@ -7,7 +8,7 @@ import os
 from datetime import datetime, timedelta
 from conf.config import resources_path
 from libs.aioparser import aioparser
-from pages.pageForms import WorkPage
+from libs.form import PageForm
 import aiohttp
 from lxml import etree
 
@@ -53,27 +54,32 @@ def pytest_generate_tests(metafunc):
 
 
 def test_form_Sending(setup_driver, url, datatest):
-    WorkPage(setup_driver)
-  
+    # print(setup_driver)
+    page = PageForm(setup_driver)
+    # FormPage = ClassFormPage(setup_driver)
+    # FormPage.getUrl("")
+    # FormPage.findForm(datatest)
+    # FormPage.FormTest(FormPage.forms[0])
+
     with allure_step("Добавление cookie"):
-        WorkPage.addCookie(url)
+        page.addCookie(url, {"name": "metric_off", "value": "1"})
 
     with allure_step(f"Переход на страницу {url=}"):
-        if WorkPage.pageCheck(url):
-            WorkPage.startDriver(url)
-    WorkPage.sleepPage(2)
+        page.getPage(url)
+        page.sleepPage(2)
 
-    el = WorkPage.findElement(f"(//form[@data-test='{datatest}'])[1]")
-    xpath = DataToXpath({"tag": "form", "attrib": WorkPage.getAttrElem(el)})
+    el = page.findElement(f"(//form[@data-test='{datatest}'])[1]")
+    xpath = DataToXpath({"tag": "form", "attrib": page.getAttr(el)})
 
     with allure_step("Инициализация формы"):
-        form = Form(xpath=xpath, driver=WorkPage.getDriver)
+        page.findform(xpath=xpath)
 
-    if not form.isready:
-        raise Exception(f"Невозможно инициализировать форму {form.name=},{form.phone=}")
+    print(page.form.isready)
+    if not page.form.isready:
+        raise Exception(f"Невозможно инициализировать форму {page.form.name=},{page.form.phone=}")
 
-    with allure_step("Отправка заявки", WorkPage.getDriver, True, True, _alarm=True):
-        answer, confirmation = form.Test()
+    with allure_step("Отправка заявки", page.driver, True, True, _alarm=True):
+        answer, confirmation = page.Test()
     if answer and confirmation:
         assert True
     elif not (answer or confirmation):
@@ -81,4 +87,4 @@ def test_form_Sending(setup_driver, url, datatest):
     elif not answer:
         assert False, "Не найдено подтверждение в ответе от сервера"
     elif not confirmation:
-        assert False, "Не найднено сообщение об успешной отправки"
+        assert False, "Не найдено сообщение об успешной отправки"

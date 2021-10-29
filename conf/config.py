@@ -9,7 +9,7 @@ project_path.replace('connect', '')
 libs_path = project_path+"/libs"
 resources_path =  project_path+"/resources"
 google_token = project_path+"/stable-ring-316114-8acf36454762.json"
-# chromedriver = project_path+"/chromedriver/chromedriver"
+chromedriver = project_path+"/chromedriver/chromedriver"
 # chromedriver = "/chromedriver/chromedriver.exe"
 
 autotest_results = project_path+"/autotest-results"

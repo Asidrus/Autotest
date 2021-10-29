@@ -1,42 +1,49 @@
+import re
+from selenium.webdriver.common.by import By
+from time import sleep
+import requests
+
 class WorkDriver:
 
     def __init__(self, driver):
         self.driver = driver
 
     def findElement(self, xpath):
-        return self.driver.find_element_by_xpath(xpath)
+        return self.driver.find_element(By.XPATH, xpath)
 
     def findElements(self, xpath):
-        return self.driver.find_elements_by_xpath(xpath)
+        return self.driver.find_elements(By.XPATH, xpath)
 
+    def searchElemAtGranddad(self, granddad, xpath):
+        return granddad.find_elements(By.XPATH, xpath)
 
-    def searchElemAtGranddad(granddad, xpath):
-        return granddad.find_elements("xpath", xpath)
+    def searchElemForTagAtGranddad(self, granddad, tag):
+        return granddad.find_elements(By.TAG_NAME, tag)
+      
+    def getAttrForElem(self, elem, attrib):
+        # print(attrib)
+        return elem.get_attribute(attrib)
+        # return elem.get_attribute
 
-    def check_cookie(self, url, cookie_dict):
+    def sleepPage(self, time):
+        return sleep(time)
+
+    def addCookie(self, url, cookie_dict):
         if self.driver.get_cookie(name=cookie_dict["name"]) is None:
+            # "https://yandex.ru/domain2/domain3"
             self.driver.get(url=url[0:url.find(".ru") + 3])
             return self.driver.add_cookie(cookie_dict=cookie_dict)
 
-    def pageCheck(self,  url):
-        if self.driver.current_url != url:
-            return True
-        else:
-            return False
-
     def getRequest(self):
         return self.driver.requests
-            
-    def getDriver(self):
-        return self.driver
 
-    def getAttrElem(self, elem):
-        getAttribute = lambda item: self.driver.execute_script('var items = {}; for (index = 0; index < '
+    def getAttr(self, elem):
+        get_attr = lambda item: self.driver.execute_script('var items = {}; for (index = 0; index < '
                                                       'arguments[0].attributes.length; ++index) { '
                                                       'items[arguments[0].attributes[index].name] = '
                                                       'arguments[0].attributes[index].value }; return '
                                                       'items;', item)
-        return getAttribute(elem)
+        return(get_attr(elem))
 
-    def startDriver(self, url):
+    def getPage(self, url):
         return self.driver.get(url)
