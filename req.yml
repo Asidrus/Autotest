@@ -93,7 +93,7 @@ dependencies:
     - async-generator==1.10
     - blinker==1.4
     - brotli==1.0.9
-    - charset-normalizer==2.0.4https://sdo.niidpo.ru/login
+    - charset-normalizer==2.0.4
     - cycler==0.10.0
     - h11==0.12.0
     - h2==4.0.0
