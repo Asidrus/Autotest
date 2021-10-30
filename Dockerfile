@@ -5,5 +5,6 @@ COPY req.yml ./
 RUN conda env create -f req.yml
 COPY . .
 ENV PATH /opt/conda/envs/mro_env/bin:$PATH
-CMD /bin/bash -c "source activate autotest"
+RUN /bin/bash -c "source activate autotest"
+CMD ["pytest", "test_speed.py"]
 
