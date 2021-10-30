@@ -11,6 +11,8 @@ sudo docker run -it \
         -v /home/tester/autotest/allure-results:/home/tester/autotest/allure-results \
         -v /home/tester/autotest/tests/resources:/home/tester/autotest/tests/resources \
         -it \
+        -d \
         autotest \
         bash -c \
-        "source /opt/conda/etc/profile.d/conda.sh; conda activate autotest; pytest $args"
+        "pytest $args"
+#        "source /opt/conda/etc/profile.d/conda.sh; conda activate autotest; pytest $args"
