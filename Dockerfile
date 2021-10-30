@@ -5,4 +5,4 @@ COPY req.yml ./
 RUN conda env create -f req.yml
 COPY . .
 RUN conda init bash
-RUN conda activate autotest
+RUN echo "conda activate autotest" > ~/.bashrc
