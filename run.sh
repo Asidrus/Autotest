@@ -15,4 +15,3 @@ sudo docker run -it \
         autotest \
         bash -c \
         "pytest $args"
-#        "source /opt/conda/etc/profile.d/conda.sh; conda activate autotest; pytest $args"
