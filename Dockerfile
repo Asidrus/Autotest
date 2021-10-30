@@ -4,5 +4,4 @@ RUN mkdir ../autotest-results ../allure-results ../autotest-results/logs
 COPY req.yml ./
 RUN conda env create -f req.yml
 COPY . .
-RUN conda init bash
-RUN echo "conda activate autotest" > ~/.bashrc
+SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
