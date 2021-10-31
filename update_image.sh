@@ -1,1 +1,1 @@
-sudo docker build . --tag autotest
+docker build . --tag autotest
