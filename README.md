@@ -1,4 +1,4 @@
-<p>commit 3</p>
+<p>commit 4</p>
 <b>Git</b>
 1. Получить обновления с master's ветки:<br>
 <i>git pull</i></br>
