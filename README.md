@@ -1,4 +1,4 @@
-<p>auto deploy test 3</p>
+<p>auto deploy test 4</p>
 <b>Git</b>
 1. Получить обновления с master's ветки:<br>
 <i>git pull</i></br>
