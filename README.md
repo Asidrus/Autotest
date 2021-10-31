@@ -1,4 +1,4 @@
-<p>commit 7</p>
+<p>auto deploy</p>
 <b>Git</b>
 1. Получить обновления с master's ветки:<br>
 <i>git pull</i></br>
