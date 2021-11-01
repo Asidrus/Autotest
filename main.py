@@ -36,6 +36,13 @@ def main():
         driver.quit()
         # driver.close()
 
+def main2():
+    import csv
+    with open('/home/kali/Downloads/data.csv', 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            print(row)
+
 
 if __name__ == "__main__":
-    main()
+    main2()

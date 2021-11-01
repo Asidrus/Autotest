@@ -70,8 +70,7 @@ def test_formSending(setup_driver, url, datatest):
     with allure_step("Добавление cookie"):
         check_cookie(driver, url, {"name": "metric_off", "value": "1"})
     with allure_step(f"Переход на страницу {url=}"):
-        if driver.current_url != url:
-            driver.get(url)
+        driver.get(url)
     el = driver.find_element("xpath", f"(//form[@data-test='{datatest}'])[1]")
     xpath = DataToXpath({"tag": "form", "attrib": getAttribute(el)})
     with allure_step("Инициализация формы"):

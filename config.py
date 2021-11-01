@@ -13,7 +13,7 @@ autotest_results = project_path + "/../autotest-results"
 allure_results = project_path + "/../allure-results"
 google_token = credentials_path + "/stable-ring-316114-8acf36454762.json"
 try:
-    import credentials.credentials
+    from credentials.credentials import *
 except:
     print("Файл credentials.py не найден")
 # telegram socket

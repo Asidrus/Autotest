@@ -32,13 +32,13 @@ class Form:
         :param kwargs: driver -> selenium.webdriver
         """
         self.__emailDefault__ = "tester_form@gaps.edu.ru"
-        self.__phoneDefault__ = "71234567890"
+        self.__phoneDefault__ = "81234567890"
         self.__nameDefault__ = "Автотест"
         self._email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
                         "name": ["email", "e-mail"]}
         self._phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
         self._name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
-        self.confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
+        self.confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется", "отправлен"]
         self.driver = driver
         self.getAttribute = lambda item: self.driver.execute_script('var items = {}; for (index = 0; index < '
                                                                     'arguments[0].attributes.length; ++index) { '
