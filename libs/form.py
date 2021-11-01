@@ -128,7 +128,7 @@ class Form:
     def fillForm(self):
         self.action(obj=self.name, act="send_keys", data=self.__nameDefault__)
         # self.name.send_keys(self.__nameDefault__)
-        self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[1:])
+        self.action(obj=self.phone, act="send_keys", data=self.__phoneDefault__[:])
         # self.phone.send_keys(self.__phoneDefault__[1:])
         if self.email is not None:
             self.action(obj=self.email, act="send_keys", data=self.__emailDefault__)
