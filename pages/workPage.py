@@ -13,14 +13,14 @@ class Pages(WorkDriver):
 
     def clickButton(self, granddad, xpath):
         try:
-            button = self.searchElemAtGranddad(granddad, xpath).click()
+            button = self.searchElemForTagAtGranddad(granddad, xpath)
+            button.click()
         except:
             try:
                 items =  self.searchElemForTagAtGranddad(granddad, "input")
                 for item in items:
                     if "отправить" in self.getAttrForElem(item, "value").lower():
-                        button = item
-                        button.click()
+                        item.click()
             except:
                 print("кнопка не обнаружена")
 

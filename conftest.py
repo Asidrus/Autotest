@@ -25,21 +25,24 @@ def pytest_addoption(parser):
 def setup_driver(request):
     try:
         options = webdriver.ChromeOptions()
+        print('123')
         # options.add_argument("no-sandbox")
         # options.add_argument("--disable-gpu")
-        options.add_argument("--window-size=1920,1080")
+        # options.add_argument("--window-size=1920,1080")
+        options.add_argument("--window-size=1024,768")
         # options.add_argument("--disable-dev-shm-usage")
         options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
         options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
         if request.config.getoption("--adaptive"):
             options.add_argument(
-                '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
+                 '--user-agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"')
         if request.config.getoption("--local"):
             if request.config.getoption("--invisible"):
-                display = Display(visible=0, size=(1920, 1080))
+                # display = Display(visible=0, size=(1920, 1080))
+                display = Display(visible=0, size=(1024, 768))
                 display.start()
-            service = Service(chromedriver)
-            Driver = webdriver.Chrome(service=service, options=options)
+            # services = Service(chromedriver)
+            Driver = webdriver.Chrome(chromedriver, chrome_options=options)
         else:
             Driver = webdriver.Remote(command_executor=f"http://{selenoid_IP}:{selenoid_port}/wd/hub", options=options)
     except Exception as e:

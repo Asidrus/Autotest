@@ -26,7 +26,7 @@ from selenium import webdriver
 from libs.form import PageForm
 from libs.func4test import DataToXpath
 
-driver = webdriver.Chrome("./chromedriver/chromedriver")
+driver = webdriver.Chrome("./chromedriver/chromedr")
 page = PageForm(driver)
 page.getPage("https://edu.i-spo.ru")
 datatest = "consultant_form_g"
@@ -34,6 +34,5 @@ el = page.findElement(f"(//form[@data-test='{datatest}'])[1]")
 xpath = DataToXpath({"tag": "form", "attrib": page.getAttr(el)})
 page.findform(xpath=xpath)
 
-print(page.form.phone)
 page.Test()
 page.sleepPage(10)

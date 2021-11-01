@@ -14,7 +14,8 @@ class Form:
     name = None
     phone = None
     email = None
-    button = None
+    button = 'button'
+    # "//button"
     callButton = None
     # If form if ready for test
     isready = True
@@ -41,11 +42,24 @@ class PageForm(Pages):
         self.form.name =  self.assigningAnArgumentField(args, self.form._name_)
         self.form.phone =  self.assigningAnArgumentField(args, self.form._phone_)
         self.form.email = self.assigningAnArgumentField(args, self.form._email_)
-        self.form.button = ".//button"
+
+
+
 
         if self.form.granddad is None:
             self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath", "..")
-      
+        
+        try:
+            self.form.button = self.searchElemAtGranddad(self.form.granddad, ".//button")
+        except:
+            try:
+                items = self.searchElemForTagAtGranddad(self.form.granddad, "input")
+                for item in items:
+                    if "отправить" in self.getAttrForElem(item, "value").lower():
+                        self.form.button = item
+            except:
+                print("кнопка не обнаружена")           
+
         try:
             data_test = self.getAttr(self.form.granddad)["data-test"]
             self.form.callButton = f"//button[@data-test='{data_test}']"
@@ -65,7 +79,9 @@ class PageForm(Pages):
             if act == "send_keys":
                 self.writingTextInField(obj, text=data)
             elif act == "click":
-                self.clickButton(self.form.granddad, obj)
+                obj.click()
+                # self.clickButton(self.form.granddad, obj)
+                # self.clickButton(self.form.granddad, obj)
         # self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")      
         for _ in range(10):
             try:
