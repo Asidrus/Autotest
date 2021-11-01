@@ -4,7 +4,7 @@ for arg in "$@"
 do
 args="$args $arg";
 done
-sudo docker run -it \
+docker run -it \
         --rm \
         --net=host \
         -v /home/tester/autotest/autotest-results:/home/tester/autotest/autotest-results \
