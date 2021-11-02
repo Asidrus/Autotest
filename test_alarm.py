@@ -8,7 +8,7 @@ from datetime import datetime
 
 codes = {1: True, 2: True, 3: True, 4: False, 5: False}
 
-
+@pytest.mark.asyncio
 async def test_getSpeed():
     url = "https://doesnotexist.rus"
     with allure_step(f"Получение данных {url=}", _alarm="ошибка"):

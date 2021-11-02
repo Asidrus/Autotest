@@ -4,6 +4,6 @@ import allure
 import pytest
 
 
-async def test_alarm():
+def test_alarm():
     with allure_step(f"Тестирование бота", _alarm="ошибка"):
         assert False
