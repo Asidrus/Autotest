@@ -1,5 +1,5 @@
 from config import *
-from conftest import alarm, db_connection, allure_step
+from conftest import alarm, db_connection, allure_step, send_telegram_broadcast
 import allure
 import pytest
 import asyncio
@@ -51,6 +51,7 @@ def pytest_generate_tests(metafunc):
 #             await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', False, {url_id});")
 #             assert True
 
+
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)
@@ -65,12 +66,12 @@ async def test_getSpeed(db, data):
             async with session.get(url) as response:
                 status_code = response.status
     except ClientConnectionError:
-        alarm(f"Страница {url=} не отвечает")
+        await send_telegram_broadcast(f"Страница {url=} не отвечает")
     except:
-        alarm(f"Страница {url=} не отвечает")
+        await send_telegram_broadcast(f"Страница {url=} не отвечает")
     result = codes[status_code // 100]
     if not result:
-        alarm(f"Ответ от {url=} \n {status_code=}")
+        await send_telegram_broadcast(f"Ответ от {url=} \n {status_code=}")
         await db.fetch(f"INSERT INTO TIMINGS (DATETIME, SPEED, ERROR, url_id) VALUES('{str(datetime.now())}','{str(datetime.now() - start_time)}', TRUE, {url_id});")
         assert False, status_code
     else:
