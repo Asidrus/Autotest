@@ -3,6 +3,7 @@ import datetime
 import time
 
 import aiohttp
+import asyncpg
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -53,7 +54,7 @@ codes = {1: True, 2: True, 3: True, 4: False, 5: False}
 async def getUrl():
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://doesntexsist.rus") as response:
+            async with session.get("https://pentaschool.ru") as response:
                 status_code = response.status
     except:
         print("error")
@@ -63,12 +64,29 @@ async def getUrl():
     else:
         print("True")
 
+
 from libs.search_content_ import *
+
 
 def mgaps():
     pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
     main("https://mgaps.ru", "windows-1251", pattern)
 
+from config import db_host, db_login, db_password
+db_name = "speedtest"
+
+async def db():
+    db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
+    connection = await asyncpg.connect(**db_data)
+    urls = await connection.fetch("SELECT url FROM urls;")
+    connection.close()
+    return urls
+
+
+
+
 if __name__ == "__main__":
     # asyncio.run(getUrl())
-    mgaps()
+    # mgaps()
+    urls = asyncio.run(db())
+    print(urls)
