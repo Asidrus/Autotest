@@ -1,6 +1,8 @@
+import asyncio
 import datetime
 import time
 
+import aiohttp
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -36,6 +38,7 @@ def main():
         driver.quit()
         # driver.close()
 
+
 def main2():
     import csv
     with open('/home/kali/Downloads/data.csv', 'r') as file:
@@ -44,5 +47,28 @@ def main2():
             print(row)
 
 
+codes = {1: True, 2: True, 3: True, 4: False, 5: False}
+
+
+async def getUrl():
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://doesntexsist.rus") as response:
+                status_code = response.status
+    except:
+        print("error")
+    result = codes[status_code // 100]
+    if not result:
+        print("False")
+    else:
+        print("True")
+
+from libs.search_content_ import *
+
+def mgaps():
+    pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
+    main("https://mgaps.ru", "windows-1251", pattern)
+
 if __name__ == "__main__":
-    main2()
+    # asyncio.run(getUrl())
+    mgaps()
