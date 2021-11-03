@@ -77,7 +77,7 @@ def test_formSending(setup_driver, url, datatest):
         form = Form(xpath=xpath, driver=driver)
     if not form.isready:
         raise Exception(f"Невозможно инициализировать форму {form.name=},{form.phone=}")
-    with allure_step("Отправка заявки", driver, True, True, _alarm=True):
+    with allure_step("Отправка заявки", driver, True, True, _alarm=__alarm):
         # answer, confirmation = form.Test()
         confirmation = form.Test()
     with allure_step(f"Проверка результата {url=}, {datatest=}", _alarm=__alarm):

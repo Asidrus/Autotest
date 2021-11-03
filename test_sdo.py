@@ -31,7 +31,6 @@ def write_log():
     sendInGoogleSheet(test_datetime, times)
 
 
-
 def sendInGoogleSheet(test_datetime, times):
     try:
         report = GoogleSheets(SSID=listener_months_SSID[test_datetime.date().month], typeOfDoc="Timings",

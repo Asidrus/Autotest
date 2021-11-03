@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
+from conftest import check_cookie, alarm
 from libs.form import DataToXpath, Form
 from config import listener_login, listener_password
 import json
@@ -72,8 +73,11 @@ def mgaps():
     pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
     main("https://mgaps.ru", "windows-1251", pattern)
 
+
 from config import db_host, db_login, db_password
+
 db_name = "speedtest"
+
 
 async def db():
     db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
@@ -83,10 +87,42 @@ async def db():
     return urls
 
 
+def formSending():
+    url = 'https://pentaschool.ru/program/program-graficheskij-dizajn-v-reklame-s-nulya'
+    datatest = 'blockPopupByTrigger'
+    driver = webdriver.Chrome("./resources/chromedriver")
+    getAttribute = lambda item: driver.execute_script('var items = {}; for (index = 0; index < '
+                                                      'arguments[0].attributes.length; ++index) { '
+                                                      'items[arguments[0].attributes[index].name] = '
+                                                      'arguments[0].attributes[index].value }; return '
+                                                      'items;', item)
+    check_cookie(driver, url, {"name": "metric_off", "value": "1"})
+    driver.get(url)
+    el = driver.find_element("xpath", f"(//form[@data-test='{datatest}'])[1]")
+    xpath = DataToXpath({"tag": "form", "attrib": getAttribute(el)})
+    form = Form(xpath=xpath, driver=driver)
+    _alarm = "error"
+    step_name = "заполнение формы"
+    ignore = None
+    try:
+        confirmation = form.Test()
+    except Exception as e:
+        if _alarm is not None:
+            try:
+                mes = _alarm + f"\nШаг {step_name} провален" + f"\nОшибка {str(e)}"
+                print(mes)
+                alarm(mes)
+            except Exception as er:
+                e = f"{e}, {str(er)}"
+        if ignore is not True:
+            pass
+            raise Exception(e)
+    print(confirmation)
 
 
 if __name__ == "__main__":
     # asyncio.run(getUrl())
     # mgaps()
-    urls = asyncio.run(db())
-    print(urls)
+    # urls = asyncio.run(db())
+    # print(urls)
+    formSending()
