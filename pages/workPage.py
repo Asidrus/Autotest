@@ -5,24 +5,43 @@ from connect.baseApp import WorkDriver
 
 class Pages(WorkDriver):
 
-    def writingTextInField(self, input, text):
+    def writingTextInField(self, text, input=None, xpath=None):
+        if input is None:
+            input = self.findElement(xpath=xpath)
+        else:
+            input = input
+            
         input.clear()
         for symbol in text:
             self.sleepPage(.05)
             input.send_keys(symbol)
 
-    def clickButton(self, granddad, xpath):
-        try:
-            button = self.searchElemForTagAtGranddad(granddad, xpath)
-            button.click()
-        except:
+    def clickButton(self, xpath: str, granddad=None):
+        if granddad is None:
             try:
-                items =  self.searchElemForTagAtGranddad(granddad, "input")
-                for item in items:
-                    if "отправить" in self.getAttrForElem(item, "value").lower():
-                        item.click()
+                button = self.findElement(xpath)
+                button.click()
             except:
-                print("кнопка не обнаружена")
+                return None
+        else:
+            try:
+                button = self.searchElemAtGranddad(granddad, xpath)
+                button.click()
+            except:
+                try:
+                    items = self.searchElemAtGranddad(granddad, "input")
+                    for item in items:
+                        if "отправить" in self.getAttrForElem(item, "value").lower():
+                            button = item
+                            button.click()
+                except:
+                    return None
+
+    def assigningAnArgumentField(self, args, dict):
+        for arg in args:
+            for key in dict.keys():
+                if str.lower(self.getAttrForElem(arg, key)) in dict[key]:
+                    return arg
 
 
     def sleepPage(self, time):

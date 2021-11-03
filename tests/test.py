@@ -54,12 +54,8 @@ def pytest_generate_tests(metafunc):
 
 
 def test_form_Sending(setup_driver, url, datatest):
-    # print(setup_driver)
+
     page = PageForm(setup_driver)
-    # FormPage = ClassFormPage(setup_driver)
-    # FormPage.getUrl("")
-    # FormPage.findForm(datatest)
-    # FormPage.FormTest(FormPage.forms[0])
 
     with allure_step("Добавление cookie"):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
@@ -74,7 +70,6 @@ def test_form_Sending(setup_driver, url, datatest):
     with allure_step("Инициализация формы"):
         page.findform(xpath=xpath)
 
-    print(page.form.isready)
     if not page.form.isready:
         raise Exception(f"Невозможно инициализировать форму {page.form.name=},{page.form.phone=}")
 

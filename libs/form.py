@@ -14,7 +14,7 @@ class Form:
     name = None
     phone = None
     email = None
-    button = 'button'
+    button = ".//button"
     # "//button"
     callButton = None
     # If form if ready for test
@@ -37,29 +37,15 @@ class PageForm(Pages):
         self.form = Form()
         if xpath is not None:
             self.form.granddad = self.findElement(xpath)
-            args =  self.searchElemAtGranddad(self.form.granddad, ".//input")
+            args = self.searchElemsAtGranddad(self.form.granddad, f"({xpath})//input")
 
         self.form.name =  self.assigningAnArgumentField(args, self.form._name_)
         self.form.phone =  self.assigningAnArgumentField(args, self.form._phone_)
         self.form.email = self.assigningAnArgumentField(args, self.form._email_)
-
-
-
-
+      
         if self.form.granddad is None:
             self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath", "..")
-        
-        try:
-            self.form.button = self.searchElemAtGranddad(self.form.granddad, ".//button")
-        except:
-            try:
-                items = self.searchElemForTagAtGranddad(self.form.granddad, "input")
-                for item in items:
-                    if "отправить" in self.getAttrForElem(item, "value").lower():
-                        self.form.button = item
-            except:
-                print("кнопка не обнаружена")           
-
+         
         try:
             data_test = self.getAttr(self.form.granddad)["data-test"]
             self.form.callButton = f"//button[@data-test='{data_test}']"
@@ -68,20 +54,13 @@ class PageForm(Pages):
         if any(map(lambda i: i is None, (self.form.name, self.form.phone, self.form.button))):
             self.form.isready = False
 
-    def assigningAnArgumentField(self, args, dict):
-        for arg in args:
-            for key in dict.keys():
-                if str.lower(self.getAttrForElem(arg, key)) in dict[key]:
-                    return arg
-
     def action(self, obj, act: str, data=None):
         def do(obj, act, data):
             if act == "send_keys":
-                self.writingTextInField(obj, text=data)
+                self.writingTextInField(input=obj, text=data)
             elif act == "click":
-                obj.click()
-                # self.clickButton(self.form.granddad, obj)
-                # self.clickButton(self.form.granddad, obj)
+                self.clickButton(obj, self.form.granddad)
+
         # self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")      
         for _ in range(10):
             try:

@@ -5,19 +5,23 @@ from datetime import datetime
 
 # paths
 project_path = os.path.abspath(os.getcwd())
-project_path.replace('connect', '')
-libs_path = project_path+"/libs"
-resources_path =  project_path+"/resources"
-google_token = project_path+"/stable-ring-316114-8acf36454762.json"
-# chromedriver = project_path+"/chromedriver/chromedr"
-chromedriver = "./chromedriver/chromedr"
-# chromedriver = "/chromedriver/chromedriver.exe"
-
-autotest_results = project_path+"/autotest-results"
-allure_results = project_path+"/allure-results"
+libs_path = project_path + "/libs"
+resources_path = project_path + "/resources"
+credentials_path = project_path + "/credentials"
+chromedriver = "/chromedriver/chromedr" 
+autotest_results = project_path + "/autotest-results"
+allure_results = project_path + "/allure-results"
+google_token = credentials_path + "/stable-ring-316114-8acf36454762.json"
+try:
+    from credentials.credentials import *
+except:
+    print("Файл credentials.py не найден")
 # telegram socket
 IP = "127.0.0.1"
 PORT = 1234
+# selenoid
+selenoid_IP = "80.87.200.64"
+selenoid_port = "4444"
 # gather the logs
 today = datetime.now().date()
 fname = autotest_results + "/logs" + "/" + str(today) + ".log"
@@ -28,13 +32,6 @@ logging.basicConfig(filename=fname,
                     level=logging.WARNING,
                     datefmt='%d/%m/%Y %H:%M:%S')
 logger = logging
-# DB
-db_login = ""
-db_password = ""
-# sdo.Niidpo.ru
-
-listener_login = ""
-listener_password = ""
 
 listener_months_SSID = {
     8: "1u88yKDi46j1AjpSxVr2tp1sdt1oKyCzoLkSXZ99cGh4",

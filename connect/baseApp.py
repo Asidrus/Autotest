@@ -15,6 +15,9 @@ class WorkDriver:
         return self.driver.find_elements(By.XPATH, xpath)
 
     def searchElemAtGranddad(self, granddad, xpath):
+        return granddad.find_element(By.XPATH, xpath)
+
+    def searchElemsAtGranddad(self, granddad, xpath):
         return granddad.find_elements(By.XPATH, xpath)
 
     def searchElemForTagAtGranddad(self, granddad, tag):
