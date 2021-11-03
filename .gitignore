@@ -1,0 +1,9 @@
+config.py
+libs/func4test.py
+libs/__pycache__
+__pycache__
+.vscode
+cases/__pycache__
+conf/__pycache__
+libs/pages/__pycache__
+
