@@ -46,8 +46,10 @@ async def test_pageStatus(url):
                 status_code = response.status
     except ClientConnectionError:
         await send_telegram_broadcast(f"{__alarm} Страница {url=} не отвечает")
+        assert False
     except Exception as e:
         await send_telegram_broadcast(f"{__alarm} Страница {url=} не отвечает. ERROR: {e}")
+        assert False
     result = codes[status_code // 100]
     if not result:
         await send_telegram_broadcast(f"{__alarm} Ответ от {url=} - {status_code}")
