@@ -8,9 +8,9 @@ project_path = os.path.abspath(os.getcwd())
 libs_path = project_path + "/libs"
 resources_path = project_path + "/resources"
 credentials_path = project_path + "/credentials"
-chromedriver = "/chromedriver/chromedr" 
-autotest_results = project_path + "/autotest-results"
-allure_results = project_path + "/allure-results"
+chromedriver = project_path+"chromedr" 
+autotest_results = project_path + "/../autotest-results"
+allure_results = project_path + "././allure-results"
 google_token = credentials_path + "/stable-ring-316114-8acf36454762.json"
 try:
     from credentials.credentials import *
