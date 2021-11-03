@@ -74,12 +74,16 @@ def test_form_Sending(setup_driver, url, datatest):
         raise Exception(f"Невозможно инициализировать форму {page.form.name=},{page.form.phone=}")
 
     with allure_step("Отправка заявки", page.driver, True, True, _alarm=True):
-        answer, confirmation = page.Test()
-    if answer and confirmation:
+        confirmation = page.Test()
+    if confirmation:
         assert True
-    elif not (answer or confirmation):
-        assert (answer and confirmation), f"Форма не отправлена"
-    elif not answer:
-        assert False, "Не найдено подтверждение в ответе от сервера"
-    elif not confirmation:
-        assert False, "Не найдено сообщение об успешной отправки"
+    else:
+        assert False, "error"
+    # if answer and confirmation:
+    #     assert True
+    # elif not (answer or confirmation):
+    #     assert (answer and confirmation), f"Форма не отправлена"
+    # elif not answer:
+    #     assert False, "Не найдено подтверждение в ответе от сервера"
+    # elif not confirmation:
+    #     assert False, "Не найдено сообщение об успешной отправки"

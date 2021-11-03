@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from libs.form import DataToXpath, Form
+from libs.form import DataToXpath, Form, PageForm
+
 
 def main():
     driver = webdriver.Chrome("./chromedriver/chromedriver")
@@ -31,5 +32,18 @@ def main():
         driver.close()
         driver.quit()
 
+def main2():
+    url = "https://edu.i-spo.ru/seminar/ehkonomika-i-upravlenie-na-predpriyatii"
+    datatest = "order_form"
+    driver = webdriver.Chrome(executable_path="/home/kali/python/tests/chromedriver/chromedr")
+    page = PageForm(driver)
+    page.addCookie(url, {"name": "metric_off", "value": "1"})
+    page.getPage(url)
+    page.sleepPage(2)
+    el = page.findElement(f"(//form[@data-test='{datatest}'])[1]")
+    xpath = DataToXpath({"tag": "form", "attrib": page.getAttr(el)})
+    page.findform(xpath=xpath)
+    confirmation = page.Test()
+
 if __name__ == "__main__":
-    main()
+    main2()

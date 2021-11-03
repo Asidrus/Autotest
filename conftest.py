@@ -42,7 +42,7 @@ def setup_driver(request):
                 display = Display(visible=0, size=(1024, 768))
                 display.start()
             services = Service(chromedriver)
-            Driver = webdriver.Chrome(services=services, chrome_options=options)
+            Driver = webdriver.Chrome(service=services, chrome_options=options)
         else:
             Driver = webdriver.Remote(command_executor=f"http://{selenoid_IP}:{selenoid_port}/wd/hub", options=options)
     except Exception as e:
