@@ -6,7 +6,7 @@ from libs.func4test import *
 import re
 import zlib
 from urllib.parse import unquote
-from pages.workPage import Pages
+from libs.pages.workPage import Pages
 
 class Form:
 
@@ -15,7 +15,6 @@ class Form:
     phone = None
     email = None
     button = ".//button"
-    # "//button"
     callButton = None
     # If form if ready for test
     isready = True
@@ -37,7 +36,7 @@ class PageForm(Pages):
         self.form = Form()
         if xpath is not None:
             self.form.granddad = self.findElement(xpath)
-            args = self.searchElemsAtGranddad(self.form.granddad, f"({xpath})//input")
+            args = self.findElements(element=self.form.granddad, xpath=f"({xpath})//input")
 
         self.form.name =  self.assigningAnArgumentField(args, self.form._name_)
         self.form.phone =  self.assigningAnArgumentField(args, self.form._phone_)

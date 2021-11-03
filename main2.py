@@ -21,12 +21,12 @@
 
 # cc = C()
 
-from connect.baseApp import WorkDriver
+from libs.baseApp import WorkDriver
 from selenium import webdriver
 from libs.form import PageForm
 from libs.func4test import DataToXpath
 
-driver = webdriver.Chrome("./chromedriver/chromedr")
+driver = webdriver.Chrome("/home/ta-tyan/Документы/py/Tests/chromedr")
 page = PageForm(driver)
 page.getPage("https://edu.i-spo.ru")
 datatest = "consultant_form_g"
