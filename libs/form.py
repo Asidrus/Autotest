@@ -112,7 +112,7 @@ class Form:
         try:
             self.fillForm()
         except Exception as e:
-            raise Exception(f"Не получилось заполнить форму: {e}")
+            raise Exception(f"Не получилось заполнить форму")
         # answer = self.answerEvaluation()
         # confirmation = self.confirmationEvaluation(text_before)
         confirmation = self.waitEvaluation(text_before)

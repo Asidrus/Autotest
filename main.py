@@ -117,7 +117,7 @@ def formSending():
         if ignore is not True:
             pass
             raise Exception(e)
-    print(confirmation)
+    # print(confirmation)
 
 
 if __name__ == "__main__":
