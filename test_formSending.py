@@ -16,6 +16,8 @@ test_name = "Проверка отправки заявок с ФОС"
 severity = "Сritical"
 __alarm = f"{severity}: {suite_name}: {test_name}:"
 
+ignores = ["blockPopupByTrigger", "formAddReview"]
+
 
 async def seekForms(urls):
     parser = etree.HTMLParser()
@@ -52,6 +54,9 @@ def pytest_generate_tests(metafunc):
         Data = {"data": asyncio.run(seekForms(urls))}
         with open(fname, "w") as write_file:
             json.dump(Data, write_file, indent=4)
+    for form in Data["data"]:
+        if form["data-test"] in ignores:
+            Data["data"].remove(form)
     result = [(item["url"], item["data-test"]) for item in Data["data"]]
     metafunc.parametrize("url, datatest", result)
 
