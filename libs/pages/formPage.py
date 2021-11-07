@@ -1,12 +1,12 @@
 from contextlib import contextmanager
 from time import time
 
-from conftest import allure_step
+from tests.conftest import allure_step
 from libs.func4test import *
 import re
 import zlib
 from urllib.parse import unquote
-from libs.pages.workPage import Pages
+from libs.pages.workPage import Page
 
 
 class Form:
@@ -30,7 +30,7 @@ class Form:
     confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
 
 
-class PageForm(Pages):
+class PageForm(Page):
 
     def findform(self, *args, xpath=None, **kwargs):
         self.form = Form()
@@ -38,9 +38,9 @@ class PageForm(Pages):
             self.form.granddad = self.findElement(xpath)
             args = self.findElements(element=self.form.granddad, xpath=f"({xpath})//input")
 
-        self.form.name = self.assigningAnArgumentField(args, self.form._name_)
-        self.form.phone = self.assigningAnArgumentField(args, self.form._phone_)
-        self.form.email = self.assigningAnArgumentField(args, self.form._email_)
+        self.form.name = self.selectElement(args, self.form._name_)
+        self.form.phone = self.selectElement(args, self.form._phone_)
+        self.form.email = self.selectElement(args, self.form._email_)
 
         if self.form.granddad is None:
             self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath",
@@ -57,9 +57,9 @@ class PageForm(Pages):
     def action(self, obj, act: str, data=None):
         def do(obj, act, data):
             if act == "send_keys":
-                self.writingTextInField(input=obj, text=data)
+                self.fill(text=data, input=obj)
             elif act == "click":
-                self.clickButton(obj, self.form.granddad)
+                self.click(obj, self.form.granddad)
 
         # self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
         for _ in range(10):
@@ -67,7 +67,7 @@ class PageForm(Pages):
                 do(obj, act, data)
                 return True
             except:
-                self.sleepPage(0.1)
+                self.sleep(0.1)
         do(obj, act, data)
 
     def Test(self):
@@ -76,7 +76,7 @@ class PageForm(Pages):
     def Evaluation(self):
         if self.form.callButton is not None:
             self.callPopup()
-        text_before = self.outTextElem("//body")
+        text_before = self.text("//body")
         # self.driver.backend.storage.clear_requests()
         try:
             self.fillForm()
@@ -107,7 +107,7 @@ class PageForm(Pages):
         # self.name.send_keys(self.__nameDefault__)
         self.action(obj=self.form.phone, act="send_keys", data=self.form.__phoneDefault__[1:])
         # self.phone.send_keys(self.__phoneDefault__[1:])
-        self.sleepPage(1)
+        self.sleep(1)
         if self.form.email is not None:
             self.action(obj=self.form.email, act="send_keys", data=self.form.__emailDefault__)
         self.action(obj=self.form.button, act="click")
@@ -133,7 +133,7 @@ class PageForm(Pages):
             if request:
                 return request
                 break
-            self.sleepPage(delta)
+            self.sleep(delta)
         raise TimeoutError("Запрос не найден")
 
     def waitRequest(self, timeout=10, delta=0.25):
@@ -143,7 +143,7 @@ class PageForm(Pages):
             if request:
                 return request
                 break
-            self.sleepPage(delta)
+            self.sleep(delta)
         raise TimeoutError("Запрос не найден")
 
     def answerEvaluation(self):
@@ -157,6 +157,6 @@ class PageForm(Pages):
 
     def confirmationEvaluation(self, text_before):
         with allure_step(f"Обработка результата"):
-            text_after = self.outTextElem("//body")
+            text_after = self.text("//body")
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             return any([conf in txt.lower() for txt in txt_after for conf in self.form.confirm])

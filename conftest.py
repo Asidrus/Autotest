@@ -11,6 +11,9 @@ import allure
 from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display
 from config import *
+from libs.webdriver import WebDriver
+
+print("imported")
 
 
 def pytest_addoption(parser):
@@ -21,6 +24,18 @@ def pytest_addoption(parser):
     parser.addoption("--site", type=str, help="Url of site")
     parser.addoption("--parse", action='store_true', help="Parse site on urls")
 
+
+@pytest.fixture(scope="session")
+def setup_driver_new(request):
+    opt = lambda o: request.config.getoption(o)
+    Driver = WebDriver(invisible=opt("--invisible"),
+                         adaptive=opt("--adaptive"),
+                         local=opt("--local"),
+                         logs=True,
+                         **request.param)
+    Driver.runDriver()
+    yield Driver.driver
+    del Driver
 
 @pytest.fixture(scope="session")
 def setup_driver(request):
@@ -150,13 +165,16 @@ def db_connection(**kwargs):
     getData(connection):
         await = connection.fetch("SELECT * FROM ...")
     """
+
     def _wrapper(func):
         async def wrapper():
             connection = await asyncpg.connect(**kwargs)
             result = await func(connection)
             await connection.close()
             return result
+
         return wrapper
+
     return _wrapper
 
 
@@ -174,3 +192,6 @@ async def db(request):
     connection = await asyncpg.connect(**request.param)
     yield connection
     await connection.close()
+
+
+

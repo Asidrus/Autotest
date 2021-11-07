@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
-from conftest import check_cookie, alarm
+from tests.conftest import check_cookie, alarm
 from libs.form import DataToXpath, Form
 from config import listener_login, listener_password
 import json
@@ -120,9 +120,18 @@ def formSending():
     # print(confirmation)
 
 
+
 if __name__ == "__main__":
     # asyncio.run(getUrl())
     # mgaps()
     # urls = asyncio.run(db())
     # print(urls)
-    formSending()
+    # formSending()
+    import requests
+    from libs.pages.workPage import Page
+    from libs.baseApp import WorkDriver
+    wd = WorkDriver
+
+    p = Page()
+    p.fill()
+    pass

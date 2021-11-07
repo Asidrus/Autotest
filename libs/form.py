@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from time import sleep, time
 
-from conftest import allure_step
+from tests.conftest import allure_step
 from libs.func4test import *
 import re
 import zlib
