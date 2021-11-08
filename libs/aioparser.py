@@ -5,7 +5,7 @@ import json
 from io import StringIO
 from lxml import etree
 from datetime import datetime, timedelta
-from config import resources_path
+from config import autotest_results
 
 
 def putInDict(url, link, dictionary):
@@ -36,7 +36,7 @@ class aioparser:
     def getAllUrls(self, site, parse=False, adaptive=False):
         self.adaptive = adaptive
         self.fname_appendix = "_adaptive" if adaptive == True else ""
-        fname = resources_path + "/" + site.replace('https://', '').replace('.ru', '') + self.fname_appendix + "_links.json"
+        fname = autotest_results + "/" + site.replace('https://', '').replace('.ru', '') + self.fname_appendix + "_links.json"
         if (not parse) and os.path.exists(fname) and (
                 (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
             self.readfile(fname)

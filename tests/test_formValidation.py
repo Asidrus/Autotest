@@ -23,7 +23,7 @@ def pytest_generate_tests(metafunc):
 @allure.feature("Тестирование форм")
 @allure.story("Валидация")
 @allure.severity("Major")
-@pytest.mark.parametrize("data", genCasesForFormValidation(path + "/resources/FormValidation.json"))
+@pytest.mark.parametrize("data", genCasesForFormValidation(path + "./FormValidation.json"))
 def test_formValidation(setup_driver, data):
     Driver = setup_driver
     if Driver.current_url is not None:

@@ -27,7 +27,7 @@ def main():
         options = webdriver.ChromeOptions()
         options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
         # options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
-        driver = webdriver.Chrome("./resources/chromedriver", options=options)
+        driver = webdriver.Chrome("./chromedriver", options=options)
         driver.get("https://psy.edu.ru")
         driver.add_cookie(cookie_dict={"name": "task_PSY_43", "value": "test"})
         driver.add_cookie(cookie_dict={"name": "psycho_site", "value": "test"})
@@ -90,7 +90,7 @@ async def db():
 def formSending():
     url = 'https://pentaschool.ru/program/program-graficheskij-dizajn-v-reklame-s-nulya'
     datatest = 'blockPopupByTrigger'
-    driver = webdriver.Chrome("./resources/chromedriver")
+    driver = webdriver.Chrome("./chromedriver")
     getAttribute = lambda item: driver.execute_script('var items = {}; for (index = 0; index < '
                                                       'arguments[0].attributes.length; ++index) { '
                                                       'items[arguments[0].attributes[index].name] = '

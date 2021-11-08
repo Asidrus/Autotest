@@ -1,12 +1,12 @@
 from contextlib import contextmanager
 from time import time
 
-from tests.conftest import allure_step
+from conftest import allure_step
 from libs.func4test import *
 import re
 import zlib
 from urllib.parse import unquote
-from libs.pages.workPage import Page
+from libs.pages.page import Page
 
 
 class Form:
@@ -34,6 +34,7 @@ class PageForm(Page):
 
     def findform(self, *args, xpath=None, **kwargs):
         self.form = Form()
+        xpath = self.__data2xpath__(xpath)
         if xpath is not None:
             self.form.granddad = self.findElement(xpath)
             args = self.findElements(element=self.form.granddad, xpath=f"({xpath})//input")
@@ -46,8 +47,12 @@ class PageForm(Page):
             self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath",
                                                                                                               "..")
 
+        # with open("file.txt", "a+") as file:
+        #     file.write(str(args)+"\n")
+        #     file.write(str(self.form.granddad)+"\n")
+
         try:
-            data_test = self.getAttr(self.form.granddad)["data-test"]
+            data_test = self.attributes(self.form.granddad)["data-test"]
             self.form.callButton = f"//button[@data-test='{data_test}']"
         except Exception as e:
             pass
@@ -59,7 +64,7 @@ class PageForm(Page):
             if act == "send_keys":
                 self.fill(text=data, input=obj)
             elif act == "click":
-                self.click(obj, self.form.granddad)
+                self.click(obj)
 
         # self.driver.execute_script(f"window.scrollTo(0, {obj.location['y'] - 400});")
         for _ in range(10):
@@ -76,7 +81,7 @@ class PageForm(Page):
     def Evaluation(self):
         if self.form.callButton is not None:
             self.callPopup()
-        text_before = self.text("//body")
+        text_before = self.text(xpath="//body")
         # self.driver.backend.storage.clear_requests()
         try:
             self.fillForm()
@@ -110,7 +115,12 @@ class PageForm(Page):
         self.sleep(1)
         if self.form.email is not None:
             self.action(obj=self.form.email, act="send_keys", data=self.form.__emailDefault__)
-        self.action(obj=self.form.button, act="click")
+        # self.action(obj=self.form.button, act="click")
+        button = self.findElement(xpath=".//button", element=self.form.granddad)
+        with open("file.txt", "a+") as file:
+            file.write(str(button))
+            file.write(str(self.attributes(button)))
+        self.click(elem=button)
 
     def findSendingRequest(self):
         with allure_step(f"Поиск отправленного запроса"):
@@ -157,6 +167,6 @@ class PageForm(Page):
 
     def confirmationEvaluation(self, text_before):
         with allure_step(f"Обработка результата"):
-            text_after = self.text("//body")
+            text_after = self.text(xpath="//body")
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             return any([conf in txt.lower() for txt in txt_after for conf in self.form.confirm])

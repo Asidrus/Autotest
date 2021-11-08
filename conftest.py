@@ -13,8 +13,6 @@ from pyvirtualdisplay import Display
 from config import *
 from libs.webdriver import WebDriver
 
-print("imported")
-
 
 def pytest_addoption(parser):
     parser.addoption("--invisible", action='store_true', help="Run on virtual display")
@@ -29,13 +27,14 @@ def pytest_addoption(parser):
 def setup_driver_new(request):
     opt = lambda o: request.config.getoption(o)
     Driver = WebDriver(invisible=opt("--invisible"),
-                         adaptive=opt("--adaptive"),
-                         local=opt("--local"),
-                         logs=True,
-                         **request.param)
+                       adaptive=opt("--adaptive"),
+                       local=opt("--local"),
+                       logs=True,
+                       **request.param)
     Driver.runDriver()
-    yield Driver.driver
+    yield Driver
     del Driver
+
 
 @pytest.fixture(scope="session")
 def setup_driver(request):
@@ -192,6 +191,3 @@ async def db(request):
     connection = await asyncpg.connect(**request.param)
     yield connection
     await connection.close()
-
-
-
