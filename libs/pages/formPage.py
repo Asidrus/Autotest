@@ -47,10 +47,6 @@ class PageForm(Page):
             self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath",
                                                                                                               "..")
 
-        # with open("file.txt", "a+") as file:
-        #     file.write(str(args)+"\n")
-        #     file.write(str(self.form.granddad)+"\n")
-
         try:
             data_test = self.attributes(self.form.granddad)["data-test"]
             self.form.callButton = f"//button[@data-test='{data_test}']"
@@ -82,15 +78,11 @@ class PageForm(Page):
         if self.form.callButton is not None:
             self.callPopup()
         text_before = self.text(xpath="//body")
-        # self.driver.backend.storage.clear_requests()
         try:
             self.fillForm()
         except Exception as e:
             raise Exception(f"Не получилось заполнить форму: {e}")
-        # answer = self.answerEvaluation()
-        # confirmation = self.confirmationEvaluation(text_before)
         confirmation = self.waitEvaluation(text_before)
-        # return answer, confirmation
         return confirmation
 
     def callPopup(self):
@@ -105,21 +97,12 @@ class PageForm(Page):
             raise Exception(f"Не удалось открыть поп-ап: {e}")
 
     def fillForm(self):
-        try:
-            self.action(obj=self.form.name, act="send_keys", data=self.form.__nameDefault__)
-        except Exception as e:
-            raise e
-        # self.name.send_keys(self.__nameDefault__)
-        self.action(obj=self.form.phone, act="send_keys", data=self.form.__phoneDefault__[1:])
-        # self.phone.send_keys(self.__phoneDefault__[1:])
-        self.sleep(1)
+        self.fill(self.form.__nameDefault__, input=self.form.name)
+        self.fill(self.form.__phoneDefault__[1:], input=self.form.phone)
         if self.form.email is not None:
             self.action(obj=self.form.email, act="send_keys", data=self.form.__emailDefault__)
         # self.action(obj=self.form.button, act="click")
         button = self.findElement(xpath=".//button", element=self.form.granddad)
-        with open("file.txt", "a+") as file:
-            file.write(str(button))
-            file.write(str(self.attributes(button)))
         self.click(elem=button)
 
     def findSendingRequest(self):

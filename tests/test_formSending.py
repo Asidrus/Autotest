@@ -5,6 +5,7 @@ import allure
 import os
 from datetime import datetime, timedelta
 from config import autotest_results
+from conftest import allure_step
 from libs.aioparser import aioparser
 from libs.pages.formPage import PageForm
 import aiohttp
@@ -71,43 +72,16 @@ def pytest_generate_tests(metafunc):
 @allure.severity(severity)
 def test_formSending(setup_driver_new, url, datatest):
     page = PageForm(setup_driver_new)
-    page.addCookie(url, {"name": "metric_off", "value": "1"})
-    page.getPage(url)
-    page.findform(xpath={"tag": "form", "data-test": datatest})
-    confirmation = page.Test()
-    assert confirmation
-    #
-    # driver = setup_driver
-    # getAttribute = lambda item: driver.execute_script('var items = {}; for (index = 0; index < '
-    #                                                   'arguments[0].attributes.length; ++index) { '
-    #                                                   'items[arguments[0].attributes[index].name] = '
-    #                                                   'arguments[0].attributes[index].value }; return '
-    #                                                   'items;', item)
-    #
-    # with allure_step("Добавление cookie"):
-    #     check_cookie(driver, url, {"name": "metric_off", "value": "1"})
-    # with allure_step(f"Переход на страницу {url=}"):
-    #     driver.get(url)
-    # el = driver.find_element("xpath", f"(//form[@data-test='{datatest}'])[1]")
-    # xpath = DataToXpath({"tag": "form", "attrib": getAttribute(el)})
-    # with allure_step("Инициализация формы"):
-    #     form = Form(xpath=xpath, driver=driver)
-    # if not form.isready:
-    #     raise Exception(f"Невозможно инициализировать форму {form.name=},{form.phone=}")
-    # with allure_step("Отправка заявки", driver, True, True, _alarm=__alarm):
-    #     # answer, confirmation = form.Test()
-    #     confirmation = form.Test()
-    # with allure_step(f"Проверка результата {url=}, {datatest=}", _alarm=__alarm):
-    #     if confirmation:
-    #         assert True
-    #     else:
-    #         assert False, "Не найднено сообщение об успешной отправки"
-
-    # if answer and confirmation:
-    #     assert True
-    # elif not (answer or confirmation):
-    #     assert (answer and confirmation), f"Форма не отправлена"
-    # elif not answer:
-    #     assert False, "Не найдено подтверждение в ответе от сервера"
-    # elif not confirmation:
-    #     assert False, "Не найднено сообщение об успешной отправки"
+    with allure_step("Добавление cookie"):
+        page.addCookie(url, {"name": "metric_off", "value": "1"})
+    with allure_step(f"Переход на страницу {url=}", _alarm=__alarm):
+        page.getPage(url)
+    with allure_step("Инициализация формы"):
+        page.findform(xpath={"tag": "form", "data-test": datatest}, _alarm=__alarm)
+    with allure_step("Отправка заявки", page.driver, True, True, _alarm=__alarm):
+        confirmation = page.Test()
+    with allure_step(f"Проверка результата {url=}, {datatest=}", _alarm=__alarm):
+        if confirmation:
+            assert True
+        else:
+            assert False, "Не найднено сообщение об успешной отправки"
