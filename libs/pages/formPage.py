@@ -100,8 +100,7 @@ class PageForm(Page):
         self.fill(self.form.__nameDefault__, input=self.form.name)
         self.fill(self.form.__phoneDefault__[1:], input=self.form.phone)
         if self.form.email is not None:
-            self.action(obj=self.form.email, act="send_keys", data=self.form.__emailDefault__)
-        # self.action(obj=self.form.button, act="click")
+            self.fill(self.form.__emailDefault__, input=self.form.email)
         button = self.findElement(xpath=".//button", element=self.form.granddad)
         self.click(elem=button)
 
