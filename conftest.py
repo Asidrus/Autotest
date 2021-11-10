@@ -81,8 +81,8 @@ def alarm(msg):
     asyncio.run(send_telegram_broadcast(msg))
 
 
-def gatherBrowserLogs(driver):
-    logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
+# def gatherBrowserLogs(driver):
+#     logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
 
 
 # def step(func):
