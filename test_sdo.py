@@ -152,7 +152,7 @@ def test_sdo(setup_driver, write_log, clicker):
             'back': False
         },
         {
-            'xpath': "(//div[@class='name-webinar'])[7]",
+            'xpath': "(//div[@class='name-webinar'])[9]",
             'back': False
         },
     ]
