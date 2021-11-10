@@ -53,4 +53,5 @@ async def run_server(host, port):
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     loop.create_task(run_server("localhost", 1234))
-    asyncio.
+    loop.create_task(run_server("localhost", 2345))
+    loop.run_forever()
