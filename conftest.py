@@ -81,38 +81,6 @@ def alarm(msg):
     asyncio.run(send_telegram_broadcast(msg))
 
 
-# def gatherBrowserLogs(driver):
-#     logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
-
-
-# def step(func):
-#     def wrapper(*args,
-#                 _error=None,
-#                 _driver=None,
-#                 _screenshot=None,
-#                 _step=None,
-#                 _browser_log=None,
-#                 _ignore=None,
-#                 **kwargs):
-#         with allure.step(_step):
-#             try:
-#                 res = func(*args, **kwargs)
-#                 return res
-#             except Exception as e:
-#                 if _screenshot and (_driver is not None):
-#                     allure.attach(_driver.get_screenshot_as_png(), name="Screenshot",
-#                                   attachment_type=AttachmentType.PNG)
-#                 if _browser_log and (_driver is not None):
-#                     logger.warning({"url": _driver.current_url, "messages": _driver.get_log('browser')})
-#                 logger.critical(f"{_step}|" + str(e))
-#                 if _error is not None:
-#                     e = Exception(_error)
-#                 if _ignore is not True:
-#                     raise Exception(_error)
-#
-#     return wrapper
-
-
 @contextmanager
 def allure_step(step_name=None,
                 driver=None,

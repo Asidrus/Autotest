@@ -1,13 +1,17 @@
+import sys
+import pathlib
+path = str(pathlib.Path(__file__).parent.parent.resolve())
+sys.path.insert(-1, path)
 import json
 from io import StringIO
-
 import aiohttp
 from lxml import etree
-
 from config import autotest_results
 import asyncio
-from libs.aioparser import aioparser
-import sys
+from aioparser import aioparser
+
+
+# autotest_results = "/home/kali/autotest-results"
 
 headers = {
     "User-Agent": 'Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166'}
@@ -31,7 +35,7 @@ async def searcher(links, pattern, encoding):
         i = 0
         for link in links:
             # менять
-            async with session.get(link["url"]) as response:
+            async with session.get(link["url"], headers=headers) as response:
                 print(i / len(links) * 100.0)
                 i = i + 1
                 parser = etree.HTMLParser()
@@ -75,6 +79,6 @@ def main(site, encoding, pattern):
 if __name__ == "__main__":
     # res = asyncio.run(searcher([{"url": "https://niidpo.ru/korporativnoe_obuchenie"}], ["4000"], "windows-1251"))
     #менять
-    fname_appendix = "_adaptive" if False else ""
-    pattern = ["4000", "3 мес", "справк", "копи", "продлить", "увеличить", "рассрочка"]
+    fname_appendix = "_adaptive" if True else ""
+    pattern = ["следующей"]
     main(sys.argv[1], "windows-1251", pattern)

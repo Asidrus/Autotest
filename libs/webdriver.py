@@ -39,10 +39,22 @@ class WebDriver:
             elif key == "remotePort":
                 self.remotePort = kwargs["remotePort"]
             elif key == "executablePath":
-                self.executablePath = key["executablePath"]
+                self.executablePath = kwargs["executablePath"]
+            elif key == "browser":
+                self.browser = kwargs["browser"]
 
     def Chrome(self):
         options = webdriver.ChromeOptions()
+        options.add_argument(f"--window-size={self.window_size[0]},{self.window_size[1]}")
+        if self.logs:
+            options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+        if self.adaptive:
+            options.add_argument(
+                '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
+        self.options = options
+
+    def FireFox(self):
+        options = webdriver.FirefoxOptions()
         options.add_argument(f"--window-size={self.window_size[0]},{self.window_size[1]}")
         if self.logs:
             options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
@@ -57,7 +69,7 @@ class WebDriver:
         elif self.browser == 'Opera':
             pass
         elif self.browser == 'FireFox':
-            pass
+            self.FireFox()
 
         if self.remote:
             self.driver = webdriver.Remote(
