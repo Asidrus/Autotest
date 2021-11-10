@@ -213,7 +213,7 @@ def test_sdo(setup_driver, write_log, clicker):
     #     start_task = datetime.now()
     for part in steps:
         with allure_step("Шаг по клику на" + str(part["xpath"]), driver=driver, screenshot=True, browser_log=True):
-            do_step(part, driver, start_task)
+            start_task = do_step(part, driver, start_task)
             gatherBrowserLogs(driver)
     WebDriverWait(driver, 100).until(EC.element_to_be_clickable((By.XPATH, "//p[@onclick='window.history.back()']")))
     times.append(datetime.now() - start_task)
