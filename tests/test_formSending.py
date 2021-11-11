@@ -76,8 +76,8 @@ def test_formSending(setup_driver_new, url, datatest):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
     with allure_step(f"Переход на страницу {url=}", _alarm=__alarm):
         page.getPage(url)
-    with allure_step("Инициализация формы"):
-        page.findform(xpath={"tag": "form", "data-test": datatest}, _alarm=__alarm)
+    with allure_step("Инициализация формы",  _alarm=__alarm):
+        page.findform(xpath={"tag": "form", "data-test": datatest})
     with allure_step("Отправка заявки", page.driver, True, True, _alarm=__alarm):
         confirmation = page.Test()
     with allure_step(f"Проверка результата {url=}, {datatest=}", _alarm=__alarm):
