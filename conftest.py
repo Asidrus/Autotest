@@ -36,94 +36,37 @@ def setup_driver_new(request):
     del Driver
 
 
-@pytest.fixture(scope="session")
-def setup_driver(request):
-    try:
-        options = webdriver.ChromeOptions()
-        # options.add_argument("no-sandbox")
-        # options.add_argument("--disable-gpu")
-        options.add_argument("--window-size=1920,1080")
-        # options.add_argument("--disable-dev-shm-usage")
-        options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-        # options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
-        if request.config.getoption("--adaptive"):
-            options.add_argument(
-                '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
-        if request.config.getoption("--local"):
-            if request.config.getoption("--invisible"):
-                display = Display(visible=0, size=(1920, 1080))
-                display.start()
-            service = Service(chromedriver)
-            Driver = webdriver.Chrome(service=service, options=options)
-        else:
-            Driver = webdriver.Remote(command_executor=f"http://{selenoid_IP}:{selenoid_port}/wd/hub", options=options)
-    except Exception as e:
-        raise e
-    yield Driver
-    try:
-        Driver.close()
-        Driver.quit()
-        if request.config.getoption("--invisible"):
-            display.stop()
-    except Exception as e:
-        raise e
-
-
-async def send_telegram_broadcast(msg):
-    reader, writer = await asyncio.open_connection(
-        'localhost', 1234)
-    writer.write((msg + "#END").encode())
-    writer.close()
-    await writer.wait_closed()
-
-
-def alarm(msg):
-    asyncio.run(send_telegram_broadcast(msg))
-
-
-@contextmanager
-def allure_step(step_name=None,
-                driver=None,
-                screenshot=None,
-                browser_log=None,
-                ignore=None,
-                _alarm=None):
-    with allure.step(step_name):
-        try:
-            yield
-        except Exception as e:
-            if screenshot and (driver is not None):
-                allure.attach(driver.get_screenshot_as_png(), name=step_name, attachment_type=AttachmentType.PNG)
-            if browser_log and (driver is not None):
-                logger.warning({"url": driver.current_url, "messages": driver.get_log('browser')})
-            logger.critical(f"{step_name}|" + str(e))
-            if _alarm is not None:
-                try:
-                    alarm(_alarm + f"\nШаг {step_name} провален" + f"\nОшибка {str(e)}")
-                except Exception as er:
-                    e = f"{e}, {str(er)}"
-            if ignore is not True:
-                raise Exception(e)
-
-
-def check_cookie(driver, url, cookie_dict):
-    if driver.get_cookie(name=cookie_dict["name"]) is None:
-        driver.get(url=url[0:url.find(".ru") + 3])
-        driver.add_cookie(cookie_dict=cookie_dict)
-
-
-@pytest.fixture(scope="session")
-def clicker():
-    def _clicker(driver, button):
-        for i in range(200):
-            try:
-                button.click()
-                return 1
-            except:
-                sleep(0.05)
-        button.click()
-
-    return _clicker
+# @pytest.fixture(scope="session")
+# def setup_driver(request):
+#     try:
+#         options = webdriver.ChromeOptions()
+#         # options.add_argument("no-sandbox")
+#         # options.add_argument("--disable-gpu")
+#         options.add_argument("--window-size=1920,1080")
+#         # options.add_argument("--disable-dev-shm-usage")
+#         options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+#         # options.set_capability('goog:loggingPrefs', {'browser': 'ALL'})
+#         if request.config.getoption("--adaptive"):
+#             options.add_argument(
+#                 '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
+#         if request.config.getoption("--local"):
+#             if request.config.getoption("--invisible"):
+#                 display = Display(visible=0, size=(1920, 1080))
+#                 display.start()
+#             service = Service(chromedriver)
+#             Driver = webdriver.Chrome(service=service, options=options)
+#         else:
+#             Driver = webdriver.Remote(command_executor=f"http://{selenoid_IP}:{selenoid_port}/wd/hub", options=options)
+#     except Exception as e:
+#         raise e
+#     yield Driver
+#     try:
+#         Driver.close()
+#         Driver.quit()
+#         if request.config.getoption("--invisible"):
+#             display.stop()
+#     except Exception as e:
+#         raise e
 
 
 def db_connection(**kwargs):
@@ -159,3 +102,29 @@ async def db(request):
     connection = await asyncpg.connect(**request.param)
     yield connection
     await connection.close()
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.asyncio
+async def async_retry(request):
+    from libs.client import Client
+    for i in range(3):
+        try:
+            yield Client()
+        except:
+            break
+    if len(Client.messages) > 0:
+        Client.send(Client.messages[-1])
+
+
+@pytest.fixture(scope="function")
+def retry(request):
+    from libs.client import Client
+    for i in range(3):
+        try:
+            yield Client()
+        except:
+            break
+    if len(Client.messages) > 0:
+        Client.send(Client.messages[-1])
+
