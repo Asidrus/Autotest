@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from time import time
 
-from conftest import allure_step
 from libs.func4test import *
 import re
 import zlib
@@ -105,7 +104,7 @@ class PageForm(Page):
         self.click(elem=button)
 
     def findSendingRequest(self):
-        with allure_step(f"Поиск отправленного запроса"):
+        with self.allure_step(f"Поиск отправленного запроса"):
             for request in self.getRequest:
                 if request.response:
                     if request.response.headers['Content-Type'] == 'text/html; charset=UTF-8':
@@ -148,7 +147,7 @@ class PageForm(Page):
         return any([conf in text for conf in self.confirm])
 
     def confirmationEvaluation(self, text_before):
-        with allure_step(f"Обработка результата"):
+        with self.allure_step(f"Обработка результата"):
             text_after = self.text(xpath="//body")
             _, txt_after = compareLists(str2list(text_before), str2list(text_after))
             return any([conf in txt.lower() for txt in txt_after for conf in self.form.confirm])

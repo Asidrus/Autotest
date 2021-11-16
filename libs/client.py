@@ -6,8 +6,8 @@ class Client:
     messages = []
 
     def __init__(self,
-                 ip: str = "192.168.248.32",
-                 port: int = 9654,
+                 ip: str = "localhost",
+                 port: int = 1234,
                  name: dict = {"first_name": "autotest", "last_name": ""},
                  header: str = "",
                  debug: int = 1):  # 0 or 1

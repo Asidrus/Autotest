@@ -31,16 +31,11 @@ async def read_request(reader, delimiter=b'#END'):
             return data
         except:
             pass
-        # if delimiter in request:
-        #     return request[:-2]
     return None
 
 
 async def write_response(writer, response, cid):
-    # await broadcaster(response.decode())
-
-    # writer.write(response)
-    # await writer.drain()
+    writer(str({"status": "OK"}).encode())
     writer.close()
     print(f'Client #{cid} has been served')
 
@@ -53,5 +48,4 @@ async def run_server(host, port):
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     loop.create_task(run_server("localhost", 1234))
-    loop.create_task(run_server("localhost", 2345))
     loop.run_forever()

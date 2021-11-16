@@ -1,16 +1,16 @@
 from config import *
-from conftest import alarm, db_connection, allure_step, send_telegram_broadcast
+from conftest import db_connection
 import allure
 import pytest
 import asyncio
-import aiohttp
-from libs.aioparser import aioparser
-from aiohttp.client_exceptions import ClientConnectionError
+
+from libs.client import Client
+import requests
 
 suite_name = "Мониторинг сайтов"
 test_name = "Статус ответа"
 severity = "Сritical"
-__alarm = f"{severity}: {suite_name}: {test_name}:"
+__alarm = f"{severity}: {suite_name}: {test_name}: "
 db_name = "speedtest"
 db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
 
@@ -24,35 +24,40 @@ async def getData(connection):
 
 
 def pytest_generate_tests(metafunc):
-    if metafunc.config.getoption("site"):
-        site = metafunc.config.getoption("site")
-        parser = aioparser()
-        domain = site.lower().replace("https://", "")
-        parser.getAllUrls(site, metafunc.config.getoption("parse"))
-        metafunc.parametrize("url", [link["url"] for link in parser.links])
-    else:
-        urls = asyncio.run(getData())
-        metafunc.parametrize("url", [url["url"] for url in urls])
+    urls = asyncio.run(getData())
+    metafunc.parametrize("url", [url["url"] for url in urls])
+    # if metafunc.config.getoption("site"):
+    #     site = metafunc.config.getoption("site")
+    #     parser = aioparser()
+    #     domain = site.lower().replace("https://", "")
+    #     parser.getAllUrls(site, metafunc.config.getoption("parse"))
+    #     metafunc.parametrize("url", [link["url"] for link in parser.links])
+    # else:
+
+
+rerunInfo = {}
+lastTry = 2
 
 
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)
-@pytest.mark.asyncio
-async def test_pageStatus(url):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                status_code = response.status
-    except ClientConnectionError:
-        await send_telegram_broadcast(f"{__alarm} Страница {url=} не отвечает")
-        assert False
-    except Exception as e:
-        await send_telegram_broadcast(f"{__alarm} Страница {url=} не отвечает. ERROR: {e}")
-        assert False
-    result = codes[status_code // 100]
-    if not result:
-        await send_telegram_broadcast(f"{__alarm} Ответ от {url=} - {status_code}")
-        assert False, status_code
+@pytest.mark.flaky(reruns=2)
+def test_pageStatus(url):
+    global rerunInfo
+    if url in rerunInfo.keys():
+        rerunInfo[url] = rerunInfo[url] + 1
     else:
+        rerunInfo[url] = 0
+    alarm = Client(ip="localhost", port=1234, header=__alarm, debug=1)
+    try:
+        response = requests.get(url, timeout=15)
+    except Exception as e:
+        print(e)
+        alarm.send(alarm.createMessage(f'Bad connection for {url}'))
+        assert False
+    if codes[response.status_code // 100]:
         assert True
+    else:
+        alarm.send(alarm.createMessage(f"Site {url} -> ответ {response.status_code}"))
+        assert False

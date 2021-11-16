@@ -5,7 +5,7 @@ import allure
 import os
 from datetime import datetime, timedelta
 from config import autotest_results
-from conftest import allure_step
+from libs.client import Client
 from libs.aioparser import aioparser
 from libs.pages.formPage import PageForm
 import aiohttp
@@ -71,16 +71,17 @@ def pytest_generate_tests(metafunc):
 @allure.story(test_name)
 @allure.severity(severity)
 def test_formSending(setup_driver_new, url, datatest):
+    alarm = Client(header=__alarm)
     page = PageForm(setup_driver_new)
-    with allure_step("Добавление cookie"):
+    with page.allure_step("Добавление cookie"):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
-    with allure_step(f"Переход на страницу {url=}", _alarm=__alarm):
+    with page.allure_step(f"Переход на страницу {url=}", True, True, alarm=True):
         page.getPage(url)
-    with allure_step("Инициализация формы",  _alarm=__alarm):
+    with page.allure_step("Инициализация формы", True, True, alarm=True):
         page.findform(xpath={"tag": "form", "data-test": datatest})
-    with allure_step("Отправка заявки", page.driver, True, True, _alarm=__alarm):
+    with page.allure_step("Отправка заявки", True, True, alarm=True):
         confirmation = page.Test()
-    with allure_step(f"Проверка результата {url=}, {datatest=}", _alarm=__alarm):
+    with page.allure_step(f"Проверка результата {url=}, {datatest=}", True, True, alarm=True):
         if confirmation:
             assert True
         else:
