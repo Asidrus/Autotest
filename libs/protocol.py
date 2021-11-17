@@ -16,11 +16,11 @@ class Protocol:
         return count
 
     def __bodyLength__(self):
-        l = 0
+        length = 0
         for head in self.header:
             if head['head'] != "message":
-                l = l + head['data']['value']
-        return l
+                length = length + head['data']['value']
+        return length
 
     def set(self, key, value):
         for head in self.header:
@@ -34,7 +34,6 @@ class Protocol:
         self.set("message", self.__headerLength__() + self.__bodyLength__())
         for head in self.header:
             self.raw = self.raw + (head['data']['value']).to_bytes(head['data']['len'], byteorder='big')
-
         self.raw = self.raw + text + image
         return self.raw
 
@@ -42,22 +41,21 @@ class Protocol:
         for head in self.header:
             offset = head['data']['offset']
             length = head['data']['len']
-            self.set(head['head'], int.from_bytes(s[offset:offset+length], 'big'))
+            self.set(head['head'], int.from_bytes(s[offset:offset + length], 'big'))
         bl = self.__headerLength__()
         cursor = bl
         for head in self.header:
             if head['head'] != 'message':
                 length = head['data']['value']
-                self.data[head['head']] = s[cursor:cursor+length]
-                cursor = cursor+length
-        print(self.data)
+                self.data[head['head']] = s[cursor:cursor + length]
+                cursor = cursor + length
 
     def setChunk(self, chunk):
         if self.serial == 0:
             self.raw = chunk
             offset = self.header[0]['data']['offset']
             length = self.header[0]['data']['len']
-            self.header[0]['data']['value'] = int.from_bytes(self.raw[offset:offset+length], 'big')
+            self.header[0]['data']['value'] = int.from_bytes(self.raw[offset:offset + length], 'big')
             self.serial = self.serial + 1
         else:
             self.raw = self.raw + chunk
@@ -67,15 +65,5 @@ class Protocol:
             self.readMessage(self.raw)
 
 
-
 if __name__ == "__main__":
-    p = Protocol()
-    text = 'hello'.encode()
-    print(text)
-    raw = p.writeMessage(text, b'image')
-    # raw = p.writeMessage(b'', b'')
-    print(raw)
-    pp = Protocol()
-    # res = pp.readMessage(raw)
-    pp.setChunk(raw)
-    print(pp.data['text'].decode())
+    pass

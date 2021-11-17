@@ -1,9 +1,11 @@
 import asyncio
-import json
+from PIL import Image
+import io
+from libs.protocol import Protocol
+
 
 counter = 0
 
-from libs.protocol import Protocol
 
 async def serve_client(reader, writer):
     global counter
@@ -12,42 +14,28 @@ async def serve_client(reader, writer):
     print(f'Client #{cid} connected')
 
     request = await read_request(reader)
-    print(request)
+    # im = Image.open(io.BytesIO(request['image']))
+
     if request is None:
         print(f'Client #{cid} unexpectedly disconnected')
     else:
         await write_response(writer, request, cid)
 
 
-# async def read_request(reader, delimiter=b'#END'):
-#     request = bytearray()
-#     while True:
-#         chunk = await reader.read(2 ** 10)
-#         if not chunk:
-#             # Клиент преждевременно отключился.
-#             break
-#         request += chunk
-#         try:
-#             data = json.loads(request.decode("utf-8").replace("'", "\""))
-#             return data
-#         except:
-#             pass
-#     return None
-
-
 async def read_request(reader, delimiter=b'#END'):
     protocol = Protocol()
-    while not Protocol.STOP_READING:
+    while not protocol.STOP_READING:
         chunk = await reader.read(2 ** 10)
         if not chunk:
             # Клиент преждевременно отключился.
             break
         protocol.setChunk(chunk)
+    print("out of func")
     return Protocol.data
 
 
 async def write_response(writer, response, cid):
-    writer(str({"status": "OK"}).encode())
+    writer.write(str({"status": "OK"}).encode())
     writer.close()
     print(f'Client #{cid} has been served')
 
