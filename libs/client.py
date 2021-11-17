@@ -1,6 +1,7 @@
 import asyncio
 from time import time, sleep
 
+from libs.protocol import Protocol
 
 class Client:
     messages = []
@@ -24,7 +25,8 @@ class Client:
         IP = self.IP if ip is None else ip
         port = self.port if port is None else port
         reader, writer = await asyncio.open_connection(IP, port)
-        writer.write(str(msg).encode())
+        # writer.write(str(msg).encode())
+        writer.write(msg)
         data = await reader.read(2 ** 10)
         print(data)
         writer.close()
@@ -38,6 +40,6 @@ class Client:
 
 if __name__ == "__main__":
     client = Client(debug=0)
-    for i in range(1000):
-        client.send("дудосю")
-        sleep(0.1)
+    protocol = Protocol()
+    protocol.writeMessage(b'hello', b'world')
+    client.send(protocol.raw)

@@ -3,6 +3,7 @@ import json
 
 counter = 0
 
+from libs.protocol import Protocol
 
 async def serve_client(reader, writer):
     global counter
@@ -18,20 +19,31 @@ async def serve_client(reader, writer):
         await write_response(writer, request, cid)
 
 
+# async def read_request(reader, delimiter=b'#END'):
+#     request = bytearray()
+#     while True:
+#         chunk = await reader.read(2 ** 10)
+#         if not chunk:
+#             # Клиент преждевременно отключился.
+#             break
+#         request += chunk
+#         try:
+#             data = json.loads(request.decode("utf-8").replace("'", "\""))
+#             return data
+#         except:
+#             pass
+#     return None
+
+
 async def read_request(reader, delimiter=b'#END'):
-    request = bytearray()
-    while True:
+    protocol = Protocol()
+    while not Protocol.STOP_READING:
         chunk = await reader.read(2 ** 10)
         if not chunk:
             # Клиент преждевременно отключился.
             break
-        request += chunk
-        try:
-            data = json.loads(request.decode("utf-8").replace("'", "\""))
-            return data
-        except:
-            pass
-    return None
+        protocol.setChunk(chunk)
+    return Protocol.data
 
 
 async def write_response(writer, response, cid):

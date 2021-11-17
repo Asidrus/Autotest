@@ -3,17 +3,18 @@ from io import StringIO
 
 import aiohttp
 from lxml import etree
-
 from config import autotest_results
 import asyncio
 from libs.aioparser import aioparser
 import sys
+
 
 headers = {
     "User-Agent": 'Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166'}
 fname_appendix = ""
 
 # autotest_results = "/home/kali/autotest/autotest-results"
+
 
 def find_all(a_str, sub):
     start = 0
@@ -77,5 +78,7 @@ if __name__ == "__main__":
     # res = asyncio.run(searcher([{"url": "https://niidpo.ru/korporativnoe_obuchenie"}], ["4000"], "windows-1251"))
     #менять
     fname_appendix = "_adaptive" if False else ""
-    pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
-    main("https://mgaps.ru", "windows-1251", pattern)
+    # pattern = ["гуманитарн", "гапс", "академ", "мисао", "мипк", "институт"]
+    pattern = ["webp"]
+    # main("https://mgaps.ru/", "windows-1251", pattern)
+    main("https://psy.dev-u.ru/", "utf-8", pattern)
