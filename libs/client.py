@@ -1,9 +1,7 @@
 import asyncio
 from time import time, sleep
-
-import PIL.Image
-
 from libs.protocol import Protocol
+
 
 class Client:
     messages = []
@@ -45,14 +43,8 @@ if __name__ == "__main__":
     protocol = Protocol()
     from PIL import Image
     import io
-    # with Image.open("/home/kali/Downloads/image.png") as im:
-    #     image = im.tobytes()
     with open("/home/kali/Downloads/image.png", 'rb') as file:
         image = file.read()
     im = Image.open(io.BytesIO(image))
-    # im.show()
-    # print(len(image))
     protocol.writeMessage(b'hello', image=image)
-    print(len(protocol.raw))
-    print(protocol.header)
     client.send(protocol.raw)
