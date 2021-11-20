@@ -5,7 +5,7 @@ import allure
 import os
 from datetime import datetime, timedelta
 from config import autotest_results
-from libs.client import Client
+from libs.network import Client
 from libs.aioparser import aioparser
 from libs.pages.formPage import PageForm
 import aiohttp
@@ -72,7 +72,7 @@ def pytest_generate_tests(metafunc):
 @allure.severity(severity)
 def test_formSending(setup_driver_new, url, datatest):
     alarm = Client(header=__alarm)
-    page = PageForm(setup_driver_new)
+    page = PageForm(setup_driver_new, alarm=alarm)
     with page.allure_step("Добавление cookie"):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
     with page.allure_step(f"Переход на страницу {url=}", True, True, alarm=True):

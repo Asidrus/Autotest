@@ -28,7 +28,7 @@ def setup_driver_new(request):
     opt = lambda o: request.config.getoption(o)
     Driver = WebDriver(invisible=opt("--invisible"),
                        adaptive=opt("--adaptive"),
-                       local=opt("--local"),
+                       remote=not opt("--local"),
                        logs=True,
                        **request.param)
     Driver.runDriver()

@@ -1,15 +1,8 @@
 import json
-from contextlib import contextmanager
 from time import sleep, time
-from typing import Union
 
-import allure
-from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-
-from libs.client import Client
-import logging
 
 
 class Page:
@@ -17,19 +10,16 @@ class Page:
     a class for working with elements on a page
     """
     driver = None
-    # current_url = None
     TIMEOUT = 5  # max time of waiting
     STEPTIME = .5  # repetition period
 
-    def __init__(self, webdriver, logger: logging = None, alarm: Client = None) -> None:
+    def __init__(self, webdriver) -> None:
         """Base class for pages
 
         :param driver: Selenium WebDriver
         """
         self.webdriver = webdriver
         self.driver = webdriver.driver
-        self.logger = logger
-        self.alarm = alarm
 
     def current_url(self):
         return self.driver.current_url
@@ -183,30 +173,3 @@ class Page:
                     return e
             except:
                 pass
-
-    def gatherBrowserLogs(self):
-        self.logger.warning({"url": self.current_url(), "messages": self.driver.get_log('browser')})
-
-    @contextmanager
-    def allure_step(self, step_name: str,
-                    screenshot: bool = False,
-                    browserLog: bool = False,
-                    ignore: bool = False,
-                    alarm: bool = False):
-        with allure.step(step_name):
-            try:
-                yield
-            except Exception as e:
-                if screenshot:
-                    allure.attach(self.driver.get_screenshot_as_png(), name=step_name, attachment_type=AttachmentType.PNG)
-                if browserLog:
-                    self.gatherBrowserLogs()
-                if self.logger:
-                    self.logger.critical(f"{step_name}|" + str(e))
-                if self.alarm and alarm:
-                    try:
-                        self.alarm.send(f"\nШаг {step_name} провален\nОшибка\n{str(e)[:50]}")
-                    except Exception as er:
-                        e = f"{e}, {er}"
-                if ignore is not True:
-                    raise Exception(e)

@@ -151,16 +151,13 @@ async def readMessage(reader) -> dict:
 
 
 async def handlerIn(**kwargs):
-    print(kwargs['text'].decode())
-    if kwargs['text'].decode() == 'test':
-        return {'text': b'ok'}
-    else:
-        return {'text': b'error'}
+    print(kwargs)
+    return {'text': b'ok'}
 
 
 async def handlerOut(**kwargs):
     print(kwargs['text'].decode())
-    if kwargs['text'].decode() == 'huy':
+    if kwargs['text'].decode() == 'test':
         return {'text': 'ok'}
     else:
         return {'text': 'error'}

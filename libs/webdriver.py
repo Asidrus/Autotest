@@ -20,14 +20,14 @@ class WebDriver:
 
         @param kwargs:
         @param adaptive: default is False
-        @param browser: 'Chrome', 'Opera' or 'FireFox'. 'Chrome' is default
+        @param browser: 'Chrome', 'Opera' or 'Firefox'. 'Chrome' is default
         @param version: '0.95'. Latest is default
         """
         for key in kwargs.keys():
             if key == "adaptive":
                 self.adaptive = kwargs["adaptive"]
             elif key == "remote":
-                self.remote = not kwargs["local"]
+                self.remote = kwargs["remote"]
             elif key == "invisible":
                 self.invisible = kwargs["invisible"]
             elif key == "logs":
@@ -43,41 +43,47 @@ class WebDriver:
             elif key == "browser":
                 self.browser = kwargs["browser"]
 
+    def setOptions(self):
+        self.options.add_argument(f"--window-size={self.window_size[0]},{self.window_size[1]}")
+        if self.logs:
+            self.options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+        if self.version != 'latest':
+            self.options.set_capability("version", self.version)
+        if self.adaptive:
+            self.options.add_argument(
+                '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
+
     def Chrome(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument(f"--window-size={self.window_size[0]},{self.window_size[1]}")
-        if self.logs:
-            options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-        if self.adaptive:
-            options.add_argument(
-                '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
-        self.options = options
+        self.options = webdriver.ChromeOptions()
+        self.setOptions()
 
-    def FireFox(self):
-        options = webdriver.FirefoxOptions()
-        options.add_argument(f"--window-size={self.window_size[0]},{self.window_size[1]}")
-        if self.logs:
-            options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-        if self.adaptive:
-            options.add_argument(
-                '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
-        self.options = options
+    def Firefox(self):
+        self.options = webdriver.FirefoxOptions()
+        self.setOptions()
 
-    def runDriver(self):
+    def Opera(self):
+        pass
+
+    def run(self):
         if self.browser == 'Chrome':
             self.Chrome()
         elif self.browser == 'Opera':
-            pass
-        elif self.browser == 'FireFox':
-            self.FireFox()
+            self.Opera()
+        elif self.browser == 'Firefox':
+            self.Firefox()
 
         if self.remote:
             self.driver = webdriver.Remote(
-                command_executor=f'http://{self.remoteIP}:{self.remotePort}',
+                command_executor=f'http://{self.remoteIP}:{self.remotePort}/wd/hub/',
                 options=self.options)
         else:
             if self.browser == 'Chrome':
                 self.driver = webdriver.Chrome(
+                    service=Service(self.executablePath),
+                    options=self.options)
+            elif self.browser == 'Firefox':
+                print('start firefox')
+                self.driver = webdriver.Firefox(
                     service=Service(self.executablePath),
                     options=self.options)
 
