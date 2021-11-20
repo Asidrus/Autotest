@@ -1,7 +1,8 @@
 from libs.pages.page import Page
+from libs.pages.testpage import TestPage
 
 
-class PageLogin(Page):
+class PageLogin(TestPage):
 
     _name_ = {"name": ["username"]}
     _password_ = {"name": ["password"]}

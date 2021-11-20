@@ -31,7 +31,7 @@ def setup_driver_new(request):
                        remote=not opt("--local"),
                        logs=True,
                        **request.param)
-    Driver.runDriver()
+    Driver.run()
     yield Driver
     del Driver
 

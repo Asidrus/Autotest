@@ -9,6 +9,7 @@ from libs.network import Client
 from libs.aioparser import aioparser
 from libs.pages.formPage import PageForm
 import aiohttp
+from config import logger
 from lxml import etree
 
 
@@ -71,8 +72,7 @@ def pytest_generate_tests(metafunc):
 @allure.story(test_name)
 @allure.severity(severity)
 def test_formSending(setup_driver_new, url, datatest):
-    alarm = Client(header=__alarm)
-    page = PageForm(setup_driver_new, alarm=alarm)
+    page = PageForm(setup_driver_new, logger=logger, alarm=Client())
     with page.allure_step("Добавление cookie"):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
     with page.allure_step(f"Переход на страницу {url=}", True, True, alarm=True):
