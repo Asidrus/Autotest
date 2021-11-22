@@ -108,6 +108,7 @@ class Server:
 
     async def serveClient(self, reader, writer):
         request = await readMessage(reader)
+        print(request)
         if request is None:
             print(f'Client unexpectedly disconnected')
         else:
@@ -115,7 +116,8 @@ class Server:
                 pass
             else:
                 response = await self.handler(**request)
-                await writeMessage(writer, **response)
+                if response is not None:
+                    await writeMessage(writer, **response)
                 writer.close()
 
     async def runSever(self):
@@ -174,7 +176,10 @@ async def readMessage(reader) -> dict:
 
 async def handlerIn(**kwargs):
     print(kwargs)
-    return {'text': b'ok'}
+    if kwargs['debug'] == 1:
+        return {"contentType": "text", "content":{"text": "ok"}}
+    else: 
+        return {"contentType": "text", "content":{"text": "error"}}
 
 
 async def handlerOut(**kwargs):
@@ -189,11 +194,11 @@ if __name__ == "__main__":
     print(sys.argv[1])
     if sys.argv[1] == '1':
         print('start server')
-        server = Server()
+        server = Server(handler=handlerIn)
         loop = asyncio.new_event_loop()
         loop.create_task(server.runSever())
         loop.run_forever()
     else:
         print('start client')
         client = Client()
-        asyncio.run(client.send(contentType='json', content={'data': 'hi'}, debug=1, image=b'adasd'))
+        asyncio.run(client.send(contentType='text', content='hello world', debug=0, image=b'adasd'))
