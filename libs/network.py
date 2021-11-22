@@ -115,14 +115,13 @@ class Client:
             try:
                 reader, writer = await asyncio.open_connection(self.ip, self.port)
             except Exception as e:
-                print(f'Couldn`t connect to {self.ip}:{self.port}')
-                return False
+                raise Exception(f'Couldn`t connect to {self.ip}:{self.port}')
             await writeMessage(writer, **kwargs)
             data = await readMessage(reader)
-            print(data)
+            # print(data)
             if self.handler is None:
                 writer.close()
-                break
+                return data
             else:
                 res = await self.handler(**data)
                 if res == True:
