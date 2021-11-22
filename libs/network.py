@@ -161,6 +161,7 @@ class Client:
 
 async def writeMessage(writer, **kwargs):
     protocol = Protocol()
+    print(kwargs)
     writer.write(protocol.setData(**kwargs))
 
 
@@ -177,9 +178,9 @@ async def readMessage(reader) -> dict:
 async def handlerIn(**kwargs):
     print(kwargs)
     if kwargs['debug'] == 1:
-        return {"contentType": "text", "content":{"text": "ok"}}
+        return {"contentType": "json", "content": {"text": "ok"}}
     else: 
-        return {"contentType": "text", "content":{"text": "error"}}
+        return {"contentType": "json", "content": {"text": "error"}}
 
 
 async def handlerOut(**kwargs):
