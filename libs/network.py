@@ -1,4 +1,5 @@
 import asyncio
+import json
 import sys
 
 
@@ -7,9 +8,11 @@ class Protocol:
     protocol v 0.1
     text and image transmission
     """
-    header = [{'head': "message", "data": {"len": 4, "offset": 0, "value": None}},
-              {'head': "text", "data": {"len": 4, "offset": 4, "value": None}},
-              {'head': "image", "data": {"len": 8, "offset": 8, "value": None}}]
+    header = [{'head': "request", "data": {"len": 8, "offset": 0, "value": None}},
+              {'head': "debug", "data": {"len": 1, "offset": 8, "value": None}},
+              {'head': "contentType", "data": {"len": 1, "offset": 9, "value": None}},
+              {'head': "content", "data": {"len": 4, "offset": 10, "value": None}},
+              {'head': "image", "data": {"len": 8, "offset": 14, "value": None}}]
 
     raw = b''
 
@@ -26,7 +29,7 @@ class Protocol:
     def __bodyLength__(self):
         length = 0
         for head in self.header:
-            if head['head'] != "message":
+            if head['head'] != "request":
                 length = length + head['data']['value']
         return length
 
@@ -36,13 +39,25 @@ class Protocol:
                 head['data']['value'] = value
                 return None
 
-    def setData(self, text: bytes = b'', image: bytes = b''):
-        self.set("text", len(text))
+    def setData(self, content, debug=0, contentType: str = 'json', image: bytes = b''):
+        if contentType == 'json':
+            content = str(content).encode()
+            contentType = 0
+        elif contentType == 'text':
+            content = content.encode()
+            contentType = 1
+        self.set("debug", 1)
+        self.set("contentType", 1)
+        self.set("content", len(content))
         self.set("image", len(image))
-        self.set("message", self.__headerLength__() + self.__bodyLength__())
+        self.set("request", self.__headerLength__() + self.__bodyLength__())
         for head in self.header:
             self.raw = self.raw + (head['data']['value']).to_bytes(head['data']['len'], byteorder='big')
-        self.raw = self.raw + text + image
+        self.raw = self.raw + \
+                   debug.to_bytes(1, byteorder='big') + \
+                   contentType.to_bytes(1, byteorder='big') + \
+                   content + \
+                   image
         return self.raw
 
     def getData(self, s: bytes):
@@ -53,10 +68,18 @@ class Protocol:
         bl = self.__headerLength__()
         cursor = bl
         for head in self.header:
-            if head['head'] != 'message':
+            if head['head'] != 'request':
                 length = head['data']['value']
                 self.data[head['head']] = s[cursor:cursor + length]
                 cursor = cursor + length
+        self.data['debug'] = int.from_bytes(self.data['debug'], 'big')
+        contentType = int.from_bytes(self.data['contentType'], 'big')
+        if contentType == 0:
+            self.data['contentType'] = 'json'
+            self.data['content'] = json.loads(self.data['content'].decode('utf-8').replace("'", "\""))
+        elif contentType == 1:
+            self.data['contentType'] = 'text'
+            self.data['content'] = self.data['content'].decode('utf-8')
 
     def setChunk(self, chunk):
         if self.serial == 0:
@@ -118,7 +141,7 @@ class Client:
                 raise Exception(f'Couldn`t connect to {self.ip}:{self.port}')
             await writeMessage(writer, **kwargs)
             data = await readMessage(reader)
-            # print(data)
+            print(data)
             if self.handler is None:
                 writer.close()
                 return data
@@ -166,11 +189,11 @@ if __name__ == "__main__":
     print(sys.argv[1])
     if sys.argv[1] == '1':
         print('start server')
-        server = Server(handler=handlerIn)
+        server = Server()
         loop = asyncio.new_event_loop()
         loop.create_task(server.runSever())
         loop.run_forever()
     else:
         print('start client')
         client = Client()
-        asyncio.run(client.send(text=b'test'))
+        asyncio.run(client.send(contentType='json', content={'data': 'hi'}, debug=1, image=b'adasd'))
