@@ -24,7 +24,7 @@ class Form:
     confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
 
 
-class PageForm(TestPage):
+class PageForm(Page):
 
     def findform(self, *args, xpath=None, **kwargs):
         self.form = Form()

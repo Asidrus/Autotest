@@ -11,7 +11,7 @@ from libs.pages.formPage import PageForm
 import aiohttp
 from config import logger
 from lxml import etree
-
+from libs.reporter import Reporter
 
 suite_name = "Проверка отправки заявок с ФОС"
 test_name = "Проверка отправки заявок с ФОС"
@@ -72,16 +72,21 @@ def pytest_generate_tests(metafunc):
 @allure.story(test_name)
 @allure.severity(severity)
 def test_formSending(setup_driver_new, url, datatest):
-    page = PageForm(setup_driver_new, logger=logger, alarm=Client())
-    with page.allure_step("Добавление cookie"):
+    reporter = Reporter(header=__alarm+f"\n{url=}\n{datatest=}",
+                        logger=logger,
+                        webdriver=setup_driver_new,
+                        telegram=Client(ip='192.168.248.32', port=4578),
+                        debug=0)
+    page = PageForm(setup_driver_new)
+    with reporter.step("Добавление cookie"):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
-    with page.allure_step(f"Переход на страницу {url=}", True, True, alarm=True):
+    with reporter.step(f"Переход на страницу {url=}", True, True, True):
         page.getPage(url)
-    with page.allure_step("Инициализация формы", True, True, alarm=True):
+    with reporter.step("Инициализация формы", True, True, True):
         page.findform(xpath={"tag": "form", "data-test": datatest})
-    with page.allure_step("Отправка заявки", True, True, alarm=True):
+    with reporter.step("Отправка заявки", True, True, True):
         confirmation = page.Test()
-    with page.allure_step(f"Проверка результата {url=}, {datatest=}", True, True, alarm=True):
+    with reporter.step(f"Проверка результата", True, False, True):
         if confirmation:
             assert True
         else:

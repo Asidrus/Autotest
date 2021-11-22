@@ -8,6 +8,7 @@ from allure_commons.types import AttachmentType
 from libs.network import Client
 from libs.webdriver import WebDriver
 
+
 class Reporter:
 
     header = ''
@@ -15,20 +16,21 @@ class Reporter:
     webdriver = None
     driver = None
     telegram = None
-
+    debug = None
     screenshot = None
 
     def __init__(self, header='',
                  logger=None,
                  webdriver: WebDriver = None,
                  telegram: Client = None,
-                 debug = False):
+                 debug = 0):
         self.header = header
         self.logger = logger
         self.webdriver = webdriver
         if self.webdriver:
             self.driver = webdriver.driver
         self.telegram = telegram
+        self.debug = debug
 
     def takeScreenshot(self):
         if self.driver:
@@ -42,16 +44,17 @@ class Reporter:
 
     def sendToTelegram(self, stepName, error):
         try:
-            d = {'text': f"{self.header}\nШаг {stepName} провален\nОшибка:\n{str(error)[:30]}",
-                 'datetime': time(),
-                 'debug': 0}
-            data = {"text": str(d).encode()}
+            data = {"content": f"{self.header}\nШаг '{stepName}' провален\nОшибка:\n{str(error)[:30]}",
+                    "debug": self.debug,
+                    "contentType": 'text'}
             if self.screenshot:
                 data['image'] = self.screenshot
+
             asyncio.run(self.telegram.send(**data))
-        except:
+        except Exception as e:
             if self.logger:
                 self.logger.critical(f"Не смог отправить сообщение в ТГ")
+            raise e
 
     @contextmanager
     def step(self, stepName: str,
@@ -65,7 +68,9 @@ class Reporter:
             except Exception as e:
                 self.takeScreenshot()
                 if screenshot and self.driver:
-                    allure.attach(self.screenshot, name=stepName, attachment_type=AttachmentType.PNG)
+                    allure.attach(self.screenshot,
+                                  name=stepName,
+                                  attachment_type=AttachmentType.PNG)
                 if browserLog:
                     self.gatherBrowserLogs()
                 if alarm:

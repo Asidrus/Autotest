@@ -108,7 +108,6 @@ class Server:
 
     async def serveClient(self, reader, writer):
         request = await readMessage(reader)
-        print(request)
         if request is None:
             print(f'Client unexpectedly disconnected')
         else:
@@ -176,7 +175,6 @@ async def readMessage(reader) -> dict:
 
 
 async def handlerIn(**kwargs):
-    print(kwargs)
     if kwargs['debug'] == 1:
         return {"contentType": "json", "content": {"text": "ok"}}
     else: 
