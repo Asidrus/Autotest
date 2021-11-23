@@ -82,7 +82,6 @@ def test_formSending(request, setup_driver, url, datatest):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
     with reporter.allure_step(f"Переход на страницу {url=}", True, True, True):
         page.getPage(url)
-        raise Exception('ломаю')
     with reporter.allure_step("Инициализация формы", True, True, True):
         page.findform(xpath={"tag": "form", "data-test": datatest})
     with reporter.allure_step("Отправка заявки", True, True, True):
