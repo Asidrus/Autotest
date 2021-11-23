@@ -4,7 +4,7 @@ import asyncio
 import allure
 import os
 from datetime import datetime, timedelta
-from config import autotest_results
+from config import autotest_results, TelegramIP, TelegramPORT
 from libs.network import Client
 from libs.aioparser import aioparser
 from libs.pages.formPage import PageForm
@@ -71,22 +71,22 @@ def pytest_generate_tests(metafunc):
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)
-def test_formSending(setup_driver_new, url, datatest):
+def test_formSending(request, setup_driver, url, datatest):
     reporter = Reporter(header=__alarm+f"\n{url=}\n{datatest=}",
                         logger=logger,
-                        webdriver=setup_driver_new,
-                        telegram=Client(ip='192.168.248.32', port=4578),
-                        debug=0)
-    page = PageForm(setup_driver_new)
-    with reporter.step("Добавление cookie"):
+                        webdriver=setup_driver,
+                        telegram=Client(TelegramIP, TelegramPORT),
+                        debug=int(request.config.getoption("--fDebug")))
+    page = PageForm(setup_driver)
+    with reporter.allure_step("Добавление cookie"):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
-    with reporter.step(f"Переход на страницу {url=}", True, True, True):
+    with reporter.allure_step(f"Переход на страницу {url=}", True, True, True):
         page.getPage(url)
-    with reporter.step("Инициализация формы", True, True, True):
+    with reporter.allure_step("Инициализация формы", True, True, True):
         page.findform(xpath={"tag": "form", "data-test": datatest})
-    with reporter.step("Отправка заявки", True, True, True):
+    with reporter.allure_step("Отправка заявки", True, True, True):
         confirmation = page.Test()
-    with reporter.step(f"Проверка результата", True, False, True):
+    with reporter.allure_step(f"Проверка результата", True, False, True):
         if confirmation:
             assert True
         else:

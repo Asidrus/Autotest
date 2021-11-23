@@ -25,7 +25,7 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope="session")
-def setup_driver_new(request):
+def setup_driver(request):
     opt = lambda o: request.config.getoption(o)
     Driver = WebDriver(invisible=opt("--invisible"),
                        adaptive=opt("--adaptive"),
