@@ -12,4 +12,4 @@ docker run \
         -v /etc/localtime:/etc/localtime:ro \
         autotest \
         bash -c \
-        "pytest tests/$args"
+        "pytest $args"
