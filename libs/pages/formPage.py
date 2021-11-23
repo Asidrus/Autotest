@@ -73,6 +73,7 @@ class PageForm(Page):
 
     def fillForm(self):
         self.fill(self.form.__nameDefault__, input=self.form.name)
+        # if self.attribute(self.form.phone, 'placeholder'):
         self.fill(self.form.__phoneDefault__, input=self.form.phone)
         if self.form.email is not None:
             self.fill(self.form.__emailDefault__, input=self.form.email)
