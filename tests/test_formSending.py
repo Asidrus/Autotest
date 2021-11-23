@@ -62,7 +62,7 @@ def pytest_generate_tests(metafunc):
     result = [(item["url"], item["data-test"]) for item in Data["data"]]
     metafunc.parametrize("url, datatest", result)
     # parametrize the webdriver
-    metafunc.parametrize("setup_driver_new", [{
+    metafunc.parametrize("setup_driver", [{
         "remoteIP": "80.87.200.64",
         "remotePort": 4444
          }], indirect=True)
@@ -82,6 +82,7 @@ def test_formSending(request, setup_driver, url, datatest):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
     with reporter.allure_step(f"Переход на страницу {url=}", True, True, True):
         page.getPage(url)
+        raise Exception('ломаю')
     with reporter.allure_step("Инициализация формы", True, True, True):
         page.findform(xpath={"tag": "form", "data-test": datatest})
     with reporter.allure_step("Отправка заявки", True, True, True):
