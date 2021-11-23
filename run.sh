@@ -7,9 +7,8 @@ done
 docker run \
         --rm \
         --net=host \
-        -v /home/tester/autotest/autotest-results:/home/tester/autotest/autotest-results \
-        -v /home/tester/autotest/allure-results:/home/tester/autotest/allure-results \
-        -v /home/tester/autotest/tests/resources:/home/tester/autotest/tests/resources \
+        -v /home/tester/autotest-results:/home/tester/autotest-results \
+        -v /home/tester/allure-results:/home/tester/allure-results \
         -v /etc/localtime:/etc/localtime:ro \
         autotest \
         bash -c \
