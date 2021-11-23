@@ -142,7 +142,6 @@ class Client:
                 raise Exception(f'Couldn`t connect to {self.ip}:{self.port}')
             await writeMessage(writer, **kwargs)
             data = await readMessage(reader)
-            print(data)
             if self.handler is None:
                 writer.close()
                 return data
@@ -160,7 +159,6 @@ class Client:
 
 async def writeMessage(writer, **kwargs):
     protocol = Protocol()
-    print(kwargs)
     writer.write(protocol.setData(**kwargs))
 
 

@@ -1,16 +1,12 @@
 import asyncio
 from contextlib import contextmanager
-from time import time
-
 import allure
 from allure_commons.types import AttachmentType
-
 from libs.network import Client
 from libs.webdriver import WebDriver
 
 
 class Reporter:
-
     header = ''
     logger = None
     webdriver = None
@@ -23,7 +19,7 @@ class Reporter:
                  logger=None,
                  webdriver: WebDriver = None,
                  telegram: Client = None,
-                 debug = 0):
+                 debug=0):
         self.header = header
         self.logger = logger
         self.webdriver = webdriver
@@ -37,7 +33,7 @@ class Reporter:
             self.screenshot = self.driver.get_screenshot_as_png()
 
     def gatherBrowserLogs(self):
-        if self.logger and self.webdriver and self.webdriver.logs:
+        if self.logger and self.driver and self.webdriver.logs:
             self.logger.warning(
                 {"url": self.driver.current_url,
                  "messages": self.driver.get_log('browser')})
@@ -49,7 +45,6 @@ class Reporter:
                     "contentType": 'text'}
             if self.screenshot:
                 data['image'] = self.screenshot
-
             asyncio.run(self.telegram.send(**data))
         except Exception as e:
             if self.logger:
@@ -57,25 +52,40 @@ class Reporter:
             raise e
 
     @contextmanager
+    def allure_step(self, stepName: str,
+                    screenshot: bool = False,
+                    browserLog: bool = False,
+                    alarm: bool = False,
+                    ignore: bool = False):
+        with allure.step(stepName):
+            try:
+                yield
+            except Exception as e:
+                if ignore is not True:
+                    self.takeScreenshot()
+                    if screenshot:
+                        allure.attach(self.screenshot,
+                                      name=stepName,
+                                      attachment_type=AttachmentType.PNG)
+                    if browserLog:
+                        self.gatherBrowserLogs()
+                    if alarm:
+                        self.sendToTelegram(stepName, e)
+                    if self.logger:
+                        self.logger.critical(f"{self.header}|{stepName}|" + str(e))
+                raise Exception(e)
+
+    @contextmanager
     def step(self, stepName: str,
-             screenshot: bool = False,
-             browserLog: bool = False,
              alarm: bool = False,
              ignore: bool = False):
         with allure.step(stepName):
             try:
                 yield
             except Exception as e:
-                self.takeScreenshot()
-                if screenshot and self.driver:
-                    allure.attach(self.screenshot,
-                                  name=stepName,
-                                  attachment_type=AttachmentType.PNG)
-                if browserLog:
-                    self.gatherBrowserLogs()
-                if alarm:
-                    self.sendToTelegram(stepName, e)
-                if self.logger:
-                    self.logger.critical(f"{self.header}|{stepName}|" + str(e))
                 if ignore is not True:
-                    raise Exception(e)
+                    if alarm:
+                        self.sendToTelegram(stepName, e)
+                    if self.logger:
+                        self.logger.critical(f"{self.header}|{stepName}|" + str(e))
+                raise Exception(e)
