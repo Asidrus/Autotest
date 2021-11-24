@@ -42,7 +42,7 @@ def test_pageStatus(request, data, isLastTry):
                         logger=logger,
                         telegram=Client(TelegramIP, TelegramPORT),
                         debug=int(request.config.getoption("--fDebug")))
-    with reporter.step(f'Connect to {url}', True, not isLastTry):
+    with reporter.step(f'Connect to {url}', alarm=True, ignore=not isLastTry):
         response = requests.get(url, timeout=15)
-    with reporter.step(f'{url} Check status-code {response.status_code}', True, not isLastTry):
+    with reporter.step(f'{url} Check status-code {response.status_code}', True, alarm=True, ignore=not isLastTry):
         assert codes[response.status_code // 100]

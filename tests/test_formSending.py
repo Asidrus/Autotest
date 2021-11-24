@@ -4,9 +4,7 @@ import asyncio
 import allure
 import os
 from datetime import datetime, timedelta
-
 import pytest
-
 from config import autotest_results, TelegramIP, TelegramPORT
 from libs.network import Client
 from libs.aioparser import aioparser
@@ -68,7 +66,6 @@ def pytest_generate_tests(metafunc):
     result = [(item["url"], item["data-test"]) for item in Data["data"]]
     metafunc.parametrize("url, data", result)
     metafunc.parametrize("reruns, rerunInfo", [(reruns, rerunInfo)])
-    # parametrize the webdriver
     metafunc.parametrize("setup_driver", [{
         "remoteIP": "80.87.200.64",
         "remotePort": 4444
@@ -87,15 +84,16 @@ def test_formSending(request, setup_driver, url, data, isLastTry):
                         telegram=Client(TelegramIP, TelegramPORT),
                         debug=int(request.config.getoption("--fDebug")))
     page = PageForm(setup_driver)
-    with reporter.allure_step("Добавление cookie"):
+    with reporter.allure_step("Добавление cookie", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.addCookie(url, {"name": "metric_off", "value": "1"})
-    with reporter.allure_step(f"Переход на страницу {url=}", True, True, not isLastTry):
+    with reporter.allure_step(f"Переход на страницу {url=}", screenshot=True, browserLog=True, alarm=True,
+                              ignore=not isLastTry):
         page.getPage(url)
-    with reporter.allure_step("Инициализация формы", True, True, not isLastTry):
+    with reporter.allure_step("Инициализация формы", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.findform(xpath={"tag": "form", "data-test": datatest})
-    with reporter.allure_step("Отправка заявки", True, True, True):
+    with reporter.allure_step("Отправка заявки", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         confirmation = page.Test()
-    with reporter.allure_step(f"Проверка результата", True, False, not isLastTry):
+    with reporter.allure_step(f"Проверка результата", screenshot=True, alarm=True, ignore=not isLastTry):
         if confirmation:
             assert True
         else:
