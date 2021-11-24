@@ -38,7 +38,7 @@ class aioparser:
         self.fname_appendix = "_adaptive" if adaptive == True else ""
         fname = autotest_results + "/" + site.replace('https://', '').replace('.ru', '') + self.fname_appendix + "_links.json"
         if (not parse) and os.path.exists(fname) and (
-                (datetime.fromtimestamp(os.path.getmtime(fname)) - datetime.now()) < timedelta(days=1)):
+                (datetime.now() - datetime.fromtimestamp(os.path.getmtime(fname))) < timedelta(hours=23)):
             self.readfile(fname)
         else:
             print(f"Файл {fname} не найден или страрый, начинаем парсинг ссылок, наливайте кофе... это надолго")

@@ -71,3 +71,11 @@ async def db(request):
     yield connection
     await connection.close()
 
+
+@pytest.fixture(scope='function')
+def isLastTry(reruns, rerunInfo, data):
+    if data in rerunInfo.keys():
+        rerunInfo[data] = rerunInfo[data] + 1
+    else:
+        rerunInfo[data] = 0
+    return reruns == rerunInfo[data]

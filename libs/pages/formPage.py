@@ -1,3 +1,4 @@
+import re
 from time import time
 from libs.pages.page import Page
 from libs.pages.testpage import TestPage
@@ -14,14 +15,14 @@ class Form:
     isready = True
 
     __emailDefault__ = "tester_form@gaps.edu.ru"
-    __phoneDefault__ = "71234567890"
+    __phoneDefault__ = "81234567890"
     __nameDefault__ = "Автотест"
 
     _email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
                "name": ["email", "e-mail"]}
     _phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
     _name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
-    confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется"]
+    confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется", "отправлен"]
 
 
 class PageForm(Page):
@@ -73,8 +74,13 @@ class PageForm(Page):
 
     def fillForm(self):
         self.fill(self.form.__nameDefault__, input=self.form.name)
-        # if self.attribute(self.form.phone, 'placeholder'):
-        self.fill(self.form.__phoneDefault__, input=self.form.phone)
+
+        self.fill(self.form.__phoneDefault__, self.form.phone)
+        self.sleep()
+        value = ''.join(re.findall('[0-9]+', self.attribute(self.form.phone, 'value')))
+        if value != self.form.__phoneDefault__:
+            self.fill(self.form.__phoneDefault__[1:], self.form.phone)
+
         if self.form.email is not None:
             self.fill(self.form.__emailDefault__, input=self.form.email)
         button = self.findElement(xpath=".//button", element=self.form.granddad)

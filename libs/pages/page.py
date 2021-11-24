@@ -130,13 +130,7 @@ class Page:
                 elem = self.findElement(self.__data2xpath__(xpath))
             else:
                 raise Exception("Elem или xpath не должны быть None")
-        # try:
-        #     WebDriverWait(self.driver, self.TIMEOUT, self.STEPTIME).until(
-        #         lambda: elem.click()
-        #     )
-        #     elem.click()
-        # except:
-        #     Exception(f"Не удалось кликнуть на элемент {self.__data2xpath__(self.attributes(elem))}, {elem}")
+        self.driver.execute_script(f"window.scrollTo(0, {elem.location['y']-400})")
         start = time()
         while time() - start < self.TIMEOUT:
             try:
