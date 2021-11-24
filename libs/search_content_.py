@@ -58,7 +58,7 @@ async def searcher(links, pattern, encoding):
 
 def main(site, encoding, pattern):
     parser = aioparser()
-    parser.getAllUrls(site, adaptive=True)
+    parser.getAllUrls(site, adaptive=False)
     res = asyncio.run(searcher(parser.links, pattern, encoding))
 
     with open(autotest_results + f"/{site.replace('https://', '').replace('https://', '')}{fname_appendix}_result.json",
