@@ -45,5 +45,4 @@ def test_pageStatus(request, data, isLastTry):
     with reporter.step(f'Connect to {url}', alarm=True, ignore=not isLastTry):
         response = requests.get(url, timeout=15)
     with reporter.step(f'{url} Check status-code {response.status_code}', alarm=True, ignore=not isLastTry):
-        raise Exception('ломаю')
         assert codes[response.status_code // 100]

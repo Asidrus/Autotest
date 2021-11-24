@@ -94,5 +94,4 @@ def test_formSending(request, setup_driver, url, data, isLastTry):
     with reporter.allure_step("Отправка заявки", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         confirmation = page.Test()
     with reporter.allure_step(f"Проверка результата", screenshot=True, alarm=True, ignore=not isLastTry):
-        raise Exception('ломаю форму')
         assert confirmation, "Не найднено сообщение об успешной отправки"
