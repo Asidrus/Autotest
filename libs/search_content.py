@@ -34,27 +34,30 @@ async def searcher(links, pattern, encoding):
     async with aiohttp.ClientSession() as session:
         i = 0
         for link in links:
-            # менять
-            async with session.get(link["url"], headers=headers) as response:
-                print(i / len(links) * 100.0)
-                i = i + 1
-                parser = etree.HTMLParser()
-                content = await response.content.read()
-                txt = content.decode(encoding, errors='ignore')
-                for p in pattern:
-                    if p in txt.lower():
-                        if p == "рассрочка":
-                            # менять
-                            if len([el for el in find_all(txt.lower(), p)]) < 3:
-                                continue
-                        if p in ["справк", "копи", "продлить", "увеличить", "рассрочка"]:
-                            if any([(el in link["url"]) for el in ["/seminar", "/anons"]]):
-                                continue
-                        if p == "4000":
-                            if (len([el for el in find_all(txt.lower(), p)]) == 1) and ("}, 4000" in txt.lower()):
-                                continue
-                        res[p].append(link["url"])
-                        print({p: link["url"]})
+            try:
+                # менять
+                async with session.get(link["url"]) as response:
+                    print(i / len(links) * 100.0)
+                    i = i + 1
+                    parser = etree.HTMLParser()
+                    content = await response.content.read()
+                    txt = content.decode(encoding, errors='ignore')
+                    for p in pattern:
+                        if p in txt.lower():
+                            if p == "рассрочка":
+                                # менять
+                                if len([el for el in find_all(txt.lower(), p)]) < 3:
+                                    continue
+                            if p in ["справк", "копи", "продлить", "увеличить", "рассрочка"]:
+                                if any([(el in link["url"]) for el in ["/seminar", "/anons"]]):
+                                    continue
+                            if p == "4000":
+                                if (len([el for el in find_all(txt.lower(), p)]) == 1) and ("}, 4000" in txt.lower()):
+                                    continue
+                            res[p].append(link["url"])
+                            print({p: link["url"]})
+            except Exception as e:
+                print(f"Error {e}")
     return res
 
 

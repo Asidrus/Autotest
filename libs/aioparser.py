@@ -69,20 +69,23 @@ class aioparser:
         async with aiohttp.ClientSession() as session:
             for link in self.takeLink():
                 print(link["url"])
-                async with session.get(link["url"]) as response:
-                    if "text/html" not in response.headers["Content-Type"]:
-                        continue
-                    html = await response.text("utf-8", errors="ignore")
-                    tree = etree.parse(StringIO(html), parser=self.parser)
-                    a_tags = tree.xpath("//a[@href]")
-                    for a in a_tags:
-                        url = a.get("href", "")
-                        if url in ("", "/", link["url"], link["url"] + "/", link["url"].replace(site, "")) or ("#" in url) or ("?" in url):
+                try:
+                    async with session.get(link["url"], allow_redirects=True) as response:
+                        if "text/html" not in response.headers["Content-Type"]:
                             continue
-                        if url.startswith("/"):
-                            url = site + url
-                            putInDict(url, link, self.links)
-                        elif url.startswith("http"):
-                            putInDict(url, link, self.redirect)
-                        else:
-                            putInDict(url, link, self.others)
+                        html = await response.text("utf-8", errors="ignore")
+                        tree = etree.parse(StringIO(html), parser=self.parser)
+                        a_tags = tree.xpath("//a[@href]")
+                        for a in a_tags:
+                            url = a.get("href", "")
+                            if url in ("", "/", link["url"], link["url"] + "/", link["url"].replace(site, "")) or ("#" in url) or ("?" in url):
+                                continue
+                            if url.startswith("/"):
+                                url = site + url
+                                putInDict(url, link, self.links)
+                            elif url.startswith("http"):
+                                putInDict(url, link, self.redirect)
+                            else:
+                                putInDict(url, link, self.others)
+                except Exception as e:
+                    print(f'Error {e}')
