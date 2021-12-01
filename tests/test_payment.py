@@ -36,7 +36,7 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.flaky(reruns=reruns)
 def test_pageStatus(request, setup_driver, data, isLastTry):
     url = data
-    reporter = Reporter(header=__alarm,
+    reporter = Reporter(header=__alarm+'\nАдаптив:' if request.config.getoption("--fDebug") else __alarm,
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),
