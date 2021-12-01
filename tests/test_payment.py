@@ -36,7 +36,10 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.flaky(reruns=reruns)
 def test_pageStatus(request, setup_driver, data, isLastTry):
     url = data
-    reporter = Reporter(header=__alarm+'\nАдаптив:' if request.config.getoption("--fDebug") else __alarm,
+    alarm = __alarm+'\nАдаптив:' if request.config.getoption("--fDebug") else __alarm
+    alarm += "\n" + url
+
+    reporter = Reporter(header=alarm,
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),
@@ -44,6 +47,7 @@ def test_pageStatus(request, setup_driver, data, isLastTry):
     page = Page(setup_driver)
     with reporter.allure_step('Переход на страницу', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.getPage(url)
+        raise Exception('ломаю')
     with reporter.allure_step('Поиск H1', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.findElement('//H1')
     with reporter.allure_step('Поиск form', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
