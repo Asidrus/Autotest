@@ -1,119 +1,119 @@
 import json
 import os
-from case import *
+# from case import *
 import smtplib
 from lxml import etree
 from io import StringIO
 import requests
 
-path = os.path.abspath(os.getcwd())
-
-
+# path = os.path.abspath(os.getcwd())
+#
+#
 def DataToXpath(data):
     atts = ''
     for att in data["attrib"].keys():
         atts = atts + f" and @{att}='{data['attrib'][att]}'"
     atts = '[' + atts[5:] + ']'
     return f"//{data['tag']}{atts}"
-
-
-def str2list(text):
-    txt = []
-    while True:
-        ind = text.find("\n")
-        if ind >= 0:
-            if ind != 0:
-                txt.append(text[:ind])
-            text = text[ind + 1:]
-        else:
-            txt.append(text)
-            break
-    return txt
-
-
-def compareLists(list1, list2):
-    l1 = list1.copy()
-    l2 = list2.copy()
-    for l in list1:
-        if l in l2:
-            l2.remove(l)
-    for l in list2:
-        if l in l1:
-            l1.remove(l)
-    return l1, l2
-
-
-def sendReportOnEmail(to: str, title, msg):
-    # login = "tester3@gaps.edu.ru"
-    # password = None
-    # server = "smtp.yandex.ru"
-    login = ""
-    password = ""
-    server = "smtp.gmail.com"
-    if True:
-        smtp = smtplib.SMTP_SSL(server, 465)
-        smtp.login(login, password)
-    else:
-        smtp = smtplib.SMTP(server, 587)
-        smtp.starttls()
-        smtp.login(login, password)
-
-    message = f"From: {login}\r\nTo: {to}\r\nContent-Type: text/plain; charset='utf-8'\r\nSubject: {title}\r\n\r\n" + msg
-    smtp.sendmail(login, to, msg.encode("utf8"))
-    smtp.quit()
-
-
-class ErrorParser:
-    IsCorrect = 0
-    IncorrectName = 1
-    IncorrectPhone = 2
-    IncorrectEmail = 3
-    NotAllFieldsAreFilled = 4
-
-    def __init__(self):
-        self.typeError = {
-            "name": self.IncorrectName,
-            "phone": self.IncorrectPhone,
-            "email": self.IncorrectEmail
-        }
-
-    def ParseError(self, texterror):
-
-        Errors = list()
-        TextError = str.lower(texterror)
-        if len(TextError) > 0:
-            if ("звезд" in TextError) | ("звёзд" in TextError):
-                Errors.append(self.NotAllFieldsAreFilled)
-            if "имя" in TextError:
-                Errors.append(self.IncorrectName)
-            if ("номер" in TextError) | ("телеф" in TextError):
-                Errors.append(self.IncorrectPhone)
-            if ("email" in TextError) | ("e-mail" in TextError):
-                Errors.append(self.IncorrectEmail)
-        else:
-            Errors.append(self.IsCorrect)
-        return Errors
-
-
-def genCasesForFormValidation(fname):
-    with open(fname, "r") as read_file:
-        Data = json.load(read_file)
-    Cases = {}
-    for url in Data["Tests"]:
-        for form in url["form"]:
-            for valid in form["valid"]:
-                try:
-                    if Cases[valid] is None:
-                        pass
-                except:
-                    Cases[valid] = ReadCases(**Data["Cases"][valid])
-                for case in Cases[valid]:
-                    yield {
-                        "url": url["url"],
-                        "xpath": form["xpath"],
-                        "valid": valid,
-                        "case": case
-                    }
+#
+#
+# def str2list(text):
+#     txt = []
+#     while True:
+#         ind = text.find("\n")
+#         if ind >= 0:
+#             if ind != 0:
+#                 txt.append(text[:ind])
+#             text = text[ind + 1:]
+#         else:
+#             txt.append(text)
+#             break
+#     return txt
+#
+#
+# def compareLists(list1, list2):
+#     l1 = list1.copy()
+#     l2 = list2.copy()
+#     for l in list1:
+#         if l in l2:
+#             l2.remove(l)
+#     for l in list2:
+#         if l in l1:
+#             l1.remove(l)
+#     return l1, l2
+#
+#
+# def sendReportOnEmail(to: str, title, msg):
+#     # login = "tester3@gaps.edu.ru"
+#     # password = None
+#     # server = "smtp.yandex.ru"
+#     login = ""
+#     password = ""
+#     server = "smtp.gmail.com"
+#     if True:
+#         smtp = smtplib.SMTP_SSL(server, 465)
+#         smtp.login(login, password)
+#     else:
+#         smtp = smtplib.SMTP(server, 587)
+#         smtp.starttls()
+#         smtp.login(login, password)
+#
+#     message = f"From: {login}\r\nTo: {to}\r\nContent-Type: text/plain; charset='utf-8'\r\nSubject: {title}\r\n\r\n" + msg
+#     smtp.sendmail(login, to, msg.encode("utf8"))
+#     smtp.quit()
+#
+#
+# class ErrorParser:
+#     IsCorrect = 0
+#     IncorrectName = 1
+#     IncorrectPhone = 2
+#     IncorrectEmail = 3
+#     NotAllFieldsAreFilled = 4
+#
+#     def __init__(self):
+#         self.typeError = {
+#             "name": self.IncorrectName,
+#             "phone": self.IncorrectPhone,
+#             "email": self.IncorrectEmail
+#         }
+#
+#     def ParseError(self, texterror):
+#
+#         Errors = list()
+#         TextError = str.lower(texterror)
+#         if len(TextError) > 0:
+#             if ("звезд" in TextError) | ("звёзд" in TextError):
+#                 Errors.append(self.NotAllFieldsAreFilled)
+#             if "имя" in TextError:
+#                 Errors.append(self.IncorrectName)
+#             if ("номер" in TextError) | ("телеф" in TextError):
+#                 Errors.append(self.IncorrectPhone)
+#             if ("email" in TextError) | ("e-mail" in TextError):
+#                 Errors.append(self.IncorrectEmail)
+#         else:
+#             Errors.append(self.IsCorrect)
+#         return Errors
+#
+#
+# def genCasesForFormValidation(fname):
+#     with open(fname, "r") as read_file:
+#         Data = json.load(read_file)
+#     Cases = {}
+#     for url in Data["Tests"]:
+#         for form in url["form"]:
+#             for valid in form["valid"]:
+#                 try:
+#                     if Cases[valid] is None:
+#                         pass
+#                 except:
+#                     Cases[valid] = ReadCases(**Data["Cases"][valid])
+#                 for case in Cases[valid]:
+#                     yield {
+#                         "url": url["url"],
+#                         "xpath": form["xpath"],
+#                         "valid": valid,
+#                         "case": case
+#                     }
 
 
 def GenData(urls):
