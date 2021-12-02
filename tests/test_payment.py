@@ -1,9 +1,6 @@
 from config import *
-from conftest import db_connection
 import allure
 import pytest
-import asyncio
-import requests
 from libs.network import Client
 from libs.reporter import Reporter
 from libs.pages.page import Page
@@ -26,7 +23,8 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("reruns, rerunInfo", [(reruns, rerunInfo)])
     metafunc.parametrize("setup_driver", [{
         "remoteIP": "80.87.200.64",
-        "remotePort": 4444
+        "remotePort": 4444,
+        "executablePath": './chromedriver'
     }], indirect=True)
 
 
