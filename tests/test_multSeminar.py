@@ -26,7 +26,8 @@ urls = ["https://niidpo.ru/seminar/4813",
         "https://urgaps.ru/anons/8919",
         "https://adpo.edu.ru/seminar/5146",
         "https://adpo.edu.ru/anons/8920",
-
+        "https://vgaps.ru/seminar/43",
+        "https://vgaps.ru/anons/8670",
         ]
 
 
@@ -35,7 +36,8 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("reruns, rerunInfo", [(reruns, rerunInfo)])
     metafunc.parametrize("setup_driver", [{
         "remoteIP": "80.87.200.64",
-        "remotePort": 4444
+        "remotePort": 4444,
+        "executablePath": './chromedriver'
     }], indirect=True)
 
 
