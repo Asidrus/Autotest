@@ -9,7 +9,7 @@ from libs.reporter import Reporter
 from libs.pages.page import Page
 
 suite_name = "Мониторинг сайтов"
-test_name = "Защита от Чеибиева"
+test_name = "Защита от Чесебиева"
 severity = "Сritical"
 __alarm = f"{severity}: {suite_name}: {test_name}: "
 
