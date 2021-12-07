@@ -83,7 +83,10 @@ class PageForm(Page):
 
         if self.form.email is not None:
             self.fill(self.form.__emailDefault__, input=self.form.email)
-        button = self.findElement(xpath=".//button", element=self.form.granddad)
+        try:
+            button = self.findElement(xpath=".//button", element=self.form.granddad)
+        except:
+            button = self.findElement(xpath=".//input[@type='submit']", element=self.form.granddad)
         self.click(elem=button)
 
     def waitEvaluation(self, text_before, timeout=10, delta=0.25):

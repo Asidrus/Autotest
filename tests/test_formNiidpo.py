@@ -94,3 +94,34 @@ def test_orderForm(request, setup_driver, isLastTry):
         confirmation = page.Test()
     with reporter.allure_step(f"Проверка результата", screenshot=True, alarm=True, ignore=not isLastTry):
         assert confirmation, "Не найднено сообщение об успешной отправки"
+
+
+@allure.feature(suite_name)
+@allure.story(test_name)
+@allure.severity(severity)
+@pytest.mark.flaky(reruns=reruns)
+def test_oldForm(request, setup_driver, isLastTry):
+    button = "//div[@class='but_request copy_request']"
+    form = "//form[@id='form_request']" if request.config.getoption("--adaptive") else "//form[@id='order-form-2']"
+    url = "https://niidpo.ru/seminar/9570"
+
+    reporter = Reporter(header=__alarm+f"\n{url=}\n{form=}",
+                        logger=logger,
+                        webdriver=setup_driver,
+                        telegram=Client(TelegramIP, TelegramPORT),
+                        debug=int(request.config.getoption("--fDebug")))
+
+    page = PageForm(setup_driver)
+    with reporter.allure_step("Добавление cookie", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
+        page.addCookie(url, {"name": "metric_off", "value": "1"})
+    with reporter.allure_step(f"Переход на страницу {url=}", screenshot=True, browserLog=True, alarm=True,
+                              ignore=not isLastTry):
+        page.getPage(url)
+    with reporter.allure_step("Инициализация формы", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
+        if request.config.getoption("--adaptive"):
+            page.click(xpath=button)
+        page.findform(xpath=form)
+    with reporter.allure_step("Отправка заявки", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
+        confirmation = page.Test()
+    with reporter.allure_step(f"Проверка результата", screenshot=True, alarm=True, ignore=not isLastTry):
+        assert confirmation, "Не найднено сообщение об успешной отправки"
