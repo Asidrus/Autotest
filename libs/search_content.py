@@ -109,13 +109,9 @@ class aioparser:
     async def parsing(self):
         async with aiohttp.ClientSession() as session:
             for link in self.takeLink():
-                #
-                # if 'seminar' not in link["url"]:
-                #     continue
-                #
                 print(link["url"])
                 try:
-                    async with session.get(link["url"], headers=headers) as response:
+                    async with session.get(link["url"]) as response:
                         header = response.headers["Content-Type"]
                         if "text/html" not in header:
                             continue
@@ -131,7 +127,7 @@ class aioparser:
                         except Exception as e:
                             print(f"Ошибка в парсинге {e} {link['url']}")
                         try:
-                            if self.pattern:
+                            if self.pattern and ('seminar' in link['url']):
                                 await self.search(html, link)
                         except Exception as e:
                             print(f"Ошибка в поиске {e} {link['url']}")
@@ -156,34 +152,33 @@ class aioparser:
                 putInDict(url, link, self.links['resources'])
 
     async def search(self, html, link):
-        html = html.lower()
         soup = BeautifulSoup(html, "lxml")
         html1 = soup.find('div', attrs={'id': 'block_content'})
         html2 = soup.find('div', attrs={'class': 'slick-track'})
         html3 = soup.find('div', attrs={'class': 'course-objective-inf'})
-        html4 = soup.find('div', attrs={'class': 'header-icons22'})
         for p in self.pattern:
-            if p.lower() in (str(html1)+str(html2)+str(html3)+str(html4)).lower():
+            if p.lower() in (str(html1)+str(html2)+str(html3)).lower():
                 self.result[p].append(link["url"])
                 print({p: link["url"]})
 
-async def main():
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://niidpo.ru/seminar/4178') as response:
-            header = response.headers["Content-Type"]
-            if "text/html" not in header:
-                return 0
-            encoding = header[header.find("=") + 1:]
-            html = await response.text(encoding, errors="ignore")
-            html = html.lower()
-            soup = BeautifulSoup(html, "lxml")
-            html1 = soup.find('div', attrs={'id': 'block_content'})
-            html2 = soup.find('div', attrs={'class': 'slick-track'})
-            html3 = soup.find('div', attrs={'class': 'course-objective-inf'})
-            html4 = soup.find('div', attrs={'class': 'header-icons22'})
-            for p in ['бессрочн', 'библиоклуб', 'biblioclub']:
-                if p.lower() in (str(html1)+str(html2)+str(html3)+str(html4)).lower():
-                    print(p)
+# async def main():
+#     async with aiohttp.ClientSession() as session:
+#         async with session.get('https://niidpo.ru/seminar/3849') as response:
+#             header = response.headers["Content-Type"]
+#             if "text/html" not in header:
+#                 return 0
+#             encoding = header[header.find("=") + 1:]
+#             html = await response.text(encoding, errors="ignore")
+#             html = html.lower()
+#             soup = BeautifulSoup(html, "lxml")
+#             html1 = soup.find('div', attrs={'id': 'block_content'})
+#             html2 = soup.find('div', attrs={'class': 'slick-track'})
+#             html3 = soup.find('div', attrs={'class': 'course-objective-inf'})
+#             html4 = soup.find('div', attrs={'class': 'header-icons22'})
+#
+#             for p in ['бессрочн', 'библиоклуб', 'biblioclub']:
+#                 if p.lower() in (str(html1)+str(html2)+str(html3)+str(html4)).lower():
+#                     print(p)
 
 
 
