@@ -161,28 +161,8 @@ class aioparser:
                 self.result[p].append(link["url"])
                 print({p: link["url"]})
 
-# async def main():
-#     async with aiohttp.ClientSession() as session:
-#         async with session.get('https://niidpo.ru/seminar/3849') as response:
-#             header = response.headers["Content-Type"]
-#             if "text/html" not in header:
-#                 return 0
-#             encoding = header[header.find("=") + 1:]
-#             html = await response.text(encoding, errors="ignore")
-#             html = html.lower()
-#             soup = BeautifulSoup(html, "lxml")
-#             html1 = soup.find('div', attrs={'id': 'block_content'})
-#             html2 = soup.find('div', attrs={'class': 'slick-track'})
-#             html3 = soup.find('div', attrs={'class': 'course-objective-inf'})
-#             html4 = soup.find('div', attrs={'class': 'header-icons22'})
-#
-#             for p in ['бессрочн', 'библиоклуб', 'biblioclub']:
-#                 if p.lower() in (str(html1)+str(html2)+str(html3)+str(html4)).lower():
-#                     print(p)
-
-
 
 if __name__ == '__main__':
-    parser = aioparser('https://niidpo.ru', ['бессрочн', 'библиоклуб', 'biblioclub'], parse=True)
+    parser = aioparser('https://niidpo.ru', ['3 мес', '4000'], parse=True)
     asyncio.run(parser.run())
     # asyncio.run(main())
