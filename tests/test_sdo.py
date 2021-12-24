@@ -70,10 +70,7 @@ def waitResponse(request, timeout=10, delta=0.25):
 def pytest_generate_tests(metafunc):
     metafunc.parametrize("setup_driver_new", [{
         "remoteIP": "80.87.200.64",
-        "remotePort": 4444
-    }], indirect=True)
-
-
+        "remotePort": 4444ма н
 @allure.feature(suite_name)
 @allure.story(test_name)
 @allure.severity(severity)

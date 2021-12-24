@@ -35,7 +35,7 @@ async def seekForms(urls):
                     continue
                 html = await response.text("utf-8", errors="ignore")
                 tree = etree.parse(StringIO(html), parser=parser)
-                forms = tree.xpath("//form[@data-test]")
+                forms = tree.xpath("//*[@data-test]")
                 for el in forms:
                     datatest = el.attrib["data-test"]
                     if not any([(datatest == d["data-test"]) for d in data]):
@@ -68,7 +68,8 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("reruns, rerunInfo", [(reruns, rerunInfo)])
     metafunc.parametrize("setup_driver", [{
         "remoteIP": "80.87.200.64",
-        "remotePort": 4444
+        "remotePort": 4444,
+        "executablePath": "/home/evgenii/autotest/Autotest/chromedriver"
          }], indirect=True)
 
 
@@ -90,7 +91,7 @@ def test_formSending(request, setup_driver, url, data, isLastTry):
                               ignore=not isLastTry):
         page.getPage(url)
     with reporter.allure_step("Инициализация формы", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
-        page.findform(xpath={"tag": "form", "data-test": datatest})
+        page.findform(xpath={"tag": "*", "data-test": datatest})
     with reporter.allure_step("Отправка заявки", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         confirmation = page.Test()
     with reporter.allure_step(f"Проверка результата", screenshot=True, alarm=True, ignore=not isLastTry):
