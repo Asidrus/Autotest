@@ -161,11 +161,6 @@ class aioparser:
         except:
             pass
 
-        # for p in self.pattern:
-        #     if p.lower() in (str(html)+str(html2)+str(html3)).lower():
-        #         self.result[p].append(link["url"])
-        #         print({p: link["url"]})
-
 
 def main():
     import requests
