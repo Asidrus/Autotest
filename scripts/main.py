@@ -5,7 +5,7 @@ sys.path.append("/home/kali/autotest/")
 
 from libs.aioparser import aioparser
 parser = aioparser()
-parser.getAllUrls('https://distant-college.ru')
+parser.getAllUrls('https://vgaps.ru')
 
 data = GenData([link['url'] for link in parser.links])
 

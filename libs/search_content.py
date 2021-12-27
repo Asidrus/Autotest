@@ -109,9 +109,9 @@ class aioparser:
     async def parsing(self):
         async with aiohttp.ClientSession() as session:
             for link in self.takeLink():
-                print(link["url"])
+                # print(link["url"])
                 try:
-                    async with session.get(link["url"]) as response:
+                    async with session.get(link["url"], headers=headers) as response:
                         header = response.headers["Content-Type"]
                         if "text/html" not in header:
                             continue
@@ -153,16 +153,32 @@ class aioparser:
 
     async def search(self, html, link):
         soup = BeautifulSoup(html, "lxml")
-        html1 = soup.find('div', attrs={'id': 'block_content'})
-        html2 = soup.find('div', attrs={'class': 'slick-track'})
-        html3 = soup.find('div', attrs={'class': 'course-objective-inf'})
-        for p in self.pattern:
-            if p.lower() in (str(html1)+str(html2)+str(html3)).lower():
-                self.result[p].append(link["url"])
-                print({p: link["url"]})
+        a_tag = soup.find('div', attrs={'class': 'header-elems_logo'}).find("a")
+        try:
+            res = a_tag.find("a")
+            self.result["a"].append(link["url"])
+            print(link["url"])
+        except:
+            pass
+
+        # for p in self.pattern:
+        #     if p.lower() in (str(html)+str(html2)+str(html3)).lower():
+        #         self.result[p].append(link["url"])
+        #         print({p: link["url"]})
+
+
+def main():
+    import requests
+    res = requests.get("https://niidpo.ru/news/1044", headers=headers)
+    html = res.text
+    if '<a href="/view/adaptiv/assets/images_5/logo-new5.png">' in html:
+        print('dya')
+    else:
+        print('net')
 
 
 if __name__ == '__main__':
     parser = aioparser('https://niidpo.ru', ['3 мес', '4000'], parse=True)
     asyncio.run(parser.run())
-    # asyncio.run(main())
+    asyncio.run(main())
+    # main()
