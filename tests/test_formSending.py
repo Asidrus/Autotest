@@ -89,7 +89,7 @@ def test_formSending(request, setup_driver, url, data, isLastTry):
                               ignore=not isLastTry):
         page.getPage(url)
     with reporter.allure_step("Инициализация формы", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
-        page.findform(xpath={"tag": "form", "data-test": datatest})
+        page.findform(xpath={"tag": "*", "data-test": datatest})
     with reporter.allure_step("Отправка заявки", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         confirmation = page.Test()
     with reporter.allure_step(f"Проверка результата", screenshot=True, alarm=True, ignore=not isLastTry):

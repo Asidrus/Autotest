@@ -51,11 +51,11 @@ class Reporter:
 
     def sendToTelegram(self, stepName, error):
         try:
-            msg = f'{self.header}\n Step: {stepName}\n Error: {str(error)[:50]}'.replace("'", '"')
+            msg = f'{self.header}Step: {stepName}\nError: {str(error)[:50]}'.replace("'", '').replace('"', '')
             data = {"contentType": 'json',
                     "content": {
                         "msg": msg,
-                        "project": self.__setProject__(msg)
+                        "project": 'debug' if self.debug else self.__setProject__(msg)
                     }}
             # data = {"content": f"{self.header}\nШаг '{stepName}' провален\nОшибка:\n{str(error)[:30]}",
             #         "debug": self.debug,

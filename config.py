@@ -16,8 +16,10 @@ try:
 except:
     print("Файл credentials.py не найден")
 # telegram socket
-TelegramIP = "127.0.0.1"
-TelegramPORT = 1234
+# TelegramIP = "127.0.0.1"
+# TelegramPORT = 1234
+TelegramIP = "192.168.249.3"
+TelegramPORT = 4789
 # selenoid
 selenoid_IP = "80.87.200.64"
 selenoid_port = "4444"

@@ -10,7 +10,6 @@ from libs.reporter import Reporter
 suite_name = "Мониторинг сайтов"
 test_name = "Статус ответа"
 severity = "Сritical"
-__alarm = f"{severity}: {suite_name}: {test_name}: "
 db_name = "speedtest"
 db_data = {"user": db_login, "password": db_password, "database": db_name, "host": db_host}
 
@@ -42,7 +41,7 @@ def test_pageStatus(request, data, isLastTry):
                         logger=logger,
                         telegram=Client(TelegramIP, TelegramPORT),
                         debug=int(request.config.getoption("--fDebug")))
-    with reporter.step(f'Connect to {url}', alarm=True, ignore=not isLastTry):
-        response = requests.get(url, timeout=20)
+    with reporter.step(f'Connect', alarm=True, ignore=not isLastTry):
+        response = requests.get(url, timeout=15)
     with reporter.step(f'Check status-code', alarm=True, ignore=not isLastTry):
         assert codes[response.status_code // 100], f"status-code: {response.status_code}"

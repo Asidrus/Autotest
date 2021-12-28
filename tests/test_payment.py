@@ -47,4 +47,5 @@ def test_pageStatus(request, setup_driver, data, isLastTry):
     with reporter.allure_step('Поиск H1', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.findElement('//H1')
     with reporter.allure_step('Поиск form', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
+        assert False, "роняю оплату"
         page.findElement({'tag': 'form', 'method': 'post', 'id': 'formPayment'})

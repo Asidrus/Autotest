@@ -1,11 +1,18 @@
-import requests
+import sys
+
+sys.path.insert(0, '/home/kali/autotest/')
+from libs.pages.formPage import PageForm
+from libs.webdriver import WebDriver
 
 
-response = requests.post(url='https://division.bakalavr-magistr.ru/orders',
-                         data='month=2021-11&real_crm_id=&filter_division_category_id=&date_from=&date_to=&source=&status_id=&manager_num=1322&phone=&fio=&email=&source_order_num=&del_test_orders_pwd=',
-                         cookies={'_ga': 'GA1.2.1632160139.1634802152', '_ym_uid': '1634802152557629371', '_ym_d':'1634802152',
-                                  'tmr_lvid':'e316a2c7e3478e0c1210d0eedd06a761', 'tmr_lvidTS': '1634802152623', 'tmr_reqNum':'4',
-                                  'PHPSESSID':'3b6bf8dba8754016d7d5905812868426', 'mrm':'71f846e5685d896c65b1905dc1cba8de1000'})
-
-with open('test.html', 'w') as file:
-    file.write(response.content.decode('windows-1251'))
+webdriver = WebDriver(executablePath="/home/kali/autotest/chromedriver",
+                      remote=False,
+                      browser='Chrome')
+webdriver.run()
+print(webdriver.driver)
+url = "https://edu.i-spo.ru"
+page = PageForm(webdriver)
+page.addCookie(url, {"name": "metric_off", "value": "1"})
+page.getPage(url)
+page.findform(xpath={"tag": "*", "data-test": "pop_form"})
+confirmation = page.Test()
