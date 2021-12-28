@@ -34,7 +34,7 @@ async def seekForms(urls):
                     continue
                 html = await response.text("utf-8", errors="ignore")
                 tree = etree.parse(StringIO(html), parser=parser)
-                forms = tree.xpath("//form[@data-test]")
+                forms = tree.xpath("//*[@data-test]")
                 for el in forms:
                     datatest = el.attrib["data-test"]
                     if not any([(datatest == d["data-test"]) for d in data]):

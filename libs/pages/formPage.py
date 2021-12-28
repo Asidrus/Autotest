@@ -9,6 +9,7 @@ class Form:
     name = None
     phone = None
     email = None
+    comment = None
     button = ".//button"
     callButton = None
     # If form if ready for test
@@ -17,11 +18,15 @@ class Form:
     __emailDefault__ = "tester_form@gaps.edu.ru"
     __phoneDefault__ = "81234567890"
     __nameDefault__ = "Автотест"
+    __commentDefault__ = "комментарий"
 
     _email_ = {"class": ["email", "e-mail"], "placeholder": ["email", "e-mail", "email*", "e-mail*"],
                "name": ["email", "e-mail"]}
     _phone_ = {"class": ["phone"], "placeholder": ["телефон", "телефон*"], "name": ["phone"]}
     _name_ = {"class": ["name", "fio"], "placeholder": ["фио", "фио*", "имя", "имя*"], "name": ["name", "fio"]}
+    _comment_ = {"data-title": ["Текст вопроса"],
+                 "placeholder": ["Комментарий или вопрос", "Вопрос*", "Вопрос", "Текст вопроса*"],
+                 "name": ["text", "message"]}
     confirm = ["спасибо", "ваша заявка", "ожидайте", "менеджер", "перезвоним", "свяжется", "отправлен"]
 
 
@@ -30,29 +35,40 @@ class PageForm(Page):
     def findform(self, *args, xpath=None, **kwargs):
         self.form = Form()
         xpath = self.__data2xpath__(xpath)
+
+        try:
+            elem = self.findElement(xpath)
+            data_test = self.attributes(elem)["data-test"]
+            self.form.callButton = f"//button[@data-test='{data_test}']"
+            self.buttonCallPopup = self.findElement(self.form.callButton)
+
+            if self.form.callButton is not None:
+                self.callPopup()
+
+        except Exception as e:
+            pass
+
         if xpath is not None:
+            xpath = xpath.replace('*', 'form')
             self.form.granddad = self.findElement(xpath)
-            args = self.findElements(element=self.form.granddad, xpath=f"({xpath})//input")
+            args = self.findElements(element=self.form.granddad, xpath=f"({xpath})//*")
+            # textarea = self.findElements(element=self.form.granddad, xpath=f"({xpath})//textarea")
+
         self.form.name = self.selectElement(args, self.form._name_)
         self.form.phone = self.selectElement(args, self.form._phone_)
         self.form.email = self.selectElement(args, self.form._email_)
+        self.form.comment = self.selectElement(args, self.form._comment_)
         if self.form.granddad is None:
             self.form.granddad = args[0].find_element("xpath", "..").find_element("xpath", "..").find_element("xpath",
                                                                                                               "..")
-        try:
-            data_test = self.attributes(self.form.granddad)["data-test"]
-            self.form.callButton = f"//button[@data-test='{data_test}']"
-        except Exception as e:
-            pass
-        if any(map(lambda i: i is None, (self.form.name, self.form.phone, self.form.button))):
+
+        if any(map(lambda i: i is None, (self.form.name, self.form.phone, self.form.comment, self.form.button))):
             self.form.isready = False
 
     def Test(self):
         return self.Evaluation()
 
     def Evaluation(self):
-        if self.form.callButton is not None:
-            self.callPopup()
         text_before = self.text(xpath="//body")
         try:
             self.fillForm()
@@ -62,10 +78,6 @@ class PageForm(Page):
         return confirmation
 
     def callPopup(self):
-        try:
-            self.buttonCallPopup = self.findElement(self.form.callButton)
-        except:
-            self.buttonCallPopup = None
         if self.buttonCallPopup:
             try:
                 self.buttonCallPopup.click()
@@ -76,6 +88,7 @@ class PageForm(Page):
         self.fill(self.form.__nameDefault__, input=self.form.name)
 
         self.fill(self.form.__phoneDefault__, self.form.phone)
+
         self.sleep()
         value = ''.join(re.findall('[0-9]+', self.attribute(self.form.phone, 'value')))
         if value != self.form.__phoneDefault__:
@@ -83,10 +96,15 @@ class PageForm(Page):
 
         if self.form.email is not None:
             self.fill(self.form.__emailDefault__, input=self.form.email)
+
+        if self.form.comment is not None:
+            self.fill(self.form.__commentDefault__, input=self.form.comment)
+
         try:
             button = self.findElement(xpath=".//button", element=self.form.granddad)
         except:
             button = self.findElement(xpath=".//input[@type='submit']", element=self.form.granddad)
+
         self.click(elem=button)
 
     def waitEvaluation(self, text_before, timeout=10, delta=0.25):
