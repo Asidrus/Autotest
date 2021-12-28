@@ -14,7 +14,7 @@ from config import logger
 from lxml import etree
 from libs.reporter import Reporter
 
-suite_name = "Проверка отправки заявок с ФОС"
+suite_name = "Мониторинг сайтов"
 test_name = "Проверка отправки заявок с niidpo.ru"
 severity = "Сritical"
 __alarm = f"{severity}: {suite_name}: {test_name}:"
@@ -42,7 +42,7 @@ def test_askPopup(request, setup_driver, isLastTry):
     form = "//form[@id='header_feedback']"
     url = "https://niidpo.ru"
 
-    reporter = Reporter(header=__alarm+f"\n{url=}\n{form=}",
+    reporter = Reporter(header={"Test": test_name, "url": url, "form": form},
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),

@@ -38,11 +38,11 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.flaky(reruns=reruns)
 def test_pageStatus(request, data, isLastTry):
     url = data
-    reporter = Reporter(header=__alarm,
+    reporter = Reporter(header={"Test": test_name, "url": url},
                         logger=logger,
                         telegram=Client(TelegramIP, TelegramPORT),
                         debug=int(request.config.getoption("--fDebug")))
     with reporter.step(f'Connect to {url}', alarm=True, ignore=not isLastTry):
-        response = requests.get(url, timeout=15)
-    with reporter.step(f'{url} Check status-code {response.status_code}', alarm=True, ignore=not isLastTry):
-        assert codes[response.status_code // 100]
+        response = requests.get(url, timeout=20)
+    with reporter.step(f'Check status-code', alarm=True, ignore=not isLastTry):
+        assert codes[response.status_code // 100], f"status-code: {response.status_code}"

@@ -14,10 +14,9 @@ from config import logger
 from lxml import etree
 from libs.reporter import Reporter
 
-suite_name = "Проверка отправки заявок с ФОС"
+suite_name = "Мониторинг сайтов"
 test_name = "Проверка отправки заявок с ФОС"
 severity = "Сritical"
-__alarm = f"{severity}: {suite_name}: {test_name}:"
 
 ignores = ["blockPopupByTrigger", "formAddReview"]
 
@@ -78,7 +77,7 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.flaky(reruns=reruns)
 def test_formSending(request, setup_driver, url, data, isLastTry):
     datatest = data
-    reporter = Reporter(header=__alarm+f"\n{url=}\n{datatest=}",
+    reporter = Reporter(header={"Test": test_name, "url": url, "data-test": datatest},
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),

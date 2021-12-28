@@ -36,7 +36,7 @@ def test_pageStatus(request, setup_driver, data, isLastTry):
     url = data
     alarm = __alarm+'\nАдаптив:' if request.config.getoption("--adaptive") else __alarm
     alarm += "\n" + url
-    reporter = Reporter(header=alarm,
+    reporter = Reporter(header={"Test": test_name, "url": url},
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),

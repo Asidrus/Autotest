@@ -47,10 +47,7 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.flaky(reruns=reruns)
 def test_pageStatus(request, setup_driver, data, isLastTry):
     url = data
-    alarm = __alarm+'\nАдаптив:' if request.config.getoption("--adaptive") else __alarm
-    alarm += "\n" + url
-    reporter = Reporter(header=alarm,
-                        logger=logger,
+    reporter = Reporter(header={"Test": test_name, "url": url, "Adaptive": request.config.getoption("--adaptive")},                        logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),
                         debug=int(request.config.getoption("--fDebug")))
