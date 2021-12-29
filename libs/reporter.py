@@ -37,6 +37,8 @@ class Reporter:
             return "penta"
         elif "psy" in text:
             return "psy"
+        elif "i-spo" in text:
+            return "spo"
         else:
             return ""
 
