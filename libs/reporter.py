@@ -23,6 +23,7 @@ class Reporter:
         self.header = ""
         for key in header.keys():
             self.header = self.header + str(key) + ": " + str(header[key]) + "\n"
+            self.debug = debug
         self.logger = logger
         self.webdriver = webdriver
         if self.webdriver:
@@ -57,10 +58,6 @@ class Reporter:
                         "msg": msg,
                         "project": 'debug' if self.debug else self.__setProject__(msg)
                     }}
-            # data = {"content": f"{self.header}\nШаг '{stepName}' провален\nОшибка:\n{str(error)[:30]}",
-            #         "debug": self.debug,
-            #         "contentType": 'text'}
-
             if self.screenshot:
                 data['image'] = self.screenshot
             asyncio.run(self.telegram.send(**data))
