@@ -76,7 +76,7 @@ def test_orderForm(request, setup_driver, isLastTry):
     form = "//form[@id='order_form']"
     url = "https://niidpo.ru/seminar/4813"
 
-    reporter = Reporter(header=__alarm+f"\n{url=}\n{form=}",
+    reporter = Reporter(header={"Test": test_name, "url": url, "form": form},
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),
@@ -105,7 +105,7 @@ def test_oldForm(request, setup_driver, isLastTry):
     form = "//form[@id='form_request']" if request.config.getoption("--adaptive") else "//form[@id='order-form-2']"
     url = "https://niidpo.ru/seminar/9570"
 
-    reporter = Reporter(header=__alarm+f"\n{url=}\n{form=}",
+    reporter = Reporter(header={"Test": test_name, "url": url, "form": form},
                         logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),
