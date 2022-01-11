@@ -39,7 +39,7 @@ def test_formSending(request, setup_driver, isLastTry, data):
     reporter = Reporter(header={"Test": test_name, "url": url},
                         logger=logger,
                         webdriver=setup_driver,
-                        telegram=Client(TelegramIP, 1234),
+                        telegram=Client("80.87.200.64", 1234),
                         debug=int(request.config.getoption("--fDebug")))
 
     page = Page(webdriver=setup_driver)
