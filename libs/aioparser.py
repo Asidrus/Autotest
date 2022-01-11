@@ -36,7 +36,7 @@ class aioparser:
     def getAllUrls(self, site, parse=False, adaptive=False):
         self.adaptive = adaptive
         self.fname_appendix = "_adaptive" if adaptive == True else ""
-        fname = autotest_results + "/" + site.replace('https://', '').replace('.ru', '') + self.fname_appendix + "_links.json"
+        fname = autotest_results + "/" + site.replace('https://', '').replace('http://', '').replace('.ru', '') + self.fname_appendix + "_links.json"
         if (not parse) and os.path.exists(fname) and (
                 (datetime.now() - datetime.fromtimestamp(os.path.getmtime(fname))) < timedelta(hours=23)):
             self.readfile(fname)
