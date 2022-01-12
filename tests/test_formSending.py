@@ -44,9 +44,9 @@ async def seekForms(urls):
 
 def pytest_generate_tests(metafunc):
     site = metafunc.config.getoption("site")
-    domain = site.replace("https://", "").replace(".ru", "")
+    domain = site.replace("https://", "").replace("http://", "").replace(".ru", "")
     fname = autotest_results + f"/{domain}_form.json"
-
+    print(fname)
     if os.path.exists(fname) and (
             (datetime.now()-datetime.fromtimestamp(os.path.getmtime(fname))) < timedelta(hours=23)):
         with open(fname, "r") as read_file:

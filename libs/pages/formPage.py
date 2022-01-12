@@ -85,7 +85,8 @@ class PageForm(Page):
                 raise Exception(f"Не удалось открыть поп-ап: {e}")
 
     def fillForm(self):
-        self.fill(self.form.__nameDefault__, input=self.form.name)
+        # self.fill(self.form.__nameDefault__, input=self.form.name)
+        self.fill("Автотест "+genName(), input=self.form.name)
 
         self.fill(self.form.__phoneDefault__, self.form.phone)
 
@@ -147,3 +148,14 @@ def compareLists(list1, list2):
         if l in l1:
             l1.remove(l)
     return l1, l2
+
+
+def genName(n=10):
+    import random
+    line = 'абвгдезжийклмнопрстуфхцчшщэюя'
+    line = line+line.upper()
+    res = ''
+    l = len(line)
+    for i in range(n):
+        res = res + line[random.randint(0, l)]
+    return res
