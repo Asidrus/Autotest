@@ -1,4 +1,4 @@
-<img src="https://i.ibb.co/hK1wXdt/image.jpg">
+<img src="https://i.ibb.co/0YNVtZ4/system.jpg">
 <b>Git</b>
 1. Получить обновления с master's ветки:<br>
 <i>git pull</i></br>
