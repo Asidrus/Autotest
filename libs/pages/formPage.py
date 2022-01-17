@@ -157,5 +157,5 @@ def genName(n=10):
     res = ''
     l = len(line)
     for i in range(n):
-        res = res + line[random.randint(0, l)]
+        res = res + line[random.randint(0, l-1)]
     return res
