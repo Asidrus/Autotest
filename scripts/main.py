@@ -5,7 +5,7 @@ sys.path.append("/home/kali/autotest/")
 
 from libs.aioparser import aioparser
 parser = aioparser()
-parser.getAllUrls('https://vgaps.ru')
+parser.getAllUrls('https://mgaps.ru')
 
 data = GenData([link['url'] for link in parser.links])
 
@@ -20,8 +20,8 @@ for form in data:
    if not flag:
        mass.append(form)
 
-with open('forms.json', "w") as file:
-    json.dump({"data": mass}, file)
+with open('mgaps.json', "w", encoding='utf-8') as file:
+    json.dump({"data": mass}, file, indent=4, ensure_ascii=False)
 
 
 

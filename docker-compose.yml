@@ -6,23 +6,13 @@ services:
       context: ./
       dockerfile: Dockerfile
     volumes:
-      - static_volume:/app/website/static
-      - media_volume:/app/website/mediafiles
-    expose:
-      - 8000
+      - ${autotest_results}:/app/autotest-results
+      - ${allure_results}:/app/allure-results
+      - ${localtime}:/etc/localtime:ro
     env_file:
       - ./.env
-  nginx:
-    build: ./nginx
-    volumes:
-      - static_volume:/app/website/static
-      - media_volume:/app/website/mediafiles
-    ports:
-      - 443:80
-    depends_on:
-      - web
 
 volumes:
-  postgres_data:
-  static_volume:
-  media_volume:
+  autotest-results:
+  allure-results:
+  localtime:

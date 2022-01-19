@@ -1,5 +1,5 @@
 FROM continuumio/miniconda3
-WORKDIR /home/tester/autotest/
+WORKDIR /app/autotest/
 RUN mkdir ../autotest-results ../allure-results ../autotest-results/logs
 COPY req.yml ./
 RUN conda env create -f req.yml
