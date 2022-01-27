@@ -20,7 +20,7 @@ reruns = 2
 
 urls = ["https://niidpo.ru/seminar/4813",
         "https://niidpo.ru/seminar/7023",
-        "https://niidpo.ru/anons/9193",
+        "https://niidpo.ru/anons/9913",
         "https://urgaps.ru/seminar/280",
         "https://urgaps.ru/seminar/1676",
         "https://urgaps.ru/anons/8919",
@@ -47,7 +47,8 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.flaky(reruns=reruns)
 def test_pageStatus(request, setup_driver, data, isLastTry):
     url = data
-    reporter = Reporter(header={"Test": test_name, "url": url, "Adaptive": request.config.getoption("--adaptive")},                        logger=logger,
+    reporter = Reporter(header={"Test": test_name, "url": url, "Adaptive": str(request.config.getoption("--adaptive"))},
+                        logger=logger,
                         webdriver=setup_driver,
                         telegram=Client(TelegramIP, TelegramPORT),
                         debug=int(request.config.getoption("--fDebug")))
@@ -56,5 +57,5 @@ def test_pageStatus(request, setup_driver, data, isLastTry):
         page.getPage(url)
     with reporter.allure_step('Поиск H1', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.findElement('//h1')
-    with reporter.allure_step('Поиск form', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step('Поиск H2', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.findElement('//h2')
