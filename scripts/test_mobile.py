@@ -18,12 +18,13 @@ desired_capabilities = {
     "deviceName": "Pixel 5 API 30",
     "app": "/home/kali/autotest/Система обучения АкадемСити_1.5.2_apkcombo.com.apk",
     "automationName": "UiAutomator2",
+    "appium:udid": "emulator-5556"
 }
 
 driver = webdriver.Remote("http://127.0.0.1:4723/wd/hub", desired_capabilities=desired_capabilities)
 
 sleep(5)
-
+driver.save_screenshot("screen1.png")
 inputs = driver.find_elements(By.CLASS_NAME, "android.widget.EditText")
 
 login = inputs[0]
@@ -41,6 +42,7 @@ password.send_keys("123123")
 sleep(0.1)
 button.click()
 sleep(5)
+driver.save_screenshot("screen2.png")
 driver.hide_keyboard()
 sleep(50)
 
