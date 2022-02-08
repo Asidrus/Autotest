@@ -85,7 +85,6 @@ class PageForm(Page):
                 raise Exception(f"Не удалось открыть поп-ап: {e}")
 
     def fillForm(self):
-        # self.fill(self.form.__nameDefault__, input=self.form.name)
         self.fill("Автотест "+genName(), input=self.form.name)
 
         self.fill(self.form.__phoneDefault__, self.form.phone)
