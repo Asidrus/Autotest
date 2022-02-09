@@ -56,6 +56,12 @@ def test_pageStatus(request, setup_driver, data, isLastTry):
     with reporter.allure_step('Переход на страницу', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.getPage(url)
     with reporter.allure_step('Поиск H1', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
-        page.findElement('//h1')
+        try:
+            page.findElement('//h1')
+        except:
+            raise Exception('Заголовок h1, возможно поломана верстка.')
     with reporter.allure_step('Поиск H2', screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
-        page.findElement('//h2')
+        try:
+            page.findElement('//h2')
+        except:
+            raise Exception('Заголовок h2, возможно поломана верстка.')
