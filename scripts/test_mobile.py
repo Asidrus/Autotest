@@ -14,12 +14,13 @@ def findElementFromList(driver, className, attr, value):
 
 desired_capabilities = {
     "platformName": "Android",
-    "platformVersion": "11",
-    "deviceName": "Pixel 5 API 30",
+    "platformVersion": "12",
+    # "deviceName": "Pixel 5 API 30",
     "app": "/home/kali/autotest/Система обучения АкадемСити_1.5.2_apkcombo.com.apk",
     "automationName": "UiAutomator2",
-    "appium:udid": "emulator-5556",
+    # "appium:udid": "emulator-5556",
     # "appium:udid": "first_avd"
+    # "appium:udid": "em-1488",
 }
 
 driver = webdriver.Remote("http://127.0.0.1:4723/wd/hub", desired_capabilities=desired_capabilities)
