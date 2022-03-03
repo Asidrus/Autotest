@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import logging
@@ -38,3 +39,14 @@ listener_months_SSID = {
     10: "1cxBX10S5_NKYk7qpjBjtjBwatb7boosR9qAjeMX86dw",
     11: "1JU7xbBQVN8Fisg4A678okvBn_Z4J6_3pq_VW3HNkwTc"
 }
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ENVlocal = "./.env_local"
+if os.path.exists(ENVlocal):
+    load_dotenv(ENVlocal)
+
+with open("./credentials/sdo.json") as file:
+    SDO_Accounts = json.load(file)
