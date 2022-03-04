@@ -1,7 +1,6 @@
 import re
 from time import time
 from libs.pages.page import Page
-from libs.pages.testpage import TestPage
 
 
 class Form:

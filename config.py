@@ -11,6 +11,7 @@ credentials_path = project_path + "/credentials"
 chromedriver = project_path + "/chromedriver" if sys.platform == "linux" else project_path + "/chromedriver.exe"
 autotest_results = project_path + "/../autotest-results"
 allure_results = project_path + "/../allure-results"
+downloads_path = project_path + "/downloads"
 google_token = credentials_path + "/stable-ring-316114-8acf36454762.json"
 try:
     from credentials.credentials import *
@@ -49,4 +50,5 @@ if os.path.exists(ENVlocal):
     load_dotenv(ENVlocal)
 
 with open("./credentials/sdo.json") as file:
+    # ["SDO/DPO"]["nspk/osek"]["teacher/student"]
     SDO_Accounts = json.load(file)
