@@ -53,7 +53,7 @@ def test_formSending(request, setup_driver, isLastTry, data, reporter):
 
     with reporter.allure_step(f"Скачать лекцию", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.downloadLecture()
-        assert page.findDownloadedFile(), "скачанный файл .pdf с лекцией не найден"
+        assert page.findDownloadedFile('.pdf'), "скачанный файл .pdf с лекцией не найден"
 
     with reporter.allure_step(f"Развернуть лекцию на весь экран", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.backPage()

@@ -1,8 +1,11 @@
 import json
+import os
 from time import sleep, time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+
+from config import downloads_path
 
 
 class Page:
@@ -130,7 +133,7 @@ class Page:
                 elem = self.findElement(self.__data2xpath__(xpath))
             else:
                 raise Exception("Elem или xpath не должны быть None")
-        self.driver.execute_script(f"window.scrollTo(0, {elem.location['y']-400})")
+        self.driver.execute_script(f"window.scrollTo(0, {elem.location['y'] - 400})")
         start = time()
         while time() - start < self.TIMEOUT:
             try:
@@ -167,3 +170,11 @@ class Page:
                     return e
             except:
                 pass
+
+    def findDownloadedFile(self, partOfFile, TimeOut=10):
+        start = time()
+        while (time() - start) < TimeOut:
+            if any(map(lambda x: partOfFile in x, os.listdir(downloads_path))):
+                return True
+            self.sleep()
+        return False

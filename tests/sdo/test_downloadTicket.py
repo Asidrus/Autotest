@@ -51,6 +51,6 @@ def test_formSending(request, setup_driver, isLastTry, data, reporter):
 
     with reporter.allure_step(f"Скачать квитанцию", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.downloadTicket()
-        assert page.findDownloadedFile(), "скачанный файл kvitanzia.rtf с квитанцией не найден"
+        assert page.findDownloadedFile('.rtf'), "скачанный файл kvitanzia.rtf с квитанцией не найден"
 
 

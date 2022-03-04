@@ -20,12 +20,12 @@ class PageLecture(Page):
     def downloadLecture(self):
         self.click(xpath=self.downloadLectureXpath)
 
-    def findDownloadedFile(self):
-        start = time()
-        while (time() - start) < 10:
-            if any(map(lambda x: ".pdf" in x, os.listdir(downloads_path))):
-                return True
-            self.sleep()
+    # def findDownloadedFile(self):
+    #     start = time()
+    #     while (time() - start) < 10:
+    #         if any(map(lambda x: ".pdf" in x, os.listdir(downloads_path))):
+    #             return True
+    #         self.sleep()
 
     def nextPage(self):
         elem = self.findElement(self.nextButtonXpath)
