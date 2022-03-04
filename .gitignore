@@ -3,3 +3,5 @@
 .pytest_cache
 chromedriver
 .env_local
+downloads
+

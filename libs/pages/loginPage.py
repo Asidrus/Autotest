@@ -9,7 +9,6 @@ class PageLogin(Page):
 
     documentsButtonXpath = '//li[contains(@class, "myprograms") and contains(@class, "active")]//span[contains(text(),"Документы")]'
 
-
     def login(self, login, password, checkboxes=None):
         self.fill(login, input=self.selectElement(self.findElements("//input"), self._name_))
         self.fill(password, self.selectElement(self.findElements("//input"), self._password_))

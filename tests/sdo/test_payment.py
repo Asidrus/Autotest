@@ -15,7 +15,7 @@ severity = "Сritical"
 # Rerun config
 
 rerunInfo = {}
-reruns = 0
+reruns = 2
 
 
 def pytest_generate_tests(metafunc):
@@ -37,7 +37,7 @@ def pytest_generate_tests(metafunc):
 def test_formSending(request, setup_driver, isLastTry, data, reporter):
     page = PageLogin(setup_driver)
     page.getPage("https://sdo.i-spo.ru/login/index.php")
-    with reporter.allure_step("Логинимся как студент login", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Логинимся как студент", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.login(**SDO_Accounts["SDO"]["osek"]["student2"], checkboxes=['//input[@id="user_approvement"]'])
 
     with reporter.allure_step(f"Переход в документы:", screenshot=True, alarm=True, ignore=not isLastTry):
