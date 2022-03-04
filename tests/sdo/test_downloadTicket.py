@@ -41,15 +41,15 @@ def test_formSending(request, setup_driver, isLastTry, data, reporter):
     with reporter.allure_step(f"Логинимся как студент", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.login(**SDO_Accounts["SDO"]["osek"]["student2"], checkboxes=['//input[@id="user_approvement"]'])
 
-    with reporter.allure_step(f"Переход в документы:", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Переход в документы:", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.go2documents()
 
     page = PageDocuments(setup_driver)
 
-    with reporter.allure_step(f"Закрываем поп-ап, если есть", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Закрываем поп-ап, если есть", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.closePopUp()
 
-    with reporter.allure_step(f"Скачать квитанцию", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Скачать квитанцию", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.downloadTicket()
         assert page.findDownloadedFile(), "скачанный файл kvitanzia.rtf с квитанцией не найден"
 

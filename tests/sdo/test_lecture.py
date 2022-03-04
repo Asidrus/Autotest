@@ -42,20 +42,20 @@ def test_formSending(request, setup_driver, isLastTry, data, reporter):
 
     page = PageLecture(setup_driver)
 
-    with reporter.allure_step(f"Переход в лекцию", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Переход в лекцию", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.go2lecture()
 
-    with reporter.allure_step(f"Клик на след. страницу", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Клик на след. страницу", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.nextPage()
 
-    with reporter.allure_step(f"Клик на пред. страницу", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Клик на пред. страницу", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.backPage()
 
-    with reporter.allure_step(f"Скачать лекцию", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Скачать лекцию", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.downloadLecture()
         assert page.findDownloadedFile(), "скачанный файл .pdf с лекцией не найден"
 
-    with reporter.allure_step(f"Развернуть лекцию на весь экран", screenshot=True, alarm=True, ignore=not isLastTry):
+    with reporter.allure_step(f"Развернуть лекцию на весь экран", screenshot=True, browserLog=True, alarm=True, ignore=not isLastTry):
         page.backPage()
 
 
