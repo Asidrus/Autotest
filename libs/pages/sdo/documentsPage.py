@@ -1,7 +1,3 @@
-import os
-from time import time
-
-from config import downloads_path
 from libs.pages.page import Page
 
 
@@ -30,10 +26,3 @@ class PageDocuments(Page):
 
     def downloadTicket(self):
         self.click(xpath=self.downloadTicketButton)
-
-    # def findDownloadedFile(self):
-    #     start = time()
-    #     while (time() - start) < 10:
-    #         if any(map(lambda x: ".rtf" in x, os.listdir(downloads_path))):
-    #             return True
-    #         self.sleep()

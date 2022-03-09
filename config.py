@@ -12,6 +12,7 @@ chromedriver = project_path + "/chromedriver" if sys.platform == "linux" else pr
 autotest_results = project_path + "/../autotest-results"
 allure_results = project_path + "/../allure-results"
 downloads_path = project_path + "/downloads"
+uploads_path = project_path + "/files"
 google_token = credentials_path + "/stable-ring-316114-8acf36454762.json"
 try:
     from credentials.credentials import *

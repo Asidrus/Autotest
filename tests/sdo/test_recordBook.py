@@ -4,7 +4,6 @@ Template v 0.1
 import allure
 import pytest
 from libs.pages.loginPage import PageLogin
-from libs.pages.sdo.documentsPage import PageDocuments
 from config import SDO_Accounts
 # Test_name
 
@@ -24,8 +23,8 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize("headers", [{"Test": test_name}])
     metafunc.parametrize("reruns, rerunInfo", [(reruns, rerunInfo)])
     metafunc.parametrize("setup_driver", [{
-        # "remoteIP": "80.87.200.64",
-        # "remotePort": 4444,
+        "remoteIP": "80.87.200.64",
+        "remotePort": 4444,
         "executablePath": "./chromedriver"
     }], indirect=True)
 
