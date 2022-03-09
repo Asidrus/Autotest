@@ -12,6 +12,8 @@ from allure_commons.types import AttachmentType
 from pyvirtualdisplay import Display
 from config import *
 from libs.webdriver import WebDriver
+from libs.reporter import Reporter
+from libs.network import Client
 
 
 def pytest_addoption(parser):
@@ -79,3 +81,14 @@ def isLastTry(reruns, rerunInfo, data):
     else:
         rerunInfo[data] = 0
     return reruns == rerunInfo[data]
+
+
+@pytest.fixture(scope='function')
+def reporter(request, headers, setup_driver):
+    reporter = Reporter(header=headers,
+                        logger=logger,
+                        webdriver=setup_driver,
+                        telegram=Client(TelegramIP, TelegramPORT),
+                        debug=int(request.config.getoption("--fDebug")))
+    yield reporter
+    del reporter
