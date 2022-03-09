@@ -9,7 +9,7 @@ from config import SDO_Accounts
 # Test_name
 
 suite_name = "СДО/НСПК"
-test_name = "Встречу назначить"
+test_name = "Документы по ИУП"
 severity = "Сritical"
 
 # Rerun config
