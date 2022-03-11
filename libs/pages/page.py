@@ -172,9 +172,24 @@ class Page:
                 pass
 
     def findDownloadedFile(self, partOfFile, TimeOut=10):
+        if not self.driver.current_url.startswith("chrome://downloads"):
+            self.driver.get("chrome://downloads/")
         start = time()
         while (time() - start) < TimeOut:
-            if any(map(lambda x: partOfFile in x, os.listdir(downloads_path))):
-                return True
-            self.sleep()
+            files = self.driver.execute_script(
+                "return  document.querySelector('downloads-manager')  "
+                " .shadowRoot.querySelector('#downloadsList')         "
+                " .items.filter(e => e.state === 'COMPLETE')          "
+                " .map(e => e.filePath || e.file_path || e.fileUrl || e.file_url); ")
+            for file in files:
+                if partOfFile in file:
+                    return True
+            self.sleep(1)
         return False
+
+        # start = time()
+        # while (time() - start) < TimeOut:
+        #     if any(map(lambda x: partOfFile in x, os.listdir(downloads_path))):
+        #         return True
+        #     self.sleep()
+        # return False
