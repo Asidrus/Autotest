@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from config import downloads_path
 
+
 class WebDriver:
     adaptive = False
     browser = 'Chrome'
@@ -52,7 +53,7 @@ class WebDriver:
         if self.adaptive:
             self.options.add_argument(
                 '--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"')
-        self.options.add_experimental_option('prefs', {'download.default_directory': downloads_path})
+        # self.options.add_experimental_option('prefs', {'download.default_directory': downloads_path})
 
     def Chrome(self):
         self.options = webdriver.ChromeOptions()
