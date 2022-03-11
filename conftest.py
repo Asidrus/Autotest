@@ -26,7 +26,7 @@ def pytest_addoption(parser):
     parser.addoption("--fDebug", action='store_true', help="Debug flag")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def setup_driver(request):
     opt = lambda o: request.config.getoption(o)
     Driver = WebDriver(invisible=opt("--invisible"),

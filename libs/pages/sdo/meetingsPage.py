@@ -37,7 +37,13 @@ class PageMeetings(Page):
         typeSelect.select_by_visible_text(typeSelect.options[1].text)
 
         self.click(xpath=self.addAttachmentXpath)
-        self.findElement(self.uploadInputXpath).send_keys(uploads_path + "/blank.pdf")
+
+        from selenium.webdriver.remote.file_detector import LocalFileDetector
+
+        input = self.findElement(self.uploadInputXpath)
+        self.driver.execute_script("arguments[0].style.display = 'block';", input)
+        self.driver.file_detector = LocalFileDetector()
+        input.send_keys(uploads_path + "/blank.pdf")
         self.click(xpath=self.uploadThisFileButtonXpath)
 
         self.click(xpath=self.saveButtonXpath)

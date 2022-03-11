@@ -38,7 +38,7 @@ def pytest_generate_tests(metafunc):
 def test_formSending(request, setup_driver, isLastTry, data, reporter):
     page = PageLogin(setup_driver)
     page.getPage("https://sdo.i-college.ru/login/index.php")
-    with reporter.allure_step(f"Логинимся как менеджер УЦ", screenshot=True, browserLog=True, alarm=True,
+    with reporter.allure_step(f"Логинимся как учитель", screenshot=True, browserLog=True, alarm=True,
                               ignore=not isLastTry):
         page.login(**SDO_Accounts["SDO"]["nspk"]["teacher"])
 
